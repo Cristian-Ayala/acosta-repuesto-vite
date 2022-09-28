@@ -73,8 +73,14 @@ export default {
       //     }),
       //     credentials: 'include',
       // };
+      /**
+       * * My man
+       * ! deprecated
+       * ? questions
+       * TODO: Some task
+       */
       try {
-        // const fetchResponse = await fetch("https://www.couchdb.me/_session", settings);
+        // const fetchResponse = await fetch("https://www.couchdb.tk/_session", settings);
         // const data = await fetchResponse.json();
         // console.log(data);
         // this.$router.push({ path: "/" });

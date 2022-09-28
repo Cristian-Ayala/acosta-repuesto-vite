@@ -27,11 +27,11 @@ export default (app) => ({
     PouchDB,
     localProductos: null,
     currentPage: 1,
-    perPage: 5,
+    perPage: 10,
     totalRows: 0,
     optionsPagination: {
       descending: false,
-      limit: 5,
+      limit: 10,
       startkey: null,
       skip: 0,
       selectorFilter: {

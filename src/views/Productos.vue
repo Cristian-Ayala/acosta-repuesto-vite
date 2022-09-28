@@ -34,47 +34,47 @@
               </div>
             </div>
           </div>
-          <el-card 
-            :body-style="{ padding: '0px' }"
-            v-for="prod in productos"
-            :key="prod.upc"
-            >
-            <img
-              :src="prod.doc.foto"
-              class="image"
-            />
-            <div style="padding: 14px">
-              <span>{{ prod.doc.nombreProd }}</span>
-              <div class="bottom">
-                UPC: {{ prod.doc.upc }}<br />
-                P.M.: <b>${{ prod.doc.precioMayoreo }}</b
-                ><br />
-                P.P.: <b>${{ prod.doc.precioPublico }}</b
-                ><br />
-                P.T.: <b>${{ prod.doc.precioTaller }}</b
-                ><br />
-                Stock: {{ prod.doc.stockProd }}<br />
-                Marca: {{ prod.doc.nombreMarca }}<br />
-                Categoria: {{ prod.doc.nombreCategoria }}<br />
-              </div>
-              <el-button type="warning" @click="prodSelected(prod);title = 'Editar producto';show.addEditProdMovile = true" circle>
-                <i class="fas fa-pencil-alt" aria-hidden="true"/>
-              </el-button>
-              <el-button type="danger" @click="prodSelected(prod);show.deleteProduc = true" circle>
-                <i class="fas fa-times" aria-hidden="true"/>
-              </el-button>
-            </div>
-          </el-card>        
-          <div style="padding: 1rem">
-            <div class="mt-3">
-              <el-pagination
-                background
-                layout="prev, pager, next"
-                :total="totalRows"
-                :page-size="perPage"
-                v-model:currentPage="currentPageLocal"
+          <div class="bodyProducts">
+            <el-card 
+              :body-style="{ padding: '0px' }"
+              v-for="prod in productos"
+              :key="prod.upc"
+              >
+              <img
+                :src="prod.doc.foto"
+                class="image"
               />
-            </div>
+              <div style="padding: 14px;text-align: center;">
+                <span>{{ prod.doc.nombreProd }}</span>
+                <div class="bottom">
+                  <!-- UPC: {{ prod.doc.upc }}<br /> -->
+                  <div style="display: flex;justify-content: space-around;">
+                    <span class="productPrices">P.M.: <br>${{ prod.doc.precioMayoreo }}</span>
+                    <span class="productPrices">P.P.: <br>${{ prod.doc.precioPublico }}</span>
+                    <span class="productPrices">P.T.: <br>${{ prod.doc.precioTaller }}</span>
+                  </div>
+                  Stock: {{ prod.doc.stockProd }}<br />
+                  Marca: {{ prod.doc.nombreMarca }}<br />
+                  Categoria: {{ prod.doc.nombreCategoria }}<br />
+                </div>
+                <el-button type="warning" @click="prodSelected(prod);title = 'Editar producto';show.addEditProdMovile = true" circle>
+                  <i class="fas fa-pencil-alt" aria-hidden="true"/>
+                </el-button>
+                <el-button type="danger" @click="prodSelected(prod);show.deleteProduc = true" circle>
+                  <i class="fas fa-times" aria-hidden="true"/>
+                </el-button>
+              </div>
+            </el-card>        
+          </div>
+          <div class="mt-3" style="margin-left: -12px;">
+            <el-pagination
+              small
+              background
+              layout="prev, pager, next"
+              :total="totalRows"
+              :page-size="perPage"
+              v-model:currentPage="currentPageLocal"
+            />
           </div>
         </div>
       </div>
@@ -163,24 +163,8 @@ export default {
       "filtroUPC",
     ]),
     ...mapState("categorias", ["categorias"]),
-    // funcion que evalua si hay algun dato en cache para que el boton de "Aplicar Cambios" se muestre
-    applyChanges: function () {
-      let nuevosProductos = this.newProd.filter((prod) => prod.state === 1);
-      if (nuevosProductos.length > 0) {
-        return true;
-      }
-
-      if (this.deleteTransaction.length > 0) {
-        return true;
-      }
-
-      if (this.editTransaction.length > 0) {
-        return true;
-      }
-
-      return false;
-    },
     allFilters: function () {
+      console.log("allFilters")
       let categories = this.filtroCategorias.map((cat) => cat.nombreCategoria);
       let brands = this.filtroMarcas.map((marca) => marca.nombreMarca);
       if (this.filtroNombre) {
@@ -327,5 +311,22 @@ td input {
   height: 2rem;
   padding: 0;
   font-size: 12px;
+}
+.image {
+  width: 100%;
+  max-height: 7.5rem;
+  object-fit: cover;
+}
+.bodyProducts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.productPrices {
+  color: #409eff;
+  border-radius: 0.3rem;
+  background-color: #ecf5ff;
+  border: 1px solid #409eff;
+  padding: 0.2rem;
+  transform: scale(0.8);
 }
 </style>

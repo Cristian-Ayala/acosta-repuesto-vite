@@ -17,7 +17,7 @@ const router = createRouter({
   })
 
 const app = createApp(App)
-app.config.globalProperties.$url = "https://www.couchdb.me/";
+app.config.globalProperties.$url = "https://www.couchdb.tk/";
 const store = createStore(app)
 app.use(store)
 app.use(router)

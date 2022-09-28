@@ -17,7 +17,7 @@ require("vue-awesome-notifications/dist/styles/style.css")
 Vue.config.productionTip = false
 Vue.config.silent = true
 
-Vue.prototype.$url = "https://www.couchdb.me/";
+Vue.prototype.$url = "https://www.couchdb.tk/";
 
 new Vue({
   router,
