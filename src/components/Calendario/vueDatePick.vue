@@ -1,12 +1,12 @@
-<template>
+<!-- <template>
   <div class="vdpComponent" :class="{ vdpWithInput: hasInputElement }">
     <slot
       :open="open"
       :close="close"
       :toggle="toggle"
-      :inputValue="inputValue"
-      :processUserInput="processUserInput"
-      :valueToInputFormat="valueToInputFormat"
+      :input-value="inputValue"
+      :process-user-input="processUserInput"
+      :value-to-input-format="valueToInputFormat"
     >
       <input
         v-if="hasInputElement"
@@ -17,21 +17,21 @@
         @input="editable && processUserInput($event.target.value)"
         @focus="editable && open()"
         @click="editable && open()"
-      />
+      >
       <button
         v-if="editable && hasInputElement && inputValue"
         class="vdpClearInput"
         type="button"
-        @click="clear"
+        @click="clear()"
       ></button>
     </slot>
     <transition name="vdp-toggle-calendar">
       <div
         v-if="opened"
-        class="vdpOuterWrap"
         ref="outerWrap"
-        @click="closeViaOverlay"
+        class="vdpOuterWrap"
         :class="[positionClass, { vdpFloating: hasInputElement }]"
+        @click="closeViaOverlay()"
       >
         <div class="vdpInnerWrap">
           <header class="vdpHeader">
@@ -54,8 +54,8 @@
             <div class="vdpPeriodControls">
               <div class="vdpPeriodControl">
                 <button
-                  :class="directionClass"
                   :key="currentPeriod.month"
+                  :class="directionClass"
                   type="button"
                 >
                   {{ months[currentPeriod.month] }}
@@ -63,8 +63,8 @@
                 <select v-model="currentPeriod.month">
                   <option
                     v-for="(month, index) in months"
-                    :value="index"
                     :key="month"
+                    :value="index"
                   >
                     {{ month }}
                   </option>
@@ -72,14 +72,14 @@
               </div>
               <div class="vdpPeriodControl">
                 <button
-                  :class="directionClass"
                   :key="currentPeriod.year"
+                  :class="directionClass"
                   type="button"
                 >
                   {{ currentPeriod.year }}
                 </button>
                 <select v-model="currentPeriod.year">
-                  <option v-for="year in yearRange" :value="year" :key="year">
+                  <option v-for="year in yearRange" :key="year" :value="year">
                     {{ year }}
                   </option>
                 </select>
@@ -90,27 +90,27 @@
             <thead>
               <tr>
                 <th
-                  class="vdpHeadCell"
                   v-for="(weekday, weekdayIndex) in weekdaysSorted"
                   :key="weekdayIndex"
+                  class="vdpHeadCell"
                 >
                   <span class="vdpHeadCellContent">{{ weekday }}</span>
                 </th>
               </tr>
             </thead>
             <tbody
-              :key="currentPeriod.year + '-' + currentPeriod.month"
+              :key="`${currentPeriod.year}-${currentPeriod.month}`"
               :class="directionClass"
             >
               <tr
-                class="vdpRow"
                 v-for="(week, weekIndex) in currentPeriodDates"
                 :key="weekIndex"
+                class="vdpRow"
               >
                 <td
-                  class="vdpCell"
                   v-for="item in week"
-                  @click="selectDateItem(item) && editable"
+                  :key="item.dateKey"
+                  class="vdpCell"
                   :class="{
                     selectable: editable && !item.disabled,
                     selected: item.selected,
@@ -119,7 +119,7 @@
                     outOfRange: item.outOfRange,
                   }"
                   :data-id="item.dateKey"
-                  :key="item.dateKey"
+                  @click="selectDateItem(item) && editable"
                 >
                   <div class="vdpCellContent">
                     {{ item.date.getDate() }}
@@ -136,11 +136,11 @@
                 type="number"
                 pattern="\d*"
                 class="vdpHoursInput"
-                @input.prevent="inputHours"
-                @focusin="onTimeInputFocus"
                 :disabled="!editable"
                 :value="currentTime.hoursFormatted"
-              />
+                @input.prevent="inputHours()"
+                @focusin="onTimeInputFocus()"
+              >
             </div>
             <span v-if="pickMinutes" class="vdpTimeSeparator">:</span>
             <div v-if="pickMinutes" class="vdpTimeUnit">
@@ -150,11 +150,11 @@
                 type="number"
                 pattern="\d*"
                 class="vdpMinutesInput"
-                @input="inputTime('setMinutes', $event)"
-                @focusin="onTimeInputFocus"
                 :disabled="!editable"
                 :value="currentTime.minutesFormatted"
-              />
+                @input="inputTime('setMinutes', $event)"
+                @focusin="onTimeInputFocus()"
+              >
             </div>
             <span v-if="pickSeconds" class="vdpTimeSeparator">:</span>
             <div v-if="pickSeconds" class="vdpTimeUnit">
@@ -164,11 +164,11 @@
                 type="number"
                 pattern="\d*"
                 class="vdpSecondsInput"
-                @input="inputTime('setSeconds', $event)"
-                @focusin="onTimeInputFocus"
                 :disabled="!editable"
                 :value="currentTime.secondsFormatted"
-              />
+                @input="inputTime('setSeconds', $event)"
+                @focusin="onTimeInputFocus()"
+              >
             </div>
             <button
               v-if="use12HourClock"
@@ -197,17 +197,19 @@ const secondsRE = /s+/;
 const AMPMClockRE = /A/;
 
 export default {
+  name: 'VueDatePicker',
   props: {
     value: {
       type: String,
-      default: "",
+      default: '',
     },
     format: {
       type: String,
-      default: "YYYY-MM-DD",
+      default: 'YYYY-MM-DD',
     },
     displayFormat: {
       type: String,
+      default: 'YYYY-MM-DD',
     },
     editable: {
       type: Boolean,
@@ -219,6 +221,7 @@ export default {
     },
     inputAttributes: {
       type: Object,
+      default: () => ({}),
     },
     selectableYearRange: {
       type: [Number, Object, Function],
@@ -226,12 +229,15 @@ export default {
     },
     startPeriod: {
       type: Object,
+      default: () => ({}),
     },
     parseDate: {
       type: Function,
+      default: null,
     },
     formatDate: {
       type: Function,
+      default: null,
     },
     pickTime: {
       type: Boolean,
@@ -255,15 +261,15 @@ export default {
     },
     nextMonthCaption: {
       type: String,
-      default: "Next month",
+      default: 'Next month',
     },
     prevMonthCaption: {
       type: String,
-      default: "Previous month",
+      default: 'Previous month',
     },
     setTimeCaption: {
       type: String,
-      default: "Hora:",
+      default: 'Hora:',
     },
     mobileBreakpointWidth: {
       type: Number,
@@ -271,23 +277,23 @@ export default {
     },
     weekdays: {
       type: Array,
-      default: () => ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+      default: () => ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
     },
     months: {
       type: Array,
       default: () => [
-        "Enero",
-        "Febrero",
-        "Marzo",
-        "Abril",
-        "Mayo",
-        "Junio",
-        "Julio",
-        "Agosto",
-        "Septiembre",
-        "Octubre",
-        "Noviembre",
-        "Diciembre",
+        'Enero',
+        'Febrero',
+        'Marzo',
+        'Abril',
+        'Mayo',
+        'Junio',
+        'Julio',
+        'Agosto',
+        'Septiembre',
+        'Octubre',
+        'Noviembre',
+        'Diciembre',
       ],
     },
     startWeekOnSunday: {
@@ -311,8 +317,8 @@ export default {
 
   computed: {
     valueDate() {
-      const value = this.value;
-      const format = this.format;
+      const {value} = this;
+      const {format} = this;
 
       return value ? this.parseDateString(value, format) : undefined;
     },
@@ -325,7 +331,7 @@ export default {
     },
 
     isValidValue() {
-      const valueDate = this.valueDate;
+      const {valueDate} = this;
 
       return this.value ? Boolean(valueDate) : true;
     },
@@ -341,7 +347,7 @@ export default {
       const startDay = date.getDay() || 7;
 
       if (startDay > 1 - offset) {
-        for (let i = startDay - (2 - offset); i >= 0; i--) {
+        for (let i = startDay - (2 - offset); i >= 0; i-1) {
           const prevDate = new Date(date);
           prevDate.setDate(-i);
           days.push({ outOfRange: true, date: prevDate });
@@ -356,7 +362,7 @@ export default {
       // append next month dates
       const daysLeft = 7 - (days.length % 7);
 
-      for (let i = 1; i <= daysLeft; i++) {
+      for (let i = 1; i <= daysLeft; i+1) {
         const nextDate = new Date(date);
         nextDate.setDate(i);
         days.push({ outOfRange: true, date: nextDate });
@@ -370,7 +376,7 @@ export default {
           day.date.getFullYear(),
           day.date.getMonth() + 1,
           day.date.getDate(),
-        ].join("-");
+        ].join('-');
         day.selected = this.valueDate
           ? areSameDates(day.date, this.valueDate)
           : false;
@@ -386,11 +392,11 @@ export default {
 
       let yearsRange = [];
 
-      if (userRangeType === "number") {
+      if (userRangeType === 'number') {
         yearsRange = range(currentYear - userRange, currentYear + userRange);
-      } else if (userRangeType === "object") {
+      } else if (userRangeType === 'object') {
         yearsRange = range(userRange.from, userRange.to);
-      } else if (userRangeType === "function") {
+      } else if (userRangeType === 'function') {
         yearsRange = userRange(this);
       }
 
@@ -436,9 +442,9 @@ export default {
         const weekdays = this.weekdays.slice();
         weekdays.unshift(weekdays.pop());
         return weekdays;
-      } else {
+      } 
         return this.weekdays;
-      }
+      
     },
   },
 
@@ -460,12 +466,12 @@ export default {
       this.direction =
         currentDate !== oldDate
           ? currentDate > oldDate
-            ? "Next"
-            : "Prev"
+            ? 'Next'
+            : 'Prev'
           : undefined;
 
       if (currentDate !== oldDate) {
-        this.$emit("periodChange", {
+        this.$emit('periodChange', {
           year: currentPeriod.year,
           month: currentPeriod.month,
         });
@@ -473,7 +479,7 @@ export default {
     },
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     this.removeCloseEvents();
     this.teardownPosition();
   },
@@ -504,14 +510,14 @@ export default {
 
     formatDateToString(date, dateFormat) {
       return !date
-        ? ""
+        ? ''
         : this.formatDate
         ? this.formatDate(date, dateFormat)
         : this.formatSimpleDateToString(date, dateFormat);
     },
 
     parseSimpleDateString(dateString, dateFormat) {
-      let day, month, year, hours, minutes, seconds;
+      let day; let month; let year; let hours; let minutes; let seconds;
 
       const dateParts = dateString.split(formatRE);
       const formatParts = dateFormat.split(formatRE);
@@ -534,25 +540,25 @@ export default {
       }
 
       const resolvedDate = new Date(
-        [paddNum(year, 4), paddNum(month, 2), paddNum(day, 2)].join("-")
+        [paddNum(year, 4), paddNum(month, 2), paddNum(day, 2)].join('-')
       );
 
       if (isNaN(resolvedDate)) {
         return undefined;
-      } else {
+      } 
         const date = new Date(year, month - 1, day);
 
         [
-          [year, "setFullYear"],
-          [hours, "setHours"],
-          [minutes, "setMinutes"],
-          [seconds, "setSeconds"],
+          [year, 'setFullYear'],
+          [hours, 'setHours'],
+          [minutes, 'setMinutes'],
+          [seconds, 'setSeconds'],
         ].forEach(([value, method]) => {
-          typeof value !== "undefined" && date[method](value);
+          typeof value !== 'undefined' && date[method](value);
         });
 
         return date;
-      }
+      
     },
 
     formatSimpleDateToString(date, dateFormat) {
@@ -572,7 +578,7 @@ export default {
         )
         .replace(minutesRE, (match) => paddNum(date.getMinutes(), match.length))
         .replace(secondsRE, (match) => paddNum(date.getSeconds(), match.length))
-        .replace(AMPMClockRE, () => (isPM(date.getHours()) ? "PM" : "AM"));
+        .replace(AMPMClockRE, () => (isPM(date.getHours()) ? 'PM' : 'AM'));
     },
 
     incrementMonth(increment = 1) {
@@ -600,7 +606,7 @@ export default {
       this.inputValue = userText;
 
       this.$emit(
-        "input",
+        'input',
         userDate ? this.formatDateToString(userDate, this.format) : userText
       );
     },
@@ -621,10 +627,10 @@ export default {
     },
 
     close() {
-      //console.trace("cerrar function");
+      // console.trace("cerrar function");
       if (this.opened) {
         this.clicks++;
-        //Just one consecutive call means it was clicked in a date
+        // Just one consecutive call means it was clicked in a date
         if (this.clicks === 1) {
           this.timer = setTimeout(() => {
             this.opened = false;
@@ -635,7 +641,7 @@ export default {
             }, 100);
             this.clicks = 0;
           }, 100);
-          //2 consecutives calls means it was clicked outside 
+          // 2 consecutives calls means it was clicked outside 
         } else {
           clearTimeout(this.timer);
           this.opened = false;
@@ -650,8 +656,8 @@ export default {
     closeViaOverlay(e) {
           if (this.hasInputElement && e.target === this.$refs.outerWrap) {
         console.log(
-          "%c Coloreado",
-          "color: black:font-weight: bold;background-color: white;"
+          '%c Coloreado',
+          'color: black:font-weight: bold;background-color: white;'
         );
         this.close();
       }
@@ -661,7 +667,7 @@ export default {
       if (!this.closeEventListener) {
         this.closeEventListener = (e) => this.inspectCloseEvent(e);
 
-        ["click", "keyup", "focusin"].forEach((eventName) =>
+        ['click', 'keyup', 'focusin'].forEach((eventName) =>
           document.addEventListener(eventName, this.closeEventListener)
         );
       }
@@ -680,7 +686,7 @@ export default {
 
     removeCloseEvents() {
       if (this.closeEventListener) {
-        ["click", "keyup", "focusin"].forEach((eventName) =>
+        ['click', 'keyup', 'focusin'].forEach((eventName) =>
           document.removeEventListener(eventName, this.closeEventListener)
         );
 
@@ -691,7 +697,7 @@ export default {
     setupPosition() {
       if (!this.positionEventListener) {
         this.positionEventListener = () => this.positionFloater();
-        window.addEventListener("resize", this.positionEventListener);
+        window.addEventListener('resize', this.positionEventListener);
       }
 
       this.positionFloater();
@@ -700,8 +706,8 @@ export default {
     positionFloater() {
       const inputRect = this.$el.getBoundingClientRect();
 
-      let verticalClass = "vdpPositionTop";
-      let horizontalClass = "vdpPositionLeft";
+      let verticalClass = 'vdpPositionTop';
+      let horizontalClass = 'vdpPositionLeft';
 
       const calculate = () => {
         const rect = this.$refs.outerWrap.getBoundingClientRect();
@@ -715,21 +721,21 @@ export default {
               window.innerHeight &&
             inputRect.top - floaterHeight > 0
           ) {
-            verticalClass = "vdpPositionBottom";
+            verticalClass = 'vdpPositionBottom';
           }
 
           // horizontal
           if (inputRect.left + floaterWidth > window.innerWidth) {
-            horizontalClass = "vdpPositionRight";
+            horizontalClass = 'vdpPositionRight';
           }
 
           this.positionClass = [
-            "vdpPositionReady",
+            'vdpPositionReady',
             verticalClass,
             horizontalClass,
-          ].join(" ");
+          ].join(' ');
         } else {
-          this.positionClass = "vdpPositionFixed";
+          this.positionClass = 'vdpPositionFixed';
         }
       };
 
@@ -739,13 +745,13 @@ export default {
     teardownPosition() {
       if (this.positionEventListener) {
         this.positionClass = undefined;
-        window.removeEventListener("resize", this.positionEventListener);
+        window.removeEventListener('resize', this.positionEventListener);
         delete this.positionEventListener;
       }
     },
 
     clear() {
-      this.$emit("input", "");
+      this.$emit('input', '');
     },
 
     selectDateItem(item) {
@@ -757,9 +763,9 @@ export default {
           newDate.setSeconds(this.currentTime.seconds);
         }
 
-        this.$emit("input", this.formatDateToString(newDate, this.format));
+        this.$emit('input', this.formatDateToString(newDate, this.format));
         if (this.hasInputElement && !this.pickTime) {
-          console.log("Antes del close select date");
+          console.log('Antes del close select date');
           this.close();
         }
       }
@@ -770,10 +776,10 @@ export default {
       const currentHours = currentDate.getHours();
 
       currentDate.setHours(
-        value === "PM" ? currentHours + 12 : currentHours - 12
+        value === 'PM' ? currentHours + 12 : currentHours - 12
       );
 
-      this.$emit("input", this.formatDateToString(currentDate, this.format));
+      this.$emit('input', this.formatDateToString(currentDate, this.format));
     },
 
     inputHours(event) {
@@ -790,7 +796,7 @@ export default {
           : numValue
       );
       event.target.value = paddNum(numValue, 1);
-      this.$emit("input", this.formatDateToString(currentDate, this.format));
+      this.$emit('input', this.formatDateToString(currentDate, this.format));
     },
 
     inputTime(method, event) {
@@ -801,7 +807,7 @@ export default {
       event.target.value = paddNum(numValue, 2);
       currentDate[method](numValue);
 
-      this.$emit("input", this.formatDateToString(currentDate, this.format));
+      this.$emit('input', this.formatDateToString(currentDate, this.format));
     },
 
     onTimeInputFocus(event) {
@@ -811,10 +817,10 @@ export default {
 };
 
 function paddNum(num, padsize) {
-  return typeof num !== "undefined"
+  return typeof num !== 'undefined'
     ? num.toString().length > padsize
       ? num
-      : new Array(padsize - num.toString().length + 1).join("0") + num
+      : new Array(padsize - num.toString().length + 1).join('0') + num
     : undefined;
 }
 
@@ -865,4 +871,4 @@ function boundNumber(value, min, max) {
 
 <style>
 @import "./vueDatePick.min.css";
-</style>
+</style> -->

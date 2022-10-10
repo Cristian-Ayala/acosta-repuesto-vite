@@ -11,7 +11,7 @@
               v-b-modal.nuevaOrden
               variant="success"
               style="float: right"
-              ><i class="fa fa-plus" aria-hidden="true"></i
+            ><i class="fa fa-plus" aria-hidden="true"></i
             ></b-button>
           </div>
           <div class="card-body">
@@ -24,53 +24,56 @@
                 <i class="o-search-magnify-1 text-gray text-lg"></i>
               </button>
               <input
+                v-model="searchDisplay"
                 type="search"
                 placeholder="Buscar orden..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
-                v-model="searchDisplay"
                 style="border-radius: 0 0 1rem 1rem;"
-              />
+              >
             </div>
           </div>
         </div>
         <order-view v-for="orden in ordenes" :key="orden.id" :orden="orden.doc"></order-view>
       </div>
       <button
+        id="btnDetOrden"
         type="button"
         class="btn btn-danger"
         data-toggle="modal"
         data-target="#detalleOrden"
         hidden
-        id="btnDetOrden"
       >
         <i class="fa fa-trash" aria-hidden="true"></i>
       </button>
     </div>
     <!-- Fin del Cuerpo a escribir -->
-    <NuevaOrden></NuevaOrden>
+    <nueva-orden></nueva-orden>
   </div>
 </template>
+
 <script>
-import NuevaOrden from "@/components/Ordenes/NuevaOrden.vue";
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations } from 'vuex';
+import NuevaOrden from '@/components/Ordenes/NuevaOrden.vue';
 import OrderView from '../components/Ordenes/OrderView.vue';
+
 export default {
-  name: "Ordenes",
+  name: 'OrdenesIndex',
   components: {
     NuevaOrden,
     OrderView,
   },
-  data: () => {
-    return {
-      displayOption: "",
-      searchDisplay: "",
-    };
+  data: () => ({
+      displayOption: '',
+      searchDisplay: '',
+  }),
+  computed: {
+    ...mapState('ordenes', ['ordenes', 'ordSelected', 'showDetOrd',]),
   },
   methods: {
-    ...mapMutations("ordenes", ["clickRow"]),
+    ...mapMutations('ordenes', ['clickRow']),
     filtro(valor) {
-      if (this.searchDisplay.trim() === "") return true;
-      let array = (
+      if (this.searchDisplay.trim() === '') return true;
+      const array = (
         this.ordenes[valor].idOrden +
         this.ordenes[valor].observacionesOrden +
         this.ordenes[valor].totalOrden +
@@ -79,11 +82,9 @@ export default {
       return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
     },
   },
-  computed: {
-    ...mapState("ordenes", ["ordenes", "ordSelected", "showDetOrd",]),
-  },
 };
 </script>
+
 <style scoped>
 .inp-cantidad {
   width: 3em;

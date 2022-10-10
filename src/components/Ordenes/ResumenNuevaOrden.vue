@@ -2,6 +2,7 @@
   <tr class="w-100">
     <td>
       <div class="h-100">
+        <!-- eslint-disable-next-line -->
         <p class="align-self-center" v-html="prod.nombreProd"></p>
         <div v-if="showQuantity">
           <p style="font-size: 0.6rem">
@@ -15,22 +16,22 @@
     </td>
     <td class="tdVerdeClick">
       <div
-        class="add"
         v-if="!showQuantity"
-        v-on:click="$emit('addTmpProducts', prod, true, indexForComponent, true)"
+        class="add"
+        @click="$emit('addTmpProducts', prod, true, indexForComponent, true)"
       >
         <i class="fas fa-plus"></i>
       </div>
       <div v-else class="h-100">
         <div
           class="plus_minus"
-          v-on:click="$emit('addTmpProducts', prod, true, indexForComponent, true)"
+          @click="$emit('addTmpProducts', prod, true, indexForComponent, true)"
         >
           <i class="fas fa-plus"></i>
         </div>
         <div
           class="plus_minus"
-          v-on:click="$emit('addTmpProducts', prod, false, indexForComponent, true)"
+          @click="$emit('addTmpProducts', prod, false, indexForComponent, true)"
         >
           <i class="fas fa-minus"></i>
         </div>
@@ -38,10 +39,25 @@
     </td>
   </tr>
 </template>
+
 <script>
 export default {
-  name: "ResumenNuevaOrden",
-  props: ["prod", "indexForComponent", "ordenDetalleProductos"],
+  name: 'ResumenNuevaOrden',
+  props: {
+    prod: {
+      type: Object,
+      required: true,
+    },
+    indexForComponent: {
+      type: Number,
+      required: true,
+    },
+    ordenDetalleProductos: {
+      type: Object,
+      required: true,
+    },
+  },
+  emits: ['addTmpProducts'],
   data() {
     return {
       showQuantity: false,
@@ -54,6 +70,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .tdVerdeClick {
   background-color: #28a745;

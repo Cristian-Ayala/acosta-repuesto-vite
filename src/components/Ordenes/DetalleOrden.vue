@@ -1,11 +1,11 @@
 <template>
   <div>
     <b-modal
+      v-if="showDetOrd"
       id="detalleOrden"
+      v-model="alwaysTrue"
       centered
       title="Detalle Orden"
-      v-model="alwaysTrue"
-      v-if="showDetOrd"
     >
       <div class="card-body">
         <h5>Fecha:</h5>
@@ -64,28 +64,31 @@
 
 <script>
 export default {
-  name: "DetalleOrden",
-  props: ["ordSelected", "showDetOrd"],
+  name: 'DetalleOrden',
+  props: {
+    showDetOrd: {
+      type: Boolean,
+      required: true,
+    },
+    ordSelected: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       headerLabels: [
-        { key: "upc", label: "UPC" },
-        { key: "nombreProd", label: "Nombre" },
-        { key: "nombreMarca", label: "Marca" },
-        { key: "nombreCategoria", label: "Categoria" },
-        { key: "precioUnit", label: "Precio unitario" },
-        "cantidad",
-        "descuento",
-        { key: "subtotal", label: "Sub-Total" },
+        { key: 'upc', label: 'UPC' },
+        { key: 'nombreProd', label: 'Nombre' },
+        { key: 'nombreMarca', label: 'Marca' },
+        { key: 'nombreCategoria', label: 'Categoria' },
+        { key: 'precioUnit', label: 'Precio unitario' },
+        'cantidad',
+        'descuento',
+        { key: 'subtotal', label: 'Sub-Total' },
       ],
       alwaysTrue: true,
     };
-  },
-  methods: {
-    formatDate(id) {
-        let date = new Date(id);
-        return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
-    },
   },
   watch: {
     alwaysTrue: {
@@ -93,6 +96,12 @@ export default {
         if (!newValue) this.alwaysTrue = true;
       }
     }
+  },
+  methods: {
+    formatDate(id) {
+        const date = new Date(id);
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
+    },
   },
 };
 </script>

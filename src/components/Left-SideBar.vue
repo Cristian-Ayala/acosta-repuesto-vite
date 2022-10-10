@@ -7,70 +7,84 @@
     </div>
     <ul class="sidebar-menu list-unstyled">
       <router-link
+        v-slot="{ href, navigate, isExactActive }"
         to="/"
         custom
-        v-slot="{ href, navigate, isExactActive }"
       >
-        <a :href="href" @click="navigate" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive}">
+        <a 
+          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
+          @click="navigate()">
           <i class="fas fa-home mr-4 text-gray my-2"></i><span>Home</span>
         </a>
       </router-link>
       <router-link
+        v-slot="{ href, navigate, isExactActive }"
         to="/categorias"
         custom
-        v-slot="{ href, navigate, isExactActive }"
       >
-        <a :href="href" @click="navigate" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive}">
+        <a 
+          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
+          @click="navigate()">
           <i class="fa fa-list-alt mr-4 text-gray my-2"></i
           ><span>Categorias</span>
         </a>
       </router-link>
       <router-link
+        v-slot="{ href, navigate, isExactActive }"
         to="/marcas"
         custom
-        v-slot="{ href, navigate, isExactActive }"
       >
-        <a :href="href" @click="navigate" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive}">
+        <a 
+          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }" 
+          @click="navigate()">
           <i class="fas fa-list-ul mr-4 text-gray my-2"></i>
           <span>Marca</span>
         </a>
       </router-link>
       <router-link
+        v-slot="{ href, navigate, isExactActive }"
         to="/productos"
         custom
-        v-slot="{ href, navigate, isExactActive }"
       >
-        <a :href="href" @click="navigate" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive}">
+        <a 
+          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }" 
+          @click="navigate()">
           <i class="fas fa-boxes mr-3 text-gray my-2"></i><span>Productos</span>
         </a>
       </router-link>
       <router-link
+        v-slot="{ href, navigate, isExactActive }"
         to="/ordenes"
         custom
-        v-slot="{ href, navigate, isExactActive }"
       >
-        <a :href="href" @click="navigate" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive}">
+        <a 
+          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
+          @click="navigate()">
           <i class="fas fa-clipboard-check mr-3 text-gray my-2"></i
           ><span>Ordenes</span>
         </a>
       </router-link>
       <router-link
+        v-slot="{ href, navigate, isExactActive }"
         to="/actualizar"
         custom
-        v-slot="{ href, navigate, isExactActive }"
       >
-        <a :href="href" @click="navigate" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive}">
+        <a 
+          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
+          @click="navigate()">
           <i class="fa fa-upload mr-3 text-gray my-2" aria-hidden="true"></i>
           <span>Actualizar</span>
         </a>
       </router-link>
       <router-link
+        v-if="actualUser.roles && actualUser.roles.length"
+        v-slot="{ href, navigate, isExactActive }"
         to="/usuarios"
         custom
-        v-slot="{ href, navigate, isExactActive }"
-        v-if="actualUser.roles && actualUser.roles.length"
       >
-        <a :href="href" @click="navigate" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive}">
+        <a 
+          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
+          @click="navigate()">
           <i class="fa fa-user mr-3 text-gray my-2" aria-hidden="true"></i>
           <span>Usuarios</span>
         </a>
@@ -78,8 +92,8 @@
     </ul>
     <a
       href="#"
-      @click="logout()"
       class="sidebar-link text-muted sidebar-list-item position-bottom logout"
+      @click="logout()"
     >
       <i class="fas fa-door-open mr-3 text-black my-2" aria-hidden="true"></i>
       <span v-if="actualUser">Salir {{ actualUser.user }}</span>
@@ -91,14 +105,16 @@
 import { mapState, mapActions } from 'vuex';
 
 export default {
-  methods: {
-    ...mapActions('usuarios', ['logout']),
-  },
+  name: 'LeftSideBar',
   computed: {
     ...mapState('usuarios', ['actualUser']),
   },
+  methods: {
+    ...mapActions('usuarios', ['logout']),
+  },
 };
 </script>
+
 <style scoped>
 .side-in-enter-active {
   transition: all 0.3s ease-out;

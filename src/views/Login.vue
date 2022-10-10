@@ -4,14 +4,14 @@
       <h1>Bienvenido</h1>
 
       <form class="form" autocomplete="on">
-        <input type="text" placeholder="Usuario" v-model="username" />
+        <input v-model="username" type="text" placeholder="Usuario">
         <input
+          v-model="password"
           type="password"
           placeholder="Contraseña"
-          v-model="password"
           autocomplete="on"
-        />
-        <button type="submit" id="login-button" @click.prevent="login">
+        >
+        <button id="login-button" type="submit" @click.prevent="login()">
           Iniciar Sesión
         </button>
       </form>
@@ -32,32 +32,59 @@
     </ul>
   </div>
 </template>
+
 <script>
-import PouchDB from 'pouchdb-browser';
+// import PouchDB from 'pouchdb-browser';
 // PouchDB.plugin(require("pouchdb-authentication").default);
-var remoteUsuarios;
-const remotedb = async (url) => {
-  remoteUsuarios = await new PouchDB(url + "marcas", {
-    skip_setup: true,
-  });
-};
+// const remoteUsuarios = null;
+// const remotedb = async (url) => {
+//   remoteUsuarios = await new PouchDB(url + "marcas", {
+//     skip_setup: true,
+//   });
+// };
 export default {
-  name: "Login",
+  name: 'LoginIndex',
   components: {},
-  data: () => {
+  data() {
     return {
-      username: "",
-      password: "",
+      username: '',
+      password: '',
       error: false,
     };
   },
   mounted() {
     // Trigger para comenzar script para probar si las cookies de terceros estan habilitadas
-    const url = this.$url + "/step1.js.php";
-    var step1El = document.createElement("script");
-    step1El.setAttribute("src", url);
+    const url = `${this.$url}/step1.js.php`;
+    const step1El = document.createElement('script');
+    step1El.setAttribute('src', url);
     document.body.appendChild(step1El);
     // Fin del trigger para comenzar script para probar si las cookies de terceros estan habilitadas
+  },
+  created() {
+    // Inicio de script para probar si las cookies de terceros estan habilitadas
+    const that = this;
+    // eslint-disable-next-line 
+    window._3rd_party_test_step1_loaded = function () {
+      // At this point, a third-party domain has now attempted to set a cookie (if all went to plan!)
+      const step2El = document.createElement('script');
+      const url = `${that.$url}/step2.js.php`;
+      step2El.setAttribute('src', url);
+      document.head.appendChild(step2El);
+    };
+    // eslint-disable-next-line 
+    window._3rd_party_test_step2_loaded = function (cookieSuccess) {
+      // If true, the third-party domain cookies are enabled
+      // If false, the third-party domain cookies are disable
+      if(!cookieSuccess) that.$router.push({ path: '/cookies' });
+    };
+    // Fin de script para probar si las cookies de terceros estan habilitadas
+    // remotedb(this.$url)
+    //   .then((res) => {
+    //     console.log(JSON.stringify(res));
+    //   })
+    //   .catch((err) => {
+    //     console.log(JSON.stringify(err));
+    //   });
   },
   methods: {
     async login() {
@@ -68,8 +95,8 @@ export default {
       //         'Content-Type': 'application/json',
       //     },
       //     body: JSON.stringify({
-      //         name: "",
-      //         password: "",
+      //         name: '',
+      //         password: '',
       //     }),
       //     credentials: 'include',
       // };
@@ -80,13 +107,13 @@ export default {
        * TODO: Some task
        */
       try {
-        // const fetchResponse = await fetch("https://www.couchdb.tk/_session", settings);
+        // const fetchResponse = await fetch('https://www.couchdb.tk/_session', settings);
         // const data = await fetchResponse.json();
         // console.log(data);
-        // this.$router.push({ path: "/" });
+        // this.$router.push({ path: '/' });
         window.console.log('hola');
         // const result = await remoteUsuarios.logIn(this.username, this.password)
-        // if (result.ok) this.$router.push({ path: "/" });
+        // if (result.ok) this.$router.push({ path: '/' });
       } catch (error) {
           console.error(JSON.stringify(error));
           this.error = true;        
@@ -94,9 +121,9 @@ export default {
     },
     areCookiesEnabled() {
       try {
-        document.cookie = "cookietest=1";
-        var cookiesEnabled = document.cookie.indexOf("cookietest=") !== -1;
-        document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
+        document.cookie = 'cookietest=1';
+        const cookiesEnabled = document.cookie.indexOf('cookietest=') !== -1;
+        document.cookie = 'cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT';
         return cookiesEnabled;
       } catch (e) {
         console.log(e);
@@ -104,32 +131,9 @@ export default {
       }
     },
   },
-  created() {
-    // Inicio de script para probar si las cookies de terceros estan habilitadas
-    var that = this;
-    window._3rd_party_test_step1_loaded = function () {
-      // At this point, a third-party domain has now attempted to set a cookie (if all went to plan!)
-      var step2El = document.createElement("script");
-      const url = that.$url + "/step2.js.php";
-      step2El.setAttribute("src", url);
-      document.head.appendChild(step2El);
-    };
-    window._3rd_party_test_step2_loaded = function (cookieSuccess) {
-      // If true, the third-party domain cookies are enabled
-      // If false, the third-party domain cookies are disable
-      cookieSuccess ? "" : that.$router.push({ path: "/cookies" });
-    };
-    // Fin de script para probar si las cookies de terceros estan habilitadas
-    remotedb(this.$url)
-      .then((res) => {
-        console.log(JSON.stringify(res));
-      })
-      .catch((err) => {
-        console.log(JSON.stringify(err));
-      });
-  },
 };
 </script>
+
 <style scoped>
 * {
   box-sizing: border-box;

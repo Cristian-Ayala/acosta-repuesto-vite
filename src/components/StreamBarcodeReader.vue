@@ -1,17 +1,17 @@
 <template>
   <div class="scanner-container">
     <div v-show="!isLoading">
-      <video poster="data:image/gif,AAAA" ref="scanner"></video>
+      <video ref="scanner" poster="data:image/gif,AAAA"></video>
       <div class="overlay-element">
-        <div class="div-buttoms" v-if="listOfCameras">
+        <div v-if="listOfCameras" class="div-buttoms">
           <button
-            class="btn-circle"
             v-for="(camera, index) in listOfCameras"
             :key="index"
-            @click="start(camera.deviceId)"
-            v-bind:class="{
+            class="btn-circle"
+            :class="{
               'btn-selected': selectedCamera === camera.deviceId,
             }"
+            @click="start(camera.deviceId)"
           >
             <span>{{ index + 1 }}</span>
           </button>
@@ -27,9 +27,11 @@ import {
   BrowserMultiFormatReader,
   Exception,
   NotFoundException,
-} from "@zxing/library";
+} from '@zxing/library';
+
 export default {
-  name: "stream-barcode-reader",
+  name: 'StreamBarcodeReader',
+  emits: ['loaded', 'decode'],
   data() {
     return {
       isLoading: true,
@@ -37,22 +39,22 @@ export default {
       isMediaStreamAPISupported:
         navigator &&
         navigator.mediaDevices &&
-        "enumerateDevices" in navigator.mediaDevices,
+        'enumerateDevices' in navigator.mediaDevices,
       listOfCameras: [],
       selectedCamera: null,
     };
   },
   mounted() {
     if (!this.isMediaStreamAPISupported) {
-      throw new Exception("Media Stream API is not supported");
+      throw new Exception('Media Stream API is not supported');
     }
     this.listCameras();
     this.$refs.scanner.oncanplay = () => {
       this.isLoading = false;
-      this.$emit("loaded");
+      this.$emit('loaded');
     };
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.codeReader.reset();
   },
   methods: {
@@ -60,17 +62,17 @@ export default {
       this.isLoading = true;
       this.selectedCamera = idCamera;
       this.codeReader.reset();
-      console.log("Reseted, new id is: ", idCamera);
+      console.log('Reseted, new id is: ', idCamera);
       this.codeReader.decodeFromVideoDevice(
         idCamera,
         this.$refs.scanner,
         (result, err) => {
           if (result) {
             this.isLoading = false;
-            this.$emit("decode", result.text);
+            this.$emit('decode', result.text);
           }
           if (err && !(err instanceof NotFoundException)) {
-            console.log("error: ", err);
+            console.log('error: ', err);
           }
         }
       );
@@ -84,7 +86,7 @@ export default {
             this.selectedCamera = this.listOfCameras[0].deviceId;
             this.start(this.selectedCamera);
           } else {
-            console.log("No cameras found.");
+            console.log('No cameras found.');
           }
         })
         .catch((err) => {

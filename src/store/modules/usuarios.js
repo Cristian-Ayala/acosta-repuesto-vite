@@ -1,23 +1,22 @@
-import router from '../../router/index';
 import axios from 'axios';
 
 import PouchDB from 'pouchdb-browser';
+import router from '../../router/index';
 // PouchDB.plugin(require('pouchdb-authentication').default);
-var axios1 = axios.create({
+const axios1 = axios.create({
   withCredentials: true,
 });
-var remoteUsuarios;
+let remoteUsuarios;
 const remotedb = async (url) => {
-  remoteUsuarios = await new PouchDB(url + 'marcas', {
+  remoteUsuarios = await new PouchDB(`${url}marcas`, {
     skip_setup: true,
   });
 };
-export default (app) => {
-  return {
+export default () => ({
     namespaced: true,
     state: {
       localUsuarios: null,
-      PouchDB: PouchDB,
+      PouchDB,
       usuario: {},
       usuarios: [],
       showModalEdit: false,
@@ -35,14 +34,14 @@ export default (app) => {
         state.showModalEdit = value;
       },
       alertNotification(state, { message, duration }) {
-        this._vm.$awn.alert(message, {
+        this.$awn.alert(message, {
           durations: {
             success: duration,
           },
         });
       },
       successNotification(state, { message, duration, tittle }) {
-        this._vm.$awn.success(message, {
+        this.$awn.success(message, {
           durations: {
             success: duration,
           },
@@ -75,7 +74,7 @@ export default (app) => {
             }
 
             commit('alertNotification', {
-              message: 'Error al crear usuario<br>' + mensaje,
+              message: `Error al crear usuario<br>${  mensaje}`,
               duration: 4000,
             });
           });
@@ -83,11 +82,11 @@ export default (app) => {
       getAll({ state }) {
         axios1({
           method: 'GET',
-          url: this._vm.$url + '_users/_all_docs',
+          url: `${this.$url  }_users/_all_docs`,
         })
           .then((res) => {
             if (res.status === 200) {
-              let rows = res.data.rows || [];
+              const rows = res.data.rows || [];
               state.usuarios = rows.filter((usr) => usr.id.includes('org'));
             }
           })
@@ -125,7 +124,7 @@ export default (app) => {
                 mensajeError = JSON.stringify(err);
               }
               commit('alertNotification', {
-                message: 'Error al editar la contraseña<br>' + mensajeError,
+                message: `Error al editar la contraseña<br>${  mensajeError}`,
                 duration: 4000,
               });
             });
@@ -162,7 +161,7 @@ export default (app) => {
               }
               commit('alertNotification', {
                 message:
-                  'Error al editar el nombre de usuario<br>' + mensajeError,
+                  `Error al editar el nombre de usuario<br>${  mensajeError}`,
                 duration: 4000,
               });
             });
@@ -184,14 +183,14 @@ export default (app) => {
           })
           .catch((err) => {
             commit('alertNotification', {
-              message: 'Error al eliminar el usuario<br>' + JSON.stringify(err),
+              message: `Error al eliminar el usuario<br>${  JSON.stringify(err)}`,
               duration: 4000,
             });
           });
       },
       initDBUsuarios({ state, dispatch }) {
-        //Se agrega el nombre de la DB ("marca") en la función del inicio por eso no se pasa acá
-        remotedb(this._vm.$url)
+        // Se agrega el nombre de la DB ("marca") en la función del inicio por eso no se pasa acá
+        remotedb(this.$url)
           .then(() => {
             remoteUsuarios
               .getSession()
@@ -218,10 +217,10 @@ export default (app) => {
           .catch(console.log);
       },
       logout() {
-        console.log('out');
-        var timeOut = setTimeout(function () {
-          window.location.reload(true);
-        }, 1000); //wait 1 seconds
+        // console.log('out');
+        // const timeOut = setTimeout(() => {
+        //   window.location.reload(true);
+        // }, 1000); // wait 1 seconds
         // remoteUsuarios.logout().then(() => {
         //     clearTimeout(timeOut);
         //     router.push({
@@ -233,5 +232,4 @@ export default (app) => {
         // });
       },
     },
-  };
-};
+  });

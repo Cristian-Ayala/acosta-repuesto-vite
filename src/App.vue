@@ -1,32 +1,34 @@
 <template>
   <div id="app">
     <!-- <InstallPrompt /> -->
-    <Header @toggleSideBar="isLeftSideBar = !isLeftSideBar" />
+    <!-- eslint-disable vue/v-on-event-hyphenation -->
+    <header-comp @toggleSideBar="isLeftSideBar = !isLeftSideBar" ></header-comp>
     <div class="d-flex align-items-stretch">
       <transition name="fade"
-        ><div
-          class="fondoNegro"
-          v-if="isLeftSideBar"
-          @click="isLeftSideBar = false"
-        ></div>
+      ><div
+        v-if="isLeftSideBar"
+        class="fondoNegro"
+        @click="isLeftSideBar = false"
+      ></div>
       </transition>
       <transition name="side-in">
-        <LeftSideBar v-if="isLeftSideBar" />
+        <left-side-bar v-if="isLeftSideBar" />
       </transition>
-      <router-view v-bind:class="{'noscroll':isLeftSideBar}"/>
+      <router-view :class="{ 'noscroll': isLeftSideBar }"/>
     </div>
   </div>
 </template>
+
 <script>
-import Header from "@/components/Header.vue";
-import LeftSideBar from "@/components/Left-SideBar.vue";
+import { mapActions } from 'vuex';
+import HeaderComp from '@/components/Header.vue';
+import LeftSideBar from '@/components/Left-SideBar.vue';
 // import InstallPrompt from "@/components/InstallPrompt.vue";
-import { mapActions } from "vuex";
 
 export default {
-  name: "App",
+  name: 'App',
   components: {
-    Header,
+    HeaderComp,
     LeftSideBar,
     // InstallPrompt,
   },
@@ -35,13 +37,6 @@ export default {
       isLeftSideBar: false,
     };
   },
-  methods: {
-    ...mapActions("marcas", ["initDB"]),
-    ...mapActions("categorias", ["initDbCategorias"]),
-    ...mapActions("productos", ["initDbProductos"]),
-    // ...mapActions("usuarios", ["initDBUsuarios"]),
-    // ...mapActions("ordenes", ["initDbOrdenes"]),
-  },
   created() {
     this.initDB();
     this.initDbCategorias();
@@ -49,8 +44,16 @@ export default {
     // // this.initDBUsuarios();
     // this.initDbOrdenes();
   },
+  methods: {
+    ...mapActions('marcas', ['initDB']),
+    ...mapActions('categorias', ['initDbCategorias']),
+    ...mapActions('productos', ['initDbProductos']),
+    // ...mapActions("usuarios", ["initDBUsuarios"]),
+    // ...mapActions("ordenes", ["initDbOrdenes"]),
+  },
 };
 </script>
+
 <style scoped>
 .fondoNegro {
   position: fixed;

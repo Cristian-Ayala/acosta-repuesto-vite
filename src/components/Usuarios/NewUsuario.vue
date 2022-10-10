@@ -6,10 +6,10 @@
           <label class="col-md-3 form-control-label">Usuario</label>
           <div class="col-md-9">
             <input
+              v-model="usuario.nickname"
               type="text"
               class="form-control"
-              v-model="usuario.nickname"
-            />
+            >
           </div>
         </div>
         <div class="line"></div>
@@ -17,10 +17,10 @@
           <label class="col-md-3 form-control-label">Contraseña</label>
           <div class="col-md-9">
             <input
+              v-model="usuario.password"
               type="text"
               class="form-control"
-              v-model="usuario.password"
-            />
+            >
           </div>
         </div>
       </div>
@@ -45,18 +45,18 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions } from 'vuex';
 
 export default {
-  name: "newUser",
+  name: 'NewUser',
   data() {
     return {};
   },
-  methods: {
-    ...mapActions("usuarios", ["createRegistro"]),
-  },
   computed: {
-    ...mapState("usuarios", ["usuario"]),
+    ...mapState('usuarios', ['usuario']),
+  },
+  methods: {
+    ...mapActions('usuarios', ['createRegistro']),
   },
 };
 </script>

@@ -9,11 +9,11 @@
             </h6>
             <el-button
               color="#28a745"
+              circle
               @click="
                 clearData();
                 show.modalAgregarMar = true;
               "
-              circle
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </el-button>
@@ -28,11 +28,11 @@
                 <i class="o-search-magnify-1 text-gray text-lg"></i>
               </button>
               <input
-                type="search"
                 v-model="searchDisplay"
+                type="search"
                 placeholder="Buscar marca..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
-              />
+              >
             </div>
             <table class="table card-text table-hover">
               <thead>
@@ -61,7 +61,7 @@
                         show.modalEliminarMar = true;
                       "
                     >
-                      <i class="fas fa-times" aria-hidden="true" />
+                      <i class="fas fa-times" aria-hidden="true" ></i>
                     </el-button>
                     <el-button
                       type="warning"
@@ -71,22 +71,23 @@
                         show.modalEditarMar = true;
                       "
                     >
-                      <i class="fas fa-pencil-alt" aria-hidden="true" />
+                      <i class="fas fa-pencil-alt" aria-hidden="true" ></i>
                     </el-button>
                   </td>
                 </tr>
               </tbody>
             </table>
-            <el-skeleton :rows="4" animated v-if="marcas.length === 0" />
+            <el-skeleton v-if="marcas.length === 0" :rows="4" animated />
           </div>
         </div>
       </div>
-      <AgregarMar :show="show"></AgregarMar>
-      <DeleteMar :show="show"></DeleteMar>
-      <EditMar :show="show"></EditMar>
+      <agregar-mar :show="show"></agregar-mar>
+      <delete-mar :show="show"></delete-mar>
+      <edit-mar :show="show"></edit-mar>
     </div>
   </div>
 </template>
+
 <script>
 import { mapState, mapMutations } from 'vuex';
 import AgregarMar from '@/components/Marcas/AgregarMar.vue';
@@ -110,6 +111,9 @@ export default {
       modalEliminarMar: false,
     },
   }),
+  computed: {
+    ...mapState('marcas', ['marcas', 'marca']),
+  },
   methods: {
     ...mapMutations('marcas', ['clearData', 'getMarcaSelected']),
     filtro(index) {
@@ -120,11 +124,9 @@ export default {
       return marcaBusqueda.indexOf(this.searchDisplay.toUpperCase()) >= 0;
     },
   },
-  computed: {
-    ...mapState('marcas', ['marcas', 'marca']),
-  },
 };
 </script>
+
 <style scoped>
 .el-button.is-circle {
   width: 2rem;

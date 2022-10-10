@@ -3,10 +3,10 @@
     <modals-container ref="modal_name" />
     <b-modal
       id="modal-edit-user"
+      v-model="showModalEdit"
       centered
       title="¿Qué desea modificar?"
       hide-footer
-      v-model="showModalEdit"
       @close="setModalEditShow(false)"
     >
       <div class="card-body d-flex justify-content-around">
@@ -32,22 +32,25 @@
     </b-modal>
   </div>
 </template>
+
 <script>
-import { mapMutations,mapState } from "vuex";
+import { mapMutations,mapState } from 'vuex';
 
 export default {
+  name: 'EditUser',
   data() {
     return {};
   },
-  methods: {
-    ...mapMutations("usuarios", ["setModalEditShow"]),
-  },
   computed: {
-      ...mapState("usuarios", ["showModalEdit"]),
+      ...mapState('usuarios', ['showModalEdit']),
   },
   mounted() {},
+  methods: {
+    ...mapMutations('usuarios', ['setModalEditShow']),
+  },
 };
 </script>
+
 <style scoped>
 .btn-circle {
   width: 2rem;

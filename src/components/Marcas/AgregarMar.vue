@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable vue/no-mutating-props -->
   <el-dialog
     v-model="show.modalAgregarMar"
     title="Agregar marca"
@@ -9,10 +10,10 @@
         <label class="col-md-3 form-control-label">Nombre</label>
         <div class="col-md-9">
           <input
+            v-model="marca.nombreMarca"
             type="text"
             class="form-control"
-            v-model="marca.nombreMarca"
-          />
+          >
         </div>
       </div>
       <div class="line"></div>
@@ -20,10 +21,10 @@
         <label class="col-md-3 form-control-label">Descripción</label>
         <div class="col-md-9">
           <textarea
-            class="form-control"
             id="exampleFormControlTextarea1"
-            rows="3"
             v-model="marca.descripMarca"
+            class="form-control"
+            rows="3"
           ></textarea>
         </div>
       </div>
@@ -38,19 +39,24 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions } from 'vuex';
 
 export default {
-  name: "AgregarMar",
-  props: ['show'],
+  name: 'AgregarMar',
+  props: {
+    show: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {};
   },
-  methods: {
-    ...mapActions("marcas", ["createRegistro"]),
-  },
   computed: {
-    ...mapState("marcas", ["marca"]),
+    ...mapState('marcas', ['marca']),
+  },
+  methods: {
+    ...mapActions('marcas', ['createRegistro']),
   },
 };
 </script>

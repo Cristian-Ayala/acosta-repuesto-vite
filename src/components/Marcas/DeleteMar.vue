@@ -1,11 +1,12 @@
 <template>
+  <!-- eslint-disable vue/no-mutating-props -->
   <el-dialog
-  v-model="show.modalEliminarMar"
-  title="Eliminar Marca"
-  width="90%"
+    v-model="show.modalEliminarMar"
+    title="Eliminar Marca"
+    width="90%"
   >
     <div class="card-body">
-      <h6 style="font-weight: 400; text-align: center" v-if="marca.doc">
+      <h6 v-if="marca.doc" style="font-weight: 400; text-align: center">
         ¿Está seguro que quiere eliminar la marca "{{ marca.doc.nombreMarca }}"?
       </h6>
     </div>
@@ -17,19 +18,24 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions } from 'vuex';
 
 export default {
-  name: "DeleteMar",
-  props: ['show'],
+  name: 'DeleteMar',
+  props: {
+    show: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {};
   },
-  methods: {
-    ...mapActions("marcas", ["removeRegistro"]),
-  },
   computed: {
-    ...mapState("marcas", ["marca"]),
+    ...mapState('marcas', ['marca']),
+  },
+  methods: {
+    ...mapActions('marcas', ['removeRegistro']),
   },
 };
 </script>

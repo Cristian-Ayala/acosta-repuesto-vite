@@ -78,45 +78,46 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations } from 'vuex';
 
 export default {
-  name: "ConfirmarTransacciones",
+  name: 'ConfirmarTransacciones',
   data() {
     return {
       headerLabels: [
-        { key: "upc", label: "UPC" },
-        { key: "nombreProd", label: "Nombre" },
-        { key: "nombreMarca", label: "Marca" },
-        { key: "nombreCategoria", label: "Categoria" },
-        { key: "precioUnit", label: "Precio unitario" },
-        { key: "descripcion", label: "Descripcion" },
-        { key: "stockProd", label: "Stock" },
+        { key: 'upc', label: 'UPC' },
+        { key: 'nombreProd', label: 'Nombre' },
+        { key: 'nombreMarca', label: 'Marca' },
+        { key: 'nombreCategoria', label: 'Categoria' },
+        { key: 'precioUnit', label: 'Precio unitario' },
+        { key: 'descripcion', label: 'Descripcion' },
+        { key: 'stockProd', label: 'Stock' },
       ],
     };
   },
-  methods: {
-    ...mapMutations("productos", ["applyAllChanges"]),
-  },
   computed: {
-    ...mapState("productos", [
-      "newProd",
-      "deleteTransaction",
-      "editTransaction",
+    ...mapState('productos', [
+      'newProd',
+      'deleteTransaction',
+      'editTransaction',
     ]),
     filteredArrayNewProd() {
-      let cachedProd = JSON.parse(JSON.stringify(this.newProd));
+      const cachedProd = JSON.parse(JSON.stringify(this.newProd));
       return cachedProd.filter((prod) => {
-        let state = prod.state;
-        delete prod.format;
-        delete prod.activoProd;
-        delete prod.state;
+        const {state} = prod;
+        // delete prod.format;
+        // delete prod.activoProd;
+        // delete prod.state;
         return state === 1;
       });
     },
   },
+  methods: {
+    ...mapMutations('productos', ['applyAllChanges']),
+  },
 };
 </script>
+
 <style scoped>
 :deep(.modal-dialog) {
   max-width: 100% !important;

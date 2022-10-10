@@ -198,7 +198,6 @@ export default (app) => ({
           throw new Error(totalNumberOfUPCs);
         }
         if (totalNumberOfUPCs.length > 0) {
-          window.console.log("Se verifica que los _id's sean iguales");
           if (productoDoc._id !== totalNumberOfUPCs[0]._id) {
             window.console.log(
               'No es el mismo doc así que no se modifica, se arroja error que el upc ya existe',

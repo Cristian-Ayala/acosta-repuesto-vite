@@ -2,12 +2,12 @@
   <div class="order">
     <div id="leftSide">
       <b-avatar :variant="statusColor">
-          <i class="fas fa-store" v-if="orden.tipoOrden === 'Local'"></i>
-          <i class="fas fa-motorcycle" v-else></i>
+        <i v-if="orden.tipoOrden === 'Local'" class="fas fa-store"></i>
+        <i v-else class="fas fa-motorcycle"></i>
       </b-avatar>
     </div>
     <div id="rigthSide">
-      <div class="orderName" v-if="orden && orden.nombreCliente">
+      <div v-if="orden && orden.nombreCliente" class="orderName">
         {{ orden.nombreCliente }}
       </div>
       <div v-if="orden && orden._id">
@@ -21,50 +21,58 @@
       </div>
       <a href="#" @click="showModalViewDetails = !showModalViewDetails"> Ver detalles </a>
     </div>
-    <DetalleOrden :ordSelected="orden" :showDetOrd="showModalViewDetails"></DetalleOrden>
+    <detalle-orden :ord-selected="orden" :show-det-ord="showModalViewDetails"></detalle-orden>
   </div>
 </template>
+
 <script>
-import DetalleOrden from "@/components/Ordenes/DetalleOrden.vue";
+import DetalleOrden from '@/components/Ordenes/DetalleOrden.vue';
 
 export default {
-  props: ["orden"],
+  name: 'OrderView',
   components: {
     DetalleOrden,
+  },
+  props: {
+    orden: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
       showModalViewDetails: false,
     };
   },
-  methods: {
-    formatDate(id) {
-        let date = new Date(id);
-        return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
-    },
-  },
   computed: {
-    statusColor: function () {
-        if (!this.orden) return "danger";
+    statusColor () {
+        if (!this.orden) return 'danger';
         
         switch (this.orden.status) {
-            case "Completado":
-                return "success";
-            case "En proceso":
-                return "warning";
-            case "En camino":
-                return "primary";
+            case 'Completado':
+                return 'success';
+            case 'En proceso':
+                return 'warning';
+            case 'En camino':
+                return 'primary';
             default:
                 // In case of cancelado
-                return "danger";
+                return 'danger';
         }
     },
   },
   mounted() {
     // console.log({ ...this.orden });
   },
+  methods: {
+    formatDate(id) {
+        const date = new Date(id);
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
+    },
+  },
 };
 </script>
+
 <style scoped>
 .order {
   padding: 1rem;

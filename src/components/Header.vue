@@ -9,12 +9,12 @@
             $emit('toggleSideBar');
             ('click');
           "
-          ><i class="fas fa-align-left"></i
+        ><i class="fas fa-align-left"></i
         ></a>
         <router-link to="/"
-          ><a class="navbar-brand font-weight-bold text-uppercase text-base"
-            >Acosta Repuestos</a
-          ></router-link
+        ><a class="navbar-brand font-weight-bold text-uppercase text-base"
+        >Acosta Repuestos</a
+        ></router-link
         >
       </nav>
     </header>
@@ -23,11 +23,12 @@
 
 <script>
 export default {
-  name: "Header",
+  name: 'HeaderComp',
+  emits: ['toggleSideBar'],
   methods: {
     sidebarClass() {
-      let elementDOM = document.getElementsByClassName("sidebar")[0].classList;
-      elementDOM.toggle("d-none");
+      const elementDOM = document.getElementsByClassName('sidebar')[0].classList;
+      elementDOM.toggle('d-none');
     },
   },
 };

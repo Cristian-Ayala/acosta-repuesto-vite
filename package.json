@@ -1,17 +1,19 @@
 {
   "name": "acosta-repuestos",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "eslint": "eslint --ext .js,.vue src"
+    "dev": "vite",
+    "eslint": "eslint --ext .js,.vue src",
+    "lint": "eslint --ext .js,.vue src/ --fix",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.6",
     "@zxing/library": "^0.19.1",
     "axios": "^0.27.2",
+    "core-js": "^3.8.3",
     "element-plus": "^2.2.6",
     "events": "^3.3.0",
     "image-resize-compress": "^1.0.8",
@@ -26,6 +28,7 @@
     "@babel/eslint-parser": "^7.19.1",
     "@babel/preset-env": "^7.19.3",
     "@vitejs/plugin-vue": "^2.3.3",
+    "@vue/cli-plugin-babel": "~5.0.0",
     "eslint": "^8.24.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",

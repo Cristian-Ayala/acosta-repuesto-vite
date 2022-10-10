@@ -1,9 +1,10 @@
 <template>
   <router-view />
 </template>
+
 <script>
 export default {
-  name: "Layout",
+  name: 'LayoutIndex',
   components: {
   },
 };

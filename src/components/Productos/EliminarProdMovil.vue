@@ -2,7 +2,7 @@
   <div>
     <!-- inicio del modal para eliminar (mobile) -->
     <b-modal id="deleteProduc" title="Eliminar Producto" centered>
-      <p class="my-4" v-if="newProductMobile.doc">
+      <p v-if="newProductMobile.doc" class="my-4">
         ¿Seguro quiere eliminar el producto:
         {{ newProductMobile.doc.nombreProd }}?
       </p>
@@ -25,20 +25,21 @@
     <!-- Fin del modal para eliminar (mobile) -->
   </div>
 </template>
+
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions } from 'vuex';
 
 export default {
-  name: "EliminarProdMovil",
-  methods: {
-    ...mapActions("productos", [
-      "deleteProducto",
-      // "applyAllChanges"
+  name: 'EliminarProdMovil',
+  computed: {
+    ...mapState('productos', [
+      'newProductMobile',
     ]),
   },
-  computed: {
-    ...mapState("productos", [
-      "newProductMobile",
+  methods: {
+    ...mapActions('productos', [
+      'deleteProducto',
+      // "applyAllChanges"
     ]),
   },
 };

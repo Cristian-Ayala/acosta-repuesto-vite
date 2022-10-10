@@ -1,37 +1,38 @@
 <template>
   <!-- <div v-if="deferredPrompt"> -->
   <div>
-    <b-container fluid class="bg-white banner" v-if="deferredPrompt">
+    <b-container v-if="deferredPrompt" fluid class="bg-white banner">
       <b-row class="p-2">
         <b-col class="d-flex align-items-center justify-content-center"
-          >Instalar Aplicación en tu celular o computadora.</b-col
+        >Instalar Aplicación en tu celular o computadora.</b-col
         >
-        <b-col class="text-center" v-if="windowWidth >= 900">
-          <b-button variant="danger" @click="dismiss" class="mr-2"
-            >Cancelar</b-button
+        <b-col v-if="windowWidth >= 900" class="text-center">
+          <b-button variant="danger" class="mr-2" @click="dismiss()"
+          >Cancelar</b-button
           >
-          <b-button variant="success" @click="install">Instalar</b-button>
+          <b-button variant="success" @click="install()">Instalar</b-button>
         </b-col>
       </b-row>
-      <b-row class="p-3 justify-content-center" v-if="windowWidth < 900">
+      <b-row v-if="windowWidth < 900" class="p-3 justify-content-center">
         <b-col style="text-align: end">
-          <b-button variant="danger" @click="dismiss">Cancelar</b-button>
+          <b-button variant="danger" @click="dismiss()">Cancelar</b-button>
         </b-col>
         <b-col>
-          <b-button variant="success" @click="install"
-            >Instalar</b-button
+          <b-button variant="success" @click="install()"
+          >Instalar</b-button
           ></b-col
         >
       </b-row>
     </b-container>
     <transition name="fade"
-      ><div class="fondoNegro" v-if="deferredPrompt"></div>
+    ><div v-if="deferredPrompt" class="fondoNegro"></div>
     </transition>
   </div>
 </template>
+
 <script>
 export default {
-  name: "InstallPrompt",
+  name: 'InstallPrompt',
   data() {
     return {
       deferredPrompt: null,
@@ -39,14 +40,14 @@ export default {
     };
   },
   created() {
-    window.addEventListener("beforeinstallprompt", (e) => {
+    window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
-      if(!window.localStorage.getItem("instalar")){
+      if(!window.localStorage.getItem('instalar')){
         // Stash the event so it can be triggered later.
         this.deferredPrompt = e;
       }
     });
-    window.addEventListener("appinstalled", () => {
+    window.addEventListener('appinstalled', () => {
       this.deferredPrompt = null;
     });
 
@@ -56,16 +57,17 @@ export default {
   },
   methods: {
     async dismiss() {
-      window.localStorage.setItem("instalar","false");
+      window.localStorage.setItem('instalar','false');
       this.deferredPrompt = null;
     },
     async install() {
-      //Se puede agregar una validacion si el usuario presionó cancelar, así el evento no se registrará
+      // Se puede agregar una validacion si el usuario presionó cancelar, así el evento no se registrará
       this.deferredPrompt.prompt();
     },
   },
 };
 </script>
+
 <style scoped>
 .fondoNegro {
   position: fixed;

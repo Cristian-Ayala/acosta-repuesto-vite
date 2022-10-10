@@ -8,165 +8,154 @@
               <h6 class="text-uppercase mb-0" style="display: inline-block">
                 Productos
               </h6>
-              <el-button color="#28a745" @click="prodSelected({});title = 'Agregar producto';show.addEditProdMovile =true;" circle>
+              <el-button color="#28a745" circle @click="createProduct()">
                 <i class="fa fa-plus" aria-hidden="true"></i>
               </el-button>
             </div>
             <div class="filtros">
               <div class="d-inline-flex pr-2 pb-2">
-                <el-button type="primary" round @click="show.modalFiltros">Filtros ({{ allFilters.length }})</el-button>
+                <el-button type="primary" round @click="show.modalFiltros"
+                >Filtros ({{ allFilters.length }})</el-button>
               </div>
               <div
-                class="d-inline-flex auto-scroll pb-2"
                 v-if="allFilters && allFilters.length > 0"
+                class="d-inline-flex auto-scroll pb-2"
               >
                 <el-button
-                  type="primary"
-                  round
                   v-for="filter in allFilters"
                   :key="filter"
+                  type="primary"
+                  round
                   disabled
-                  @click="show.modalFiltros"
                   class="btn-sm pr-2 pl-2"
-                  >
-                    {{ filter }}
+                  @click="show.modalFiltros"
+                >
+                  {{ filter }}
                 </el-button>
               </div>
             </div>
           </div>
           <div class="bodyProducts">
-            <el-card 
-              :body-style="{ padding: '0px' }"
+            <el-card
               v-for="prod in productos"
               :key="prod.upc"
-              >
-              <img
-                :src="prod.doc.foto"
-                class="image"
-              />
-              <div style="padding: 14px;text-align: center;">
+              :body-style="{ padding: '0px' }"
+            >
+              <img :src="prod.doc.foto" class="image">
+              <div style="padding: 14px; text-align: center">
                 <span>{{ prod.doc.nombreProd }}</span>
                 <div class="bottom">
                   <!-- UPC: {{ prod.doc.upc }}<br /> -->
-                  <div style="display: flex;justify-content: space-around;">
-                    <span class="productPrices">P.M.: <br>${{ prod.doc.precioMayoreo }}</span>
-                    <span class="productPrices">P.P.: <br>${{ prod.doc.precioPublico }}</span>
-                    <span class="productPrices">P.T.: <br>${{ prod.doc.precioTaller }}</span>
+                  <div style="display: flex; justify-content: space-around">
+                    <span class="productPrices"
+                    >P.M.: <br>${{ prod.doc.precioMayoreo }}</span
+                    >
+                    <span class="productPrices"
+                    >P.P.: <br>${{ prod.doc.precioPublico }}</span
+                    >
+                    <span class="productPrices"
+                    >P.T.: <br>${{ prod.doc.precioTaller }}</span
+                    >
                   </div>
-                  Stock: {{ prod.doc.stockProd }}<br />
-                  Marca: {{ prod.doc.nombreMarca }}<br />
-                  Categoria: {{ prod.doc.nombreCategoria }}<br />
+                  Stock: {{ prod.doc.stockProd }}<br>
+                  Marca: {{ prod.doc.nombreMarca }}<br>
+                  Categoria: {{ prod.doc.nombreCategoria }}<br>
                 </div>
-                <el-button type="warning" @click="prodSelected(prod);title = 'Editar producto';show.addEditProdMovile = true" circle>
-                  <i class="fas fa-pencil-alt" aria-hidden="true"/>
+                <el-button
+                  type="warning"
+                  circle
+                  @click="
+                    prodSelected(prod);
+                    title = 'Editar producto';
+                    show.addEditProdMovile = true;
+                  "
+                >
+                  <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                 </el-button>
-                <el-button type="danger" @click="prodSelected(prod);show.deleteProduc = true" circle>
-                  <i class="fas fa-times" aria-hidden="true"/>
+                <el-button
+                  type="danger"
+                  circle
+                  @click="
+                    prodSelected(prod);
+                    show.deleteProduc = true;
+                  "
+                >
+                  <i class="fas fa-times" aria-hidden="true"></i>
                 </el-button>
               </div>
-            </el-card>        
+            </el-card>
           </div>
-          <div class="mt-3" style="margin-left: -12px;">
+          <div class="mt-3" style="margin-left: -12px">
             <el-pagination
+              v-model:currentPage="currentPageLocal"
               small
               background
               layout="prev, pager, next"
               :total="totalRows"
               :page-size="perPage"
-              v-model:currentPage="currentPageLocal"
             />
           </div>
         </div>
       </div>
-      <!-- <ConfirmarTransacciones :show=show></ConfirmarTransacciones>
-      <EliminarProdMovil :show=show></EliminarProdMovil>
-      <AddEditProdMovile :title="title" :show=show></AddEditProdMovile>
-      <FiltrosProductos :show=show></FiltrosProductos> -->
+      <!-- 
+        <ConfirmarTransacciones :show=show></ConfirmarTransacciones>
+        <EliminarProdMovil :show=show></EliminarProdMovil>
+        <AddEditProdMovile :title="title" :show=show></AddEditProdMovile>
+        <FiltrosProductos :show=show></FiltrosProductos> 
+      -->
     </div>
   </div>
 </template>
 
 <script>
-import ConfirmarTransacciones from "@/components/Productos/ConfirmarTransacciones.vue";
-import EliminarProdMovil from "@/components/Productos/EliminarProdMovil.vue";
-import AddEditProdMovile from "@/components/Productos/AddEditProdMovile.vue";
-import FiltrosProductos from "@/components/Productos/FiltrosProductos.vue";
-import { mapState, mapMutations, mapActions } from "vuex";
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
-  name: "Productos",
-  components: {
-    ConfirmarTransacciones,
-    EliminarProdMovil,
-    AddEditProdMovile,
-    FiltrosProductos,
-  },
-  data: () => {
+  name: 'ProductosIndex',
+  // components: {
+  //   ConfirmarTransacciones: () => import('@/components/Productos/ConfirmarTransacciones.vue'),
+  //   EliminarProdMovil: () => import('@/components/Productos/EliminarProdMovil.vue'),
+  //   AddEditProdMovile: () => import('@/components/Productos/AddEditProdMovile.vue'),
+  //   FiltrosProductos: () => import('@/components/Productos/FiltrosProductos.vue'),
+  // },
+  data() {
     return {
-      displayOption: "",
-      searchDisplay: "",
-      tab: "",
-      title: "Editar",
+      displayOption: '',
+      searchDisplay: '',
+      tab: '',
+      title: 'Editar',
       currentPageLocal: 1,
       show: {
-        addEditProdMovile: false, 
+        addEditProdMovile: false,
         modalFiltros: false,
         deleteProduc: false,
-      }
+      },
     };
   },
-  methods: {
-    ...mapMutations("productos", [
-      "clearData",
-      "removeRegistro",
-      "editProd",
-      "saveEditProd",
-      "undoEditProd",
-      "transactionRemove",
-      "addProd",
-      "removeNewRegistro",
-      "saveNewProduct",
-      "editNewRegistro",
-      "prodSelected",
-    ]),
-    ...mapActions("productos", ["setPage"]),
-
-    filtro(valor) {
-      if (this.searchDisplay.trim() === "") return true;
-      let array = (
-        this.productos[valor].nombreProd +
-        this.productos[valor].descripcion +
-        this.productos[valor].precioUnit +
-        this.productos[valor].stockProd +
-        this.productos[valor].upc
-      ).toUpperCase();
-      return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
-    },
-  },
   computed: {
-    ...mapState("productos", [
-      "productos",
-      "producto",
-      "cacheEditProd",
-      "editedProd",
-      "newProd",
-      "deleteTransaction",
-      "editTransaction",
-      "numeroDeEditados",
-      "newProductMobile",
-      "currentPage",
-      "perPage",
-      "totalRows",
-      "filtroCategorias",
-      "filtroMarcas",
-      "filtroNombre",
-      "filtroUPC",
+    ...mapState('productos', [
+      'productos',
+      'producto',
+      'cacheEditProd',
+      'editedProd',
+      'newProd',
+      'deleteTransaction',
+      'editTransaction',
+      'numeroDeEditados',
+      'newProductMobile',
+      'currentPage',
+      'perPage',
+      'totalRows',
+      'filtroCategorias',
+      'filtroMarcas',
+      'filtroNombre',
+      'filtroUPC',
     ]),
-    ...mapState("categorias", ["categorias"]),
-    allFilters: function () {
-      console.log("allFilters")
-      let categories = this.filtroCategorias.map((cat) => cat.nombreCategoria);
-      let brands = this.filtroMarcas.map((marca) => marca.nombreMarca);
+    ...mapState('categorias', ['categorias']),
+    allFilters() {
+      console.log('allFilters');
+      const categories = this.filtroCategorias.map((cat) => cat.nombreCategoria);
+      const brands = this.filtroMarcas.map((marca) => marca.nombreMarca);
       if (this.filtroNombre) {
         categories.push(this.filtroNombre);
       }
@@ -177,15 +166,49 @@ export default {
     },
   },
   watch: {
-    currentPageLocal: function (valor) {
+    currentPageLocal(valor) {
       this.setPage(valor);
     },
-    currentPage: function (valor) {
+    currentPage(valor) {
       this.currentPageLocal = valor;
+    },
+  },
+  methods: {
+    ...mapMutations('productos', [
+      'clearData',
+      'removeRegistro',
+      'editProd',
+      'saveEditProd',
+      'undoEditProd',
+      'transactionRemove',
+      'addProd',
+      'removeNewRegistro',
+      'saveNewProduct',
+      'editNewRegistro',
+      'prodSelected',
+    ]),
+    ...mapActions('productos', ['setPage']),
+
+    filtro(valor) {
+      if (this.searchDisplay.trim() === '') return true;
+      const array = (
+        this.productos[valor].nombreProd +
+        this.productos[valor].descripcion +
+        this.productos[valor].precioUnit +
+        this.productos[valor].stockProd +
+        this.productos[valor].upc
+      ).toUpperCase();
+      return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
+    },
+    createProduct() {
+      this.prodSelected({});
+      this.title = 'Agregar producto';
+      this.show.addEditProdMovile = true;
     },
   },
 };
 </script>
+
 <style scoped>
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
@@ -327,6 +350,6 @@ td input {
   background-color: #ecf5ff;
   border: 1px solid #409eff;
   padding: 0.2rem;
-  transform: scale(0.8);
+  transform: scale(0.9);
 }
 </style>

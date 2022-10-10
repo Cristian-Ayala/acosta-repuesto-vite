@@ -1,63 +1,63 @@
 <template>
   <div>
     <!-- inicio del modal para eliminar (mobile) -->
-    <b-modal id="addEditProdMovile" :title="title" centered @show="modalIsActive" @hide="modalWillHide">
+    <b-modal id="addEditProdMovile" :title="title" centered @show="modalIsActive()" @hide="modalWillHide()">
       <div v-if="newProductMobile">
         <div class="form-group row">
           <label class="col-md-3 form-control-label">UPC:</label>
           <div class="col-md-9"></div>
-          <div class="col-md-9 input-group" v-if="newProductMobile.doc">
+          <div v-if="newProductMobile.doc" class="col-md-9 input-group">
             <input
+              v-model="newProductMobile.doc.upc"
               type="text"
               class="form-control"
-              v-model="newProductMobile.doc.upc"
-            /><span
-              class="input-group-text"
+            ><span
               v-b-modal.barCode
+              class="input-group-text"
               @click="
                 showBarcode = !showBarcode;
                 setCalledFrom('AddEditProdMovile.vue');
               "
-              ><i class="fas fa-barcode"
-            /></span>
+            ><i class="fas fa-barcode"
+            ></i></span>
           </div>
         </div>
         <div class="line"></div>
-        <!-------------------------------------------- -->
+        <!-- ------------------------------------------ -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Nombre</label>
-          <div class="col-md-9" v-if="newProductMobile.doc">
+          <div v-if="newProductMobile.doc" class="col-md-9">
             <input
+              v-model="newProductMobile.doc.nombreProd"
               type="text"
               class="form-control"
-              v-model="newProductMobile.doc.nombreProd"
-            />
+            >
           </div>
         </div>
         <div class="line"></div>
-        <!-------------------------------------------- -->
+        <!-- ------------------------------------------ -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Foto:</label>
-          <div class="col-md-9" v-if="newProductMobile.doc">
+          <div v-if="newProductMobile.doc" class="col-md-9">
             <h6 v-if="error">{{ error }}</h6>
-            <div class="spinner-border" role="status" v-if="loadingEffect">
+            <div v-if="loadingEffect" class="spinner-border" role="status">
               <span class="sr-only">Cargando...</span>
             </div>
             <input
+              v-if="!imagePreview && !loadingEffect"
+              id="uploadPictures"
               type="file"
               accept="image/x-png,image/jpeg,image/webp"
-              id="uploadPictures"
+              style="color: transparent"
               @change="
                 upload();
                 loadingEffect = true;
                 error = '';
               "
-              v-if="!imagePreview && !loadingEffect"
-              style="color: transparent"
-            />
+            >
             <div
-              class="image-preview-container"
               v-if="imagePreview && !loadingEffect"
+              class="image-preview-container"
             >
               <img
                 class="image-preview"
@@ -65,18 +65,18 @@
                 alt="Picture"
                 width="150"
                 height="100%"
-              />
+              >
               <b-button variant="danger" @click="imagePreview = ''"
-                >Quitar</b-button
+              >Quitar</b-button
               >
             </div>
           </div>
         </div>
         <div class="line"></div>
-        <!-------------------------------------------- -->
+        <!-- ------------------------------------------ -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Marca</label>
-          <div class="col-md-9" v-if="newProductMobile.doc">
+          <div v-if="newProductMobile.doc" class="col-md-9">
             <b-dropdown
               :text="marcaDropdown"
               split
@@ -86,27 +86,27 @@
               class="m-2"
             >
               <b-dropdown-item
-                href="#"
                 v-for="marca in marcas"
                 :key="marca.doc.nombreMarca"
+                href="#"
                 @click="marcaSel(marca.doc)"
-                >{{ marca.doc.nombreMarca }}</b-dropdown-item
+              >{{ marca.doc.nombreMarca }}</b-dropdown-item
               >
               <b-button
                 v-b-modal.modalAgregarMar
                 variant="success"
-                v-on:click="clearData()"
                 class="btn-circle"
-                ><i class="fa fa-plus" aria-hidden="true"></i>
+                @click="clearData()"
+              ><i class="fa fa-plus" aria-hidden="true"></i>
               </b-button>
             </b-dropdown>
           </div>
         </div>
         <div class="line"></div>
-        <!-------------------------------------------- -->
+        <!-- ------------------------------------------ -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Categoria</label>
-          <div class="col-md-9" v-if="newProductMobile.doc">
+          <div v-if="newProductMobile.doc" class="col-md-9">
             <b-dropdown
               :text="descripcionDropdown"
               split
@@ -116,68 +116,68 @@
               class="m-2"
             >
               <b-dropdown-item
-                href="#"
                 v-for="categoria in categorias"
                 :key="categoria.doc.nombreCategoria"
+                href="#"
                 @click="catSel(categoria.doc)"
-                >{{ categoria.doc.nombreCategoria }}</b-dropdown-item
+              >{{ categoria.doc.nombreCategoria }}</b-dropdown-item
               >
               <b-button
                 v-b-modal.modal-1
                 variant="success"
-                v-on:click="clearDataCat()"
                 class="btn-circle"
-                ><i class="fa fa-plus" aria-hidden="true"></i>
+                @click="clearDataCat()"
+              ><i class="fa fa-plus" aria-hidden="true"></i>
               </b-button>
             </b-dropdown>
           </div>
         </div>
         <div class="line"></div>
-        <!-------------------------------------------- -->
+        <!-- ------------------------------------------ -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Precio Mayorista:</label>
-          <div class="col-md-9" v-if="newProductMobile.doc">
+          <div v-if="newProductMobile.doc" class="col-md-9">
             <input
+              v-model="newProductMobile.doc.precioMayoreo"
               type="number"
               class="form-control"
-              v-model="newProductMobile.doc.precioMayoreo"
               min="0"
-            />
+            >
           </div>
         </div>
         <div class="line"></div>
-        <!-------------------------------------------- -->
-        <!-------------------------------------------- -->
+        <!-- ------------------------------------------ -->
+        <!-- ------------------------------------------ -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Precio Público:</label>
-          <div class="col-md-9" v-if="newProductMobile.doc">
+          <div v-if="newProductMobile.doc" class="col-md-9">
             <input
+              v-model="newProductMobile.doc.precioPublico"
               type="number"
               class="form-control"
-              v-model="newProductMobile.doc.precioPublico"
               min="0"
-            />
+            >
           </div>
         </div>
         <div class="line"></div>
-        <!-------------------------------------------- -->
-        <!-------------------------------------------- -->
+        <!-- ------------------------------------------ -->
+        <!-- ------------------------------------------ -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Precio Taller:</label>
-          <div class="col-md-9" v-if="newProductMobile.doc">
+          <div v-if="newProductMobile.doc" class="col-md-9">
             <input
+              v-model="newProductMobile.doc.precioTaller"
               type="number"
               class="form-control"
-              v-model="newProductMobile.doc.precioTaller"
               min="0"
-            />
+            >
           </div>
         </div>
         <div class="line"></div>
-        <!-------------------------------------------- -->
+        <!-- ------------------------------------------ -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Stock:</label>
-          <div class="col-md-9" v-if="newProductMobile.doc">
+          <div v-if="newProductMobile.doc" class="col-md-9">
             <b-form-spinbutton
               id="decrementIncrement"
               v-model="newProductMobile.doc.stockProd"
@@ -187,7 +187,7 @@
           </div>
         </div>
         <div class="line"></div>
-        <!-------------------------------------------- -->
+        <!-- ------------------------------------------ -->
       </div>
       <template #modal-footer="{ ok, cancel }">
         <b-button size="md" variant="danger" @click="cancel()">
@@ -206,151 +206,51 @@
       </template>
     </b-modal>
     <!-- Fin del modal para eliminar (mobile) -->
-    <AgregarMar></AgregarMar>
-    <AgregarCat></AgregarCat>
-    <UPCReader></UPCReader>
+    <agregar-mar></agregar-mar>
+    <agregar-cat></agregar-cat>
+    <u-p-c-reader></u-p-c-reader>
   </div>
 </template>
+
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
-import { blobToURL, fromBlob } from "image-resize-compress";
-import AgregarMar from "@/components/Marcas/AgregarMar.vue";
-import AgregarCat from "@/components/Categorias/AgregarCat.vue";
-import UPCReader from "@/components/Productos/UPCReader.vue";
+import Vue from 'vue';
+import { mapState, mapMutations, mapActions } from 'vuex';
+import { blobToURL, fromBlob } from 'image-resize-compress';
+import AgregarMar from '@/components/Marcas/AgregarMar.vue';
+import AgregarCat from '@/components/Categorias/AgregarCat.vue';
+import UPCReader from '@/components/Productos/UPCReader.vue';
 
 // Variables for upc barcode scanner
-let code = "";
+let code = '';
 let reading = false;
 
 export default {
-  name: "AddEditProdMovile",
-  props: {
-    title: {
-      type: String,
-      default: "Editar",
-      marcaDropdown: "",
-      descripcionDropdown: "",
-    },
-  },
+  name: 'AddEditProdMovile',
   components: {
     AgregarMar,
     AgregarCat,
     UPCReader,
   },
+  props: {
+    title: {
+      type: String,
+      default: 'Editar',
+      marcaDropdown: '',
+      descripcionDropdown: '',
+    },
+  },
   data() {
     return {
-      imagePreview: "",
+      imagePreview: '',
       showBarcode: false,
       loadingEffect: false,
-      error: "",
+      error: '',
     };
   },
-  methods: {
-    ...mapMutations("productos", [
-      "removeRegistro",
-      "applyAllChanges",
-      "marcaSelected",
-      "categoriaSelected",
-      "fotoSelected",
-      "setCalledFrom",
-    ]),
-    ...mapActions("productos", ["confirmation"]),
-    ...mapMutations("marcas", ["clearData"]),
-    ...mapMutations("categorias", ["clearDataCat"]),
-    upload() {
-      return new Promise((resolve, reject) => {
-        const filePicker = document.getElementById("uploadPictures");
-
-        if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {
-          reject("No hay imagen seleccionada");
-          return;
-        }
-        const myFile = filePicker.files[0];
-
-        //Options for file
-        var quality = 100;
-        const width = "auto";
-        const height = "auto";
-        const format = "webp";
-        this.checkSize(myFile, quality, width, height, format);
-        //console.log(myFile);//prints the file in JSON
-        resolve();
-      });
-    },
-    checkSize(myFile, quality, width, height, format) {
-      fromBlob(myFile, quality, width, height, format).then((blob) => {
-        console.log(blob);
-        if (blob.size > 400000) {
-          if (quality > 20) {
-            quality = quality - 20;
-            this.checkSize(myFile, quality, width, height, format);
-          } else if (quality === 20) {
-            quality = 10;
-            this.checkSize(myFile, quality, width, height, format);
-          } else if (quality === 10) {
-            quality = 1;
-            this.checkSize(myFile, quality, width, height, format);
-          }else{
-            this.error = "La imagen es demasiado grande";
-            this.loadingEffect = false;
-          }
-          return;
-        }
-        // will generate a url to the converted file
-        blobToURL(blob).then((url) => {
-          this.imagePreview = url;
-          this.fotoSelected(url);
-          this.loadingEffect = false;
-          console.log("KB length: " + blob.size) / 1e3;
-          console.log("MB: " + blob.size / 1e6);
-        });
-      });
-    },
-    marcaSel(marca) {
-      let cache = marca.nombreMarca;
-      marca.nombreMarca = "";
-      marca.nombreMarca = cache;
-      this.marcaDropdown = marca.nombreMarca;
-      this.marcaSelected(marca.nombreMarca);
-    },
-    catSel(categoria) {
-      let cache = categoria.nombreCategoria;
-      categoria.nombreCategoria = "";
-      categoria.nombreCategoria = cache;
-      this.descripcionDropdown = categoria.nombreCategoria;
-      this.categoriaSelected(categoria.nombreCategoria);
-    },
-    modalIsActive() {
-      document.addEventListener('keypress', this.listenerFunction);
-    },
-    modalWillHide() {
-      document.removeEventListener('keypress', this.listenerFunction);
-    },
-    listenerFunction(e) {
-      //usually scanners throw an 'Enter' key at the end of read
-      if (e.key === 'Enter') {
-        if (code.length > 10) {
-          this.newProductMobile.doc.upc = code;
-          /// code ready to use
-          code = "";
-        }
-      } else {
-        code += e.key; //while this is not an 'enter' it stores the every key
-      }
-      //run a timeout of 200ms at the first read and clear everything
-      if (!reading) {
-        reading = true;
-        setTimeout(() => {
-          code = "";
-          reading = false;
-        }, 200); //200 works fine for me but you can adjust it
-      }
-    },
-  },
   computed: {
-    ...mapState("productos", ["newProductMobile"]),
-    ...mapState("marcas", ["marcas"]),
-    ...mapState("categorias", ["categorias"]),
+    ...mapState('productos', ['newProductMobile']),
+    ...mapState('marcas', ['marcas']),
+    ...mapState('categorias', ['categorias']),
   },
   watch: {
     newProductMobile: {
@@ -361,17 +261,17 @@ export default {
             this.descripcionDropdown =
               this.newProductMobile.doc.nombreCategoria;
           } else {
-            this.descripcionDropdown = "";
+            this.descripcionDropdown = '';
           }
           if (this.newProductMobile.doc.nombreMarca) {
             this.marcaDropdown = this.newProductMobile.doc.nombreMarca;
           } else {
-            this.marcaDropdown = "";
+            this.marcaDropdown = '';
           }
           if (this.newProductMobile.doc.foto) {
             this.imagePreview = this.newProductMobile.doc.foto;
           } else {
-            this.imagePreview = "";
+            this.imagePreview = '';
           }
         }
       },
@@ -380,8 +280,99 @@ export default {
     //   this.newProductMobile = this.barcode;
     // },
   },
+  methods: {
+    ...mapMutations('productos', [
+      'removeRegistro',
+      'applyAllChanges',
+      'marcaSelected',
+      'categoriaSelected',
+      'fotoSelected',
+      'setCalledFrom',
+    ]),
+    ...mapActions('productos', ['confirmation']),
+    ...mapMutations('marcas', ['clearData']),
+    ...mapMutations('categorias', ['clearDataCat']),
+    upload() {
+      return new Promise((resolve, reject) => {
+        const filePicker = document.getElementById('uploadPictures');
+
+        if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {
+          reject(new Error('No hay imagen seleccionada'));
+          return;
+        }
+        const myFile = filePicker.files[0];
+
+        // Options for file
+        const quality = 100;
+        const width = 'auto';
+        const height = 'auto';
+        const format = 'webp';
+        this.checkSize(myFile, quality, width, height, format);
+        // console.log(myFile);//prints the file in JSON
+        resolve();
+      });
+    },
+    checkSize(myFile, quality, width, height, format) {
+      fromBlob(myFile, quality, width, height, format).then((blob) => {
+        console.log(blob);
+        if (blob.size > 400000) {
+          if (quality > 20) this.checkSize(myFile, quality -20, width, height, format);
+          else if (quality === 20) this.checkSize(myFile, 10, width, height, format);
+          else if (quality === 10) this.checkSize(myFile, 1, width, height, format);
+          else{
+            this.error = 'La imagen es demasiado grande';
+            this.loadingEffect = false;
+          }
+          return;
+        }
+        // will generate a url to the converted file
+        blobToURL(blob).then((url) => {
+          this.imagePreview = url;
+          this.fotoSelected(url);
+          this.loadingEffect = false;
+          // console.log(`KB length: ${  blob.size}`) / 1e3;
+          // console.log(`MB: ${  blob.size / 1e6}`);
+        });
+      });
+    },
+    marcaSel(marca) {
+      Vue.set(this, 'marcaDropdown', marca.nombreMarca);
+      this.marcaSelected(marca.nombreMarca);
+    },
+    catSel(categoria) {
+      Vue.set(this, 'descripcionDropdown', categoria.nombreCategoria);
+      this.categoriaSelected(categoria.nombreCategoria);
+    },
+    modalIsActive() {
+      document.addEventListener('keypress', this.listenerFunction);
+    },
+    modalWillHide() {
+      document.removeEventListener('keypress', this.listenerFunction);
+    },
+    listenerFunction(e) {
+      // usually scanners throw an 'Enter' key at the end of read
+      if (e.key === 'Enter') {
+        if (code.length > 10) {
+          this.newProductMobile.doc.upc = code;
+          /// code ready to use
+          code = '';
+        }
+      } else {
+        code += e.key; // while this is not an 'enter' it stores the every key
+      }
+      // run a timeout of 200ms at the first read and clear everything
+      if (!reading) {
+        reading = true;
+        setTimeout(() => {
+          code = '';
+          reading = false;
+        }, 200); // 200 works fine for me but you can adjust it
+      }
+    },
+  },
 };
 </script>
+
 <style scoped>
 @media (max-width) {
   :deep(.btn-group > .btn-group:not(:first-child) > .btn),

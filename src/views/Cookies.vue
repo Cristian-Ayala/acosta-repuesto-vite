@@ -6,7 +6,7 @@
         <h5 class="font-weight-light mb-3">
           Por favor habilite las cookies para continuar.
         </h5>
-        <button class="btn btn-dark btn-sm" id="stop" @click="onClickCookies()">
+        <button id="stop" class="btn btn-dark btn-sm" @click="onClickCookies()">
           Presiona aquí cuando las habilites
         </button>
       </div>
@@ -18,13 +18,15 @@
           <a
             href="https://support.google.com/accounts/answer/61416?hl=es-419&co=GENIE.Platform%3DDesktop"
             target="_blank"
-            >aquí</a
+            rel="noopener noreferrer"
+          >aquí</a
           >
           o
           <a
             href="https://support.cloudhq.net/how-to-enable-3rd-party-cookies-in-google-chrome-browser/"
             target="_blank"
-            >aquí</a
+            rel="noopener noreferrer"
+          >aquí</a
           >
         </p>
         <h6 v-if="visible" class="visible">
@@ -41,66 +43,68 @@
     </div>
   </div>
 </template>
+
 <script>
 export default {
-  name: "Cookies",
-  data: () => {
-    return {
+  name: 'CookiesView',
+  data: () => ({
       visible: false,
-    };
-  },
+    }),
   created() {
-    const url = this.$url + "/step1.js.php";
-    var step1El = document.createElement("script");
-    step1El.setAttribute("src", url);
+    const url = `${this.$url  }/step1.js.php`;
+    const step1El = document.createElement('script');
+    step1El.setAttribute('src', url);
     document.head.appendChild(step1El);
   },
   mounted() {
-    var that = this;
+    const that = this;
+    // eslint-disable-next-line
     window._3rd_party_test_step1_loaded = function () {
       // At this point, a third-party domain has now attempted to set a cookie (if all went to plan!)
-      var resultsEl = document.getElementById("3rd_party_cookie_test_results"),
-        step2El = document.createElement("script");
+      const resultsEl = document.getElementById('3rd_party_cookie_test_results');
+        const step2El = document.createElement('script');
 
       // Update loading / results message
-      resultsEl.innerHTML = "Etapa uno completada, cargando etapa 2&hellip;";
+      resultsEl.innerHTML = 'Etapa uno completada, cargando etapa 2&hellip;';
       // And load the second part of the test (reading the cookie)
-      const url = that.$url + "/step2.js.php";
-      step2El.setAttribute("src", url);
+      const url = `${that.$url  }/step2.js.php`;
+      step2El.setAttribute('src', url);
       //   document.head.appendChild(step2El)
       resultsEl.appendChild(step2El);
     };
+    // eslint-disable-next-line
     window._3rd_party_test_step2_loaded = function (cookieSuccess) {
-      var resultsEl = document.getElementById("3rd_party_cookie_test_results"),
-        errorEl = document.getElementById("3rd_party_cookie_test_error");
+      const resultsEl = document.getElementById('3rd_party_cookie_test_results');
+        const errorEl = document.getElementById('3rd_party_cookie_test_error');
       // Show message
       resultsEl.innerHTML = cookieSuccess
-        ? "Las cookies de terceros estan <b>funcionando</b> en tu navegador."
-        : "Las cookies de terceros estan <b>desabilitadas</b>.";
+        ? 'Las cookies de terceros estan <b>funcionando</b> en tu navegador.'
+        : 'Las cookies de terceros estan <b>desabilitadas</b>.';
 
       // Done, so remove loading class
-      resultsEl.className = resultsEl.className.replace(/\bloading\b/, " ");
+      resultsEl.className = resultsEl.className.replace(/\bloading\b/, ' ');
       // And remove error message
-      errorEl.className = "hidden";
+      errorEl.className = 'hidden';
     };
-    window.setTimeout(function () {
-      var errorEl = document.getElementById("3rd_party_cookie_test_error");
+    window.setTimeout(() => {
+      const errorEl = document.getElementById('3rd_party_cookie_test_error');
       if (errorEl.className.match(/\berror\b/)) {
         // Show error message
-        errorEl.className = errorEl.className.replace(/\bhidden\b/, " ");
+        errorEl.className = errorEl.className.replace(/\bhidden\b/, ' ');
       }
     }, 7 * 1000); // 7 sec timeout
   },
   methods: {
     onClickCookies() {
       //   !timedOut ? this.$router.push({ path: "/login" }) : (this.visible = true);
-      //this.$router.go();
-      this.$router.push({ path: "/login" })
-      console.log("click");
+      // this.$router.go();
+      this.$router.push({ path: '/login' })
+      console.log('click');
     },
   },
 };
 </script>
+
 <style scoped>
 .error {
   color: #c00;

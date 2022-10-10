@@ -6,66 +6,66 @@
       centered
       size="xl"
       title=""
-      @show="getFilters"
-      @hide="clearFilters"
+      @show="getFilters()"
+      @hide="clearFilters()"
     >
       <h5>UPC</h5>
       <div class="input-group">
-        <input type="text" class="form-control" v-model="tmpFiltroUPC" /><span
-          class="input-group-text"
+        <input v-model="tmpFiltroUPC" type="text" class="form-control" ><span
           v-b-modal.barCode
+          class="input-group-text"
           @click="
             showBarcode = !showBarcode;
             setCalledFrom('FiltrosProductos.vue');
           "
-          ><i class="fas fa-barcode"
-        /></span>
+        ><i class="fas fa-barcode"
+        ></i></span>
       </div>
-      <hr />
+      <hr >
       <div class="nombreProducto">
         <h5>Nombre</h5>
-        <input type="search" placeholder="Buscar" v-model="tmpFiltroNombre" />
+        <input v-model="tmpFiltroNombre" type="search" placeholder="Buscar" >
       </div>
-      <hr />
-      <div class="marcas" v-if="marcas.length > 0">
+      <hr >
+      <div v-if="marcas.length > 0" class="marcas">
         <h5>Marcas:</h5>
         <b-button
-          class="btn-sm p-1 m-1"
-          variant="outline-info"
           v-for="mar in marcas"
           :key="mar.doc.nombreMarca"
+          class="btn-sm p-1 m-1"
+          variant="outline-info"
           :class="{
             active: tmpFiltroMarcasActivas.includes(mar.doc),
           }"
           @click="
             tmpFiltroMarcasActivas.includes(mar.doc)
               ? tmpFiltroMarcasActivas.splice(
-                  tmpFiltroMarcasActivas.indexOf(mar.doc),
-                  1
-                )
+                tmpFiltroMarcasActivas.indexOf(mar.doc),
+                1,
+              )
               : tmpFiltroMarcasActivas.push(mar.doc)
           "
         >
           {{ mar.doc.nombreMarca }}
         </b-button>
       </div>
-      <hr />
-      <div class="categorias" v-if="categorias.length > 0">
+      <hr >
+      <div v-if="categorias.length > 0" class="categorias">
         <h5>Categorias:</h5>
         <b-button
-          class="btn-sm p-1 m-1"
-          variant="outline-info"
           v-for="categoria in categorias"
           :key="categoria.doc.nombreCategoria"
+          class="btn-sm p-1 m-1"
+          variant="outline-info"
           :class="{
             active: tmpFiltroCategoriasActivas.includes(categoria.doc),
           }"
           @click="
             tmpFiltroCategoriasActivas.includes(categoria.doc)
               ? tmpFiltroCategoriasActivas.splice(
-                  tmpFiltroCategoriasActivas.indexOf(categoria.doc),
-                  1
-                )
+                tmpFiltroCategoriasActivas.indexOf(categoria.doc),
+                1,
+              )
               : tmpFiltroCategoriasActivas.push(categoria.doc)
           "
         >
@@ -104,47 +104,56 @@
     </b-modal>
   </div>
 </template>
+
 <script>
 // import { mapState, mapMutations, mapActions } from "vuex";
-import { mapActions, mapMutations, mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from 'vuex';
 
 // Variables for upc barcode scanner
-let code = "";
+let code = '';
 let reading = false;
 
 export default {
-  name: "FiltrosProductos",
-  props: {
-    show: {
-      type: Object,
-      default: () => ({
-        modalFiltros: false,
-      }),
-    },
-  },
-  data: () => {
-    return {
+  name: 'FiltrosProductos',
+  data: () => ({
       tmpFiltroMarcasActivas: [],
       tmpFiltroCategoriasActivas: [],
-      tmpFiltroNombre: "",
-      tmpFiltroUPC: "",
+      tmpFiltroNombre: '',
+      tmpFiltroUPC: '',
       showBarcode: false,
-    };
-  },
+    }),
   computed: {
-    ...mapState("categorias", ["categorias"]),
-    ...mapState("marcas", ["marcas"]),
-    ...mapState("productos", [
-      "filtroCategorias",
-      "filtroMarcas",
-      "filtroNombre",
-      "filtroUPC",
-      "tempFiltroUPC"
+    ...mapState('categorias', ['categorias']),
+    ...mapState('marcas', ['marcas']),
+    ...mapState('productos', [
+      'filtroCategorias',
+      'filtroMarcas',
+      'filtroNombre',
+      'filtroUPC',
+      'tempFiltroUPC'
     ]),
   },
+  watch: {
+    filtroMarcas (filtroMarcas) {
+      this.tmpFiltroMarcasActivas = [...filtroMarcas];
+    },
+    filtroCategorias (filtroCategorias) {
+      this.tmpFiltroCategoriasActivas = [...filtroCategorias];
+    },
+    filtroNombre (filtroNombre) {
+      this.tmpFiltroNombre = filtroNombre.toString();
+    },
+    filtroUPC (filtroUPC) {
+      // this.setFiltroUPC(filtroUPC.toString());
+      this.tmpFiltroUPC = filtroUPC;
+    },
+    tempFiltroUPC (tempFiltroUPC) {
+      this.tmpFiltroUPC = tempFiltroUPC;
+    },
+  },
   methods: {
-    ...mapActions("productos", ["aplicarFiltros", "borrarFiltros"]),
-    ...mapMutations("productos", ["setCalledFrom","setFiltroUPC"]),
+    ...mapActions('productos', ['aplicarFiltros', 'borrarFiltros']),
+    ...mapMutations('productos', ['setCalledFrom','setFiltroUPC']),
     getFilters() {
       // console.log(JSON.parse(JSON.stringify(this.filtroMarcas)));
       // console.log(this.filtroMarcas);
@@ -161,7 +170,7 @@ export default {
       document.removeEventListener('keypress', this.listenerFunction);
     },
     listenerFunction(e) {
-      //usually scanners throw an 'Enter' key at the end of read
+      // usually scanners throw an 'Enter' key at the end of read
       if (e.key === 'Enter') {
         if (code.length > 10) {
           this.tmpFiltroUPC = code;
@@ -173,41 +182,24 @@ export default {
             });
           this.$bvModal.hide('modalFiltros');
           /// code ready to use
-          code = "";
+          code = '';
         }
       } else {
-        code += e.key; //while this is not an 'enter' it stores the every key
+        code += e.key; // while this is not an 'enter' it stores the every key
       }
-      //run a timeout of 200ms at the first read and clear everything
+      // run a timeout of 200ms at the first read and clear everything
       if (!reading) {
         reading = true;
         setTimeout(() => {
-          code = "";
+          code = '';
           reading = false;
-        }, 200); //200 works fine for me but you can adjust it
+        }, 200); // 200 works fine for me but you can adjust it
       }
-    },
-  },
-  watch: {
-    filtroMarcas: function (filtroMarcas) {
-      this.tmpFiltroMarcasActivas = [...filtroMarcas];
-    },
-    filtroCategorias: function (filtroCategorias) {
-      this.tmpFiltroCategoriasActivas = [...filtroCategorias];
-    },
-    filtroNombre: function (filtroNombre) {
-      this.tmpFiltroNombre = filtroNombre.toString();
-    },
-    filtroUPC: function (filtroUPC) {
-      // this.setFiltroUPC(filtroUPC.toString());
-      this.tmpFiltroUPC = filtroUPC;
-    },
-    tempFiltroUPC: function (tempFiltroUPC) {
-      this.tmpFiltroUPC = tempFiltroUPC;
     },
   },
 };
 </script>
+
 <style scoped>
 :deep(#modalFiltros div.modal-content) {
   min-height: 100%;
@@ -228,6 +220,7 @@ input {
 input[type="search"] {
   margin-bottom: 1rem;
   -webkit-appearance: textfield;
+  appearance: textfield;
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
   font-family: inherit;

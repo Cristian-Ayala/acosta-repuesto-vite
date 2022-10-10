@@ -28,21 +28,22 @@
     </b-modal>
   </div>
 </template>
+
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
-  name: "DeleteUser",
+  name: 'DeleteUser',
   data() {
     return {};
   },
-  methods: {
-    ...mapMutations("usuarios", ["setModalEditShow"]),
-    ...mapActions("usuarios", ["removeRegistro"]),
-  },
   computed: {
-    ...mapState("usuarios", ["usuario"]),
+    ...mapState('usuarios', ['usuario']),
   },
   mounted() {},
+  methods: {
+    ...mapMutations('usuarios', ['setModalEditShow']),
+    ...mapActions('usuarios', ['removeRegistro']),
+  },
 };
 </script>

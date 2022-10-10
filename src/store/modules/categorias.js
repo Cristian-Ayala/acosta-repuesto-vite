@@ -1,9 +1,8 @@
-import router from '../../router/index';
 import { ElMessage } from 'element-plus';
 import PouchDB from 'pouchdb-browser';
+import router from '../../router/index';
 
-export default (app) => {
-  return {
+export default (app) => ({
     namespaced: true,
     state: {
       categorias: [],
@@ -12,7 +11,7 @@ export default (app) => {
         descripcion: '',
       },
       catSelected: {},
-      PouchDB: PouchDB,
+      PouchDB,
       localCategorias: null,
     },
     mutations: {
@@ -57,7 +56,7 @@ export default (app) => {
        */
       createRegistro({ state, dispatch, commit }) {
         if (state.categoria.nombreCategoria.trim() !== '') {
-          //For puchDB we need to add an _id field
+          // For puchDB we need to add an _id field
           state.categoria._id = new Date().toISOString();
           state.categoria.nombreCategoria = state.categoria.nombreCategoria.trim().toLocaleUpperCase();
           state.localCategorias
@@ -68,7 +67,7 @@ export default (app) => {
               );
             })
             .catch((err) => {
-              errort('errorNotification', 'Error al guardar la categoria. ' + err);
+              commit('errorNotification', `Error al guardar la categoria. ${  err}`);
             });
         } else {
           commit('errorNotification', 'Por favor, introduce un nombre para la categoria.');
@@ -81,10 +80,14 @@ export default (app) => {
             descending: false,
           })
           .then((doc) => {
-            state.categorias = doc.rows.sort((a, b) => (a.doc.nombreCategoria > b.doc.nombreCategoria) ? 1 : ((b.doc.nombreCategoria > a.doc.nombreCategoria) ? -1 : 0));;
+            state.categorias = doc.rows.sort((a, b) => {
+              if (a.doc.nombreCategoria > b.doc.nombreCategoria) return 1 
+              if (b.doc.nombreCategoria > a.doc.nombreCategoria) return -1;
+              return 0;
+            });
           })
           .catch((err) =>
-            errort('errorNotification', 'Error al listar categorias. ' + err),
+            commit('errorNotification', `Error al listar categorias. ${  err}`),
           );
       },
       edithRegistro({ state, commit, dispatch }) {
@@ -96,7 +99,7 @@ export default (app) => {
             );
           })
           .catch((err) => {
-            errort('errorNotification', 'Error al editar la categoria. ' + err);
+            commit('errorNotification', `Error al editar la categoria. ${  err}`);
           });
       },
       /**
@@ -112,14 +115,14 @@ export default (app) => {
             commit('successNotification', 'Categoria eliminada con éxito');
           })
           .catch((err) => {
-            errort('errorNotification', 'Error al eliminar la categoria. ' + err);
+            commit('errorNotification', `Error al eliminar la categoria. ${  err}`);
           });
       },
       initDbCategorias({ state, dispatch }) {
         const remoteCategorias = new state.PouchDB(
-          app.config.globalProperties.$url + 'categorias',
+          `${app.config.globalProperties.$url  }categorias`,
           {
-            fetch: function (url, opts) {
+            fetch (url, opts) {
               return state.PouchDB.fetch(url, opts, {
                 credentials: 'include',
               });
@@ -150,33 +153,32 @@ export default (app) => {
                 live: true,
                 retry: true,
               })
-              .on('change', function (change) {
+              .on('change', (change) => {
                 console.log('yo, something changed!', change);
                 dispatch('getAllCategorias');
               })
-              .on('paused', function (info) {
+              .on('paused', (info) => {
                 console.log(
                   'replication was paused, usually because of a lost connection',
                   info,
                 );
               })
-              .on('active', function (info) {
+              .on('active', (info) => {
                 console.log('replication was resumed', info);
               })
-              .on('denied', function (err) {
+              .on('denied', (err) => {
                 console.log(
                   'a document failed to replicate (e.g. due to permissions)',
                   err,
                 );
               })
-              .on('complete', function (info) {
+              .on('complete', (info) => {
                 console.log('Completado', info);
               })
-              .on('error', function (err) {
-                console.log("totally unhandled error (shouldn't happen)", err);
+              .on('error', (err) => {
+                console.log('totally unhandled error (shouldn\'t happen)', err);
               });
           });
       },
     },
-  };
-};
+  });

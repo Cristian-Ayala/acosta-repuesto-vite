@@ -23,6 +23,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
+
           <div class="modal-body">
             <h6 style="font-weight: 400; text-align: center">
               ¿Está seguro que quiere eliminar la orden "{{
@@ -30,6 +31,7 @@
               }}"?
             </h6>
           </div>
+
           <div class="modal-footer">
             <button
               type="button"

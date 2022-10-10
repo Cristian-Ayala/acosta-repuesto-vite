@@ -1,12 +1,12 @@
 import { createStore as createVuexStore } from 'vuex';
-import categorias from './modules/categorias.js';
-import productos from './modules/productos.js';
-import marcas from './modules/marcas.js';
-import ordenes from './modules/ordenes.js';
-import usuarios from './modules/usuarios.js';
+import categorias from './modules/categorias';
+import productos from './modules/productos';
+import marcas from './modules/marcas';
+import ordenes from './modules/ordenes';
+import usuarios from './modules/usuarios';
 
-export const createStore = (app) => {
-  return createVuexStore({
+// eslint-disable-next-line import/prefer-default-export
+export const createStore = (app) => createVuexStore({
     modules: {
       categorias: categorias(app),
       productos: productos(app),
@@ -15,4 +15,3 @@ export const createStore = (app) => {
       usuarios: usuarios(app),
     },
   });
-};

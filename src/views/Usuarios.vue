@@ -10,7 +10,7 @@
             <b-button
               v-b-modal.modalNewUsuario
               variant="success"
-              v-on:click="clearData()"
+              @click="clearData()"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </b-button>
@@ -30,15 +30,15 @@
                     <b-button
                       v-b-modal.modal-delete-user
                       variant="danger"
-                      v-on:click="setUser(user)"
                       class="btn btn-outline-danger btn-circle"
+                      @click="setUser(user)"
                     >
                       <i class="fas fa-times" aria-hidden="true"></i>
                     </b-button>
                     <b-button
                       variant="warning"
                       class="btn btn-outline-warning btn-circle"
-                      v-on:click="setUser(user);setModalEditShow(true);"
+                      @click="setUser(user);setModalEditShow(true);"
                     >
                       <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                     </b-button>
@@ -47,32 +47,33 @@
               </tbody>
             </table>
             <b-skeleton-table
+              v-if="usuarios.length === 0"
               :rows="5"
               :columns="2"
-              v-if="usuarios.length === 0"
             ></b-skeleton-table>
           </div>
         </div>
       </div>
     </div>
-    <NewUsuario></NewUsuario>
-    <EditUser></EditUser>
-    <EditUserName></EditUserName>
-    <EditUserPassword></EditUserPassword>
-    <DeleteUser></DeleteUser>
+    <new-usuario></new-usuario>
+    <edit-user></edit-user>
+    <edit-user-name></edit-user-name>
+    <edit-user-password></edit-user-password>
+    <delete-user></delete-user>
   </div>
 </template>
+
 <script>
 // import { mapState, mapMutations, mapActions } from "vuex";
-import { mapMutations, mapState } from "vuex";
-import NewUsuario from "@/components/Usuarios/NewUsuario.vue";
-import EditUser from "@/components/Usuarios/EditUser.vue";
-import EditUserName from "@/components/Usuarios/EditUserName.vue";
-import EditUserPassword from "@/components/Usuarios/EditUserPassword.vue";
-import DeleteUser from "@/components/Usuarios/DeleteUser.vue";
+import { mapMutations, mapState } from 'vuex';
+import NewUsuario from '@/components/Usuarios/NewUsuario.vue';
+import EditUser from '@/components/Usuarios/EditUser.vue';
+import EditUserName from '@/components/Usuarios/EditUserName.vue';
+import EditUserPassword from '@/components/Usuarios/EditUserPassword.vue';
+import DeleteUser from '@/components/Usuarios/DeleteUser.vue';
 
 export default {
-  name: "Usuarios",
+  name: 'UsuariosIndex',
   components: {
     NewUsuario,
     EditUser,
@@ -80,17 +81,16 @@ export default {
     EditUserPassword,
     DeleteUser
   },
-  data: () => {
-    return {};
-  },
+  data: () => ({}),
   computed: {
-    ...mapState("usuarios", ["usuarios"]),
+    ...mapState('usuarios', ['usuarios']),
   },
   methods: {
-    ...mapMutations("usuarios", ["clearData", "setUser","setModalEditShow"]),
+    ...mapMutations('usuarios', ['clearData', 'setUser','setModalEditShow']),
   },
 };
 </script>
+
 <style scoped>
 .btn-circle {
   width: 2rem;

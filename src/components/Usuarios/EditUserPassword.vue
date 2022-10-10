@@ -11,10 +11,10 @@
           <div class="col-md-9">
             <input
               v-if="usuario"
+              v-model="usuario.password"
               type="text"
               class="form-control"
-              v-model="usuario.password"
-            />
+            >
           </div>
         </div>
       </div>
@@ -40,20 +40,20 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
-  name: "EditUserPassword",
+  name: 'EditUserPassword',
   data() {
     return {};
   },
-  methods: {
-    ...mapMutations("usuarios", ["setModalEditShow"]),
-    ...mapActions("usuarios", ["editRegistro"]),
-  },
   computed: {
-    ...mapState("usuarios", ["usuario"]),
+    ...mapState('usuarios', ['usuario']),
   },
   mounted() {},
+  methods: {
+    ...mapMutations('usuarios', ['setModalEditShow']),
+    ...mapActions('usuarios', ['editRegistro']),
+  },
 };
 </script>

@@ -1,11 +1,12 @@
 <template>
+  <!-- eslint-disable vue/no-mutating-props -->
   <el-dialog
     v-model="show.modalEliminarCat"
     title="Eliminar categoria"
     width="90%"
   >
     <div class="card-body">
-      <h6 style="font-weight: 400; text-align: center" v-if="categoria.doc">
+      <h6 v-if="categoria.doc" style="font-weight: 400; text-align: center">
         ¿Está seguro que quiere eliminar la categoria "{{
           categoria.doc.nombreCategoria
         }}"?
@@ -19,19 +20,24 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions } from 'vuex';
 
 export default {
-  name: "AgregarCat",
-  props: ['show'],
+  name: 'AgregarCat',
+  props: {
+    show: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {};
   },
-  methods: {
-    ...mapActions("categorias", ["removeRegistro"]),
-  },
   computed: {
-    ...mapState("categorias", ["categoria"]),
+    ...mapState('categorias', ['categoria']),
+  },
+  methods: {
+    ...mapActions('categorias', ['removeRegistro']),
   },
 };
 </script>

@@ -10,7 +10,7 @@
             <i class="fas fa-sync fa-10x animationColor" aria-hidden="true"></i>
             <button
               class="bubbly-button gradient-btn-outlined button-four"
-              @click="animateButton"
+              @click="animateButton()"
             >
               <span> Click para actualizar </span>
             </button>
@@ -20,15 +20,14 @@
     </div>
   </div>
 </template>
+
 <script>
 // import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
-  name: "Actualizar",
+  name: 'ActualizarView',
 
-  data: () => {
-    return {};
-  },
+  data: () => ({}),
   computed: {},
   methods: {
     animateButton() {
@@ -37,6 +36,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .cuerpo {
   width: 100%;

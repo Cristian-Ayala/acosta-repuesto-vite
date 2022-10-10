@@ -1,7 +1,8 @@
 <template>
+  <!-- eslint-disable vue/v-on-event-hyphenation -->
   <div>
-    <b-modal id="nuevaOrden" centered title="Nueva Orden" @show="modalIsActive" @hide="modalWillHide">
-      <template v-slot:modal-header v-if="paso === 'productos'">
+    <b-modal id="nuevaOrden" centered title="Nueva Orden" @show="modalIsActive()" @hide="modalWillHide()">
+      <template v-if="paso === 'productos'" #modal-header>
         <a class="ltStepBack" @click="paso = 'datos'"> &lt; </a>
         <h4 class="d-flex align-items-center">
           <b>Nueva Orden</b>
@@ -9,18 +10,18 @@
       </template>
       <div class="cuerpoModal">
         <div class="bodyMenu">
-          <div class="datosPersonales" v-if="paso === 'datos'">
+          <div v-if="paso === 'datos'" class="datosPersonales">
             <b-form class="d-flex justify-content-center mb-4 mt-4 ml-3" inline>
               <label for="fecha">Fecha de venta:&nbsp;&nbsp;&nbsp; </label>
               <date-pick
                 id="fecha"
                 v-model="date"
-                :inputAttributes="{ readonly: true }"
-                :pickTime="true"
-                :use12HourClock="true"
-                :format="'MM-DD-YYYY HH:mm'"
-                :displayFormat="'DD-MM-YYYY H:mm A'"
-                :selectableYearRange="{ from: 2020, to: 2050 }"
+                :input-attributes="{ readonly: true }"
+                :pick-time="true"
+                :use12-hour-clock="true"
+                format="MM-DD-YYYY HH:mm"
+                display-format="DD-MM-YYYY H:mm A"
+                :selectable-year-range="{ from: 2020, to: 2050 }"
               ></date-pick>
             </b-form>
             <b-form class="justifySpace ml-3" inline>
@@ -28,24 +29,24 @@
                 <label for="nombre">Nombre:&nbsp;&nbsp;&nbsp; </label>
                 <b-form-input
                   id="nombre"
-                  class="mb-2 mr-sm-2 mb-sm-0"
                   v-model="orden.nombreCliente"
+                  class="mb-2 mr-sm-2 mb-sm-0"
                 ></b-form-input>
               </div>
               <div>
                 <label for="tel">Teléfono:&nbsp;&nbsp;&nbsp; </label>
                 <b-form-input
                   id="tel"
-                  class="mb-2 mr-sm-2 mb-sm-0"
                   v-model="orden.telefono"
+                  class="mb-2 mr-sm-2 mb-sm-0"
                 ></b-form-input>
               </div>
               <div>
                 <label for="tel">Descripción:&nbsp;&nbsp;&nbsp; </label>
                 <b-form-textarea
                   id="textareaDesc"
-                  class="mb-2 mr-sm-2 mb-sm-0"
                   v-model="orden.observacionesOrden"
+                  class="mb-2 mr-sm-2 mb-sm-0"
                   rows="3"
                   max-rows="6"
                 ></b-form-textarea>
@@ -54,9 +55,10 @@
             <b-form class="d-flex justify-content-center mb-4 mt-5" inline>
               <div>
                 <label for="tipoOrdenSelection"
-                  >Tipo de orden:&nbsp;&nbsp;&nbsp;
+                >Tipo de orden:&nbsp;&nbsp;&nbsp;
                 </label>
-                <!-- <dropdown
+                <!--
+                  <dropdown
                   id="tipoOrdenSelection"
                   class="dropdown"
                   :options="dropDownTypeOfOrder.data"
@@ -64,14 +66,16 @@
                   v-on:updateOption="(payload) => dropDownTypeOfOrder.selected = payload"
                   :placeholder="dropDownTypeOfOrder.data[0].name"
                   :closeOnOutsideClick="true"
-                >
-                </dropdown> -->
+                  >
+                  </dropdown> 
+                -->
               </div>
               <div>
                 <label for="tipoDistribucionDropDown"
-                  >Tipo de Distribución:&nbsp;&nbsp;&nbsp;
+                >Tipo de Distribución:&nbsp;&nbsp;&nbsp;
                 </label>
-                <!-- <dropdown
+                <!--
+                  <dropdown
                   id="tipoDistribucionDropDown"
                   class="dropdown"
                   :options="tipoDistribucionArray"
@@ -79,8 +83,9 @@
                   v-on:updateOption="(payload) => tipoDistribucion = payload"
                   :placeholder="'Público'"
                   :closeOnOutsideClick="true"
-                >
-                </dropdown> -->
+                  >
+                  </dropdown> 
+                -->
               </div>
             </b-form>
             <div class="ml-3 pr-3">
@@ -98,35 +103,35 @@
               </blockquote>
             </div>
           </div>
-          <div class="selProductos" v-show="paso === 'productos'">
+          <div v-show="paso === 'productos'" class="selProductos">
             <div class="pl-3 pt-3 pb-3">
               <input
+                v-model="searchProduct"
                 type="search"
                 placeholder="Buscar"
-                v-model="searchProduct"
-              />
+              >
               <p>Productos encontrados ({{ searchTotalRows }})</p>
             </div>
             <!-- Aquí tienen que ir los productos -->
             <table class="table card-text">
               <tbody v-if="findProductos">
-                <FindProductos
+                <find-productos
                   v-for="(prod, index) in findProductos"
+                  :key="prod.id"
                   :prod="prod"
                   :index="index"
-                  :ordenDetalleProductos="ordenDetalleProductos"
-                  :key="prod.id"
-                  @addTmpProducts="addTmpProducts"
-                ></FindProductos>
+                  :orden-detalle-productos="ordenDetalleProductos"
+                  @addTmpProducts="addTmpProducts()"
+                ></find-productos>
               </tbody>
             </table>
             <div class="endPagination">
               <b-button
                 :disabled="!(currentPage > 1)"
-                v-on:click="
+                class="btn btn-outline-success button-product"
+                @click="
                   paginationNavPlugin({ prevOrNext: 'prev', searchProduct })
                 "
-                class="btn btn-outline-success button-product"
               >
                 <span> &lt; </span>
               </b-button>
@@ -135,28 +140,28 @@
               </b-button>
               <b-button
                 :disabled="
-                  !(this.currentPage < Math.ceil(this.searchTotalRows / 10))
-                "
-                v-on:click="
-                  paginationNavPlugin({ prevOrNext: 'next', searchProduct })
+                  !(currentPage < Math.ceil(searchTotalRows / 10))
                 "
                 class="btn btn-outline-success button-product"
+                @click="
+                  paginationNavPlugin({ prevOrNext: 'next', searchProduct })
+                "
               >
                 <span> &gt; </span>
               </b-button>
             </div>
           </div>
-          <div class="resumenClass" v-if="paso === 'resumen'">
+          <div v-if="paso === 'resumen'" class="resumenClass">
             <h3 class="pl-2" style="text-align: center;padding: 1rem 0;">Resumen de la orden</h3>
             <table class="table card-text">
               <tbody v-if="ordenDetalleProductos">
                 <resumen-nueva-orden
                   v-for="(prod, index) in ordenDetalleProductos"
-                  :prod="prod"
-                  :indexForComponent="index"
-                  :ordenDetalleProductos="ordenDetalleProductos"
                   :key="prod.id"
-                  @addTmpProducts="addTmpProducts"
+                  :prod="prod"
+                  :index-for-component="index"
+                  :orden-detalle-productos="ordenDetalleProductos"
+                  @addTmpProducts="addTmpProducts()"
                 />
                 <div style="text-align: center;margin: 2rem 0;">
                   Total:
@@ -165,14 +170,15 @@
               </tbody>
             </table>
           </div>
-          <div class="metPago" v-if="paso === 'pago'">
+          <div v-if="paso === 'pago'" class="metPago">
             <h3 class="pl-2" style="text-align: center;padding: 1rem 0;">Método de pago</h3>
             <div style="text-align: center;margin: 2rem 0;">
               Total:
               <h5 style="display: inline;">${{ total }}</h5>
             </div>
             <div id="metPagoDropdown">
-              <!-- <dropdown
+              <!--
+                <dropdown
                 id="metPagoSelection"
                 class="dropdown"
                 :options="dropDownMetodoPago.data"
@@ -180,8 +186,9 @@
                 v-on:updateOption="(payload) => dropDownMetodoPago.selected = payload"
                 :placeholder="dropDownMetodoPago.data[0].name"
                 :closeOnOutsideClick="true"
-              >
-              </dropdown> -->
+                >
+                </dropdown> 
+              -->
             </div>
           </div>
         </div>
@@ -203,28 +210,28 @@
           <b-button
             size="m"
             variant="success"
-            @click="paso = 'resumen'"
             class="active rounded"
             :disabled="total <= 0"
+            @click="paso = 'resumen'"
           >
             Siguiente
           </b-button>
         </div>
         <div v-else-if="paso === 'resumen'" class="customFooter">
-          <b-button size="m" @click="paso = 'productos'" class="stepBack">
+          <b-button size="m" class="stepBack" @click="paso = 'productos'">
             Atras
           </b-button>
           <b-button
             size="m"
             variant="success"
-            @click="paso = 'pago'"
             :disabled="total <= 0"
+            @click="paso = 'pago'"
           >
             Pagar
           </b-button>
         </div>
         <div v-else-if="paso === 'pago'" class="customFooter">
-          <b-button size="m" @click="paso = 'resumen'" class="stepBack">
+          <b-button size="m" class="stepBack" @click="paso = 'resumen'">
             Atras
           </b-button>
           <b-button
@@ -243,19 +250,38 @@
     </b-modal>
   </div>
 </template>
+
 <script>
 // import dropdown from "vue-dropdowns";
-import DatePick from "@/components/Calendario/vueDatePick.vue";
-import FindProductos from "@/components/Ordenes/FindProductos.vue";
-import { mapState, mapMutations, mapActions } from "vuex";
-import ResumenNuevaOrden from "./ResumenNuevaOrden.vue";
+import { mapState, mapMutations, mapActions } from 'vuex';
+import DatePick from '@/components/Calendario/vueDatePick.vue';
+import FindProductos from '@/components/Ordenes/FindProductos.vue';
+import ResumenNuevaOrden from './ResumenNuevaOrden.vue';
 
 // Variables for upc barcode scanner
-let code = "";
+let code = '';
 let reading = false;
 
+function todayDate() {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+  const yyyy = today.getFullYear();
+  const horas = today.getHours();
+  const minutos = today.getMinutes();
+  return `${mm}-${dd}-${yyyy} ${horas}:${minutos}`;
+}
+function twoDecimalsOnly(value) {
+  try {
+    return Math.round(value * 100) / 100;
+  } catch (error) {
+    console.log(error);
+    return 0.0;
+  }
+}
+
 export default {
-  name: "NuevaOrden",
+  name: 'NuevaOrden',
   components: {
     // dropdown,
     DatePick,
@@ -264,83 +290,104 @@ export default {
   },
   data() {
     return {
-      paso: "datos",
-      date: "20-01-2021 14:30",
+      paso: 'datos',
+      date: '20-01-2021 14:30',
       tipoDistribucionArray: [
         {
-          name: "Público",
+          name: 'Público',
         },
         {
-          name: "Mayoreo",
+          name: 'Mayoreo',
         },
         {
-          name: "Taller",
+          name: 'Taller',
         },
       ],
       tipoDistribucion: {
-        name: "Público",
+        name: 'Público',
       },
       dropDownTypeOfOrder: {
         data: [{
-            "name": "Local"
+            'name': 'Local'
         }, {
-            "name": "Delivery"
+            'name': 'Delivery'
         }],
         selected: {
-            "name": "Local"
+            'name': 'Local'
         },
       },
       dropDownMetodoPago: {
         data: [{
-            "name": "Tarjeta de Crédito"
+            'name': 'Tarjeta de Crédito'
         }, {
-            "name": "Tarjeta de Débito"
+            'name': 'Tarjeta de Débito'
         }, {
-            "name": "Efectivo"
+            'name': 'Efectivo'
         }, {
-            "name": "Credito Fiscal"
+            'name': 'Credito Fiscal'
         }, {
-            "name": "Criptomoneda"
+            'name': 'Criptomoneda'
         }],
         selected: {
-            "name": "Efectivo"
+            'name': 'Efectivo'
         },
       },
-      searchProduct: "",
+      searchProduct: '',
       ordenDetalleProductos: {},
       total: 0.0,
     };
   },
-  methods: {
-    ...mapMutations("ordenes", [
-      "change",
-      "decProducto",
-      "incProducto",
-      "filtroProd",
-      "dosDecimalesProd",
+  computed: {
+    ...mapState('ordenes', [
+      'ordSelected',
+      'showDetOrd',
+      'orden',
+      'metPago',
+      'prodSearch',
+      'searchTotalRows',
+      'findProductos',
+      'currentPage',
     ]),
-    ...mapActions("ordenes", ["searchProductos", "paginationNavPlugin", "createRegistroOrdenes"]),
-    addTmpProducts(ordenDetalleProductos, add = true, index, triggeredFromComponent = false) {
+    ...mapState('productos', ['productos']),
+  },
+  watch: {
+    searchProduct (val) {
+      // console.log("Watcheme prro", val);
+      this.searchProductos(val);
+    },
+  },
+  mounted() {
+    this.date = todayDate();
+    console.log('Mounted');
+  },
+  methods: {
+    ...mapMutations('ordenes', [
+      'change',
+      'decProducto',
+      'incProducto',
+      'filtroProd',
+      'dosDecimalesProd',
+    ]),
+    ...mapActions('ordenes', ['searchProductos', 'paginationNavPlugin', 'createRegistroOrdenes']),
+    addTmpProducts(ordenDetalleProductos, index, add = true, triggeredFromComponent = false) {
       let prod;
-      //Check if product is already in the dictionary
+      // Check if product is already in the dictionary
       if (this.ordenDetalleProductos[ordenDetalleProductos?.upc]) {
         // console.log("Exist");
-        //True: modify by 1 the quantity and update the total. Whether you add or decrease quantity
+        // True: modify by 1 the quantity and update the total. Whether you add or decrease quantity
         prod = this.ordenDetalleProductos[ordenDetalleProductos.upc];
         if (add) {
-          //check if quantity is in stock range
+          // check if quantity is in stock range
           if (prod.cantidad <= prod.stockProd) {
             prod.cantidad += 1;
             prod.subtotal = twoDecimalsOnly(prod.cantidad * prod.precioPublico);
           }
-        } else {
-          if (prod.cantidad >= 1) {
+        } else if (prod.cantidad >= 1) {
             prod.cantidad -= 1;
             prod.subtotal = twoDecimalsOnly(prod.cantidad * prod.precioPublico);
           }
-        }
       } else {
-        //False: add the product to the dictionary
+        // False: add the product to the dictionary
         // console.log("does not exist");
         prod = {
           ...ordenDetalleProductos,
@@ -349,7 +396,7 @@ export default {
         };
       }
       delete prod.foto;
-      this.ordenDetalleProductos[prod.upc] = Object.assign({}, { ...prod });
+      this.ordenDetalleProductos[prod.upc] = { ...prod};
       if (triggeredFromComponent) {
         console.log(ordenDetalleProductos);
         console.log(index);
@@ -361,8 +408,8 @@ export default {
       this.calculateTotal();
     },
     reRender(index) {
-      let render = this.findProductos[index];
-      render.id = render.id + "a";
+      const render = this.findProductos[index];
+      render.id += 'a';
       this.$set(this.findProductos, index, render);
     },
     calculateTotal() {
@@ -377,7 +424,7 @@ export default {
       }
     },
     async createOrder() {
-      let localOrder = { ...this.orden }
+      const localOrder = { ...this.orden }
       delete localOrder.totalOrden;
       const orden = {
         _id: `${new Date(this.date).toISOString().slice(0, -7)}${new Date().toISOString().slice(17)}`,
@@ -385,7 +432,7 @@ export default {
         tipoDistribucion: this.tipoDistribucion.name,
         totalOrden: this.total,
         productos: Object.values(this.ordenDetalleProductos),
-        status: this.dropDownTypeOfOrder.selected.name === "Local" ? "Completado" : "En proceso",
+        status: this.dropDownTypeOfOrder.selected.name === 'Local' ? 'Completado' : 'En proceso',
         tipoOrden: this.dropDownTypeOfOrder.selected.name, // Ir a dejar
         ...localOrder
       };
@@ -395,10 +442,10 @@ export default {
     clearData() {
       this.ordenDetalleProductos = {};
       this.total = 0.0;
-      this.paso = "datos";
+      this.paso = 'datos';
       this.orden = {
-          "nombreCliente": "",
-          "observacionesOrden": "",
+          'nombreCliente': '',
+          'observacionesOrden': '',
       }
       this.searchProduct = '';
       this.searchProductos('');
@@ -411,68 +458,28 @@ export default {
       this.clearData();
     },
     listenerFunction(e) {
-      //usually scanners throw an 'Enter' key at the end of read
+      // usually scanners throw an 'Enter' key at the end of read
       if (e.key === 'Enter') {
         if (code.length > 10) {
           this.searchProduct = code;
           console.log(code);
           /// code ready to use
-          code = "";
+          code = '';
         }
       } else {
-        code += e.key; //while this is not an 'enter' it stores the every key
+        code += e.key; // while this is not an 'enter' it stores the every key
       }
-      //run a timeout of 200ms at the first read and clear everything
+      // run a timeout of 200ms at the first read and clear everything
       if (!reading) {
         reading = true;
         setTimeout(() => {
-          code = "";
+          code = '';
           reading = false;
-        }, 200); //200 works fine for me but you can adjust it
+        }, 200); // 200 works fine for me but you can adjust it
       }
     },
   },
-  computed: {
-    ...mapState("ordenes", [
-      "ordSelected",
-      "showDetOrd",
-      "orden",
-      "metPago",
-      "prodSearch",
-      "searchTotalRows",
-      "findProductos",
-      "currentPage",
-    ]),
-    ...mapState("productos", ["productos"]),
-  },
-  mounted() {
-    this.date = todayDate();
-    console.log("Mounted");
-  },
-  watch: {
-    searchProduct: function (val) {
-      // console.log("Watcheme prro", val);
-      this.searchProductos(val);
-    },
-  },
 };
-function todayDate() {
-  const today = new Date();
-  const dd = String(today.getDate()).padStart(2, "0");
-  const mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-  const yyyy = today.getFullYear();
-  const horas = today.getHours();
-  const minutos = today.getMinutes();
-  return `${mm}-${dd}-${yyyy} ${horas}:${minutos}`;
-}
-function twoDecimalsOnly(value) {
-  try {
-    return Math.round(value * 100) / 100;
-  } catch (error) {
-    console.log(error);
-    return 0.0;
-  }
-}
 </script>
 
 <style scoped>
@@ -618,6 +625,7 @@ input {
 input[type="search"] {
   margin-bottom: 1rem;
   -webkit-appearance: textfield;
+  appearance: textfield;
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
   font-family: inherit;

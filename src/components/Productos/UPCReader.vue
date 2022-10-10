@@ -1,14 +1,14 @@
 <template>
   <div>
     <b-modal id="barCode" title="Escanear Código de Barras" centered>
-      <StreamBarcodeReader
+      <stream-barcode-reader
+        v-if="!barcode"
         @decode="(a) => onDecode(a)"
         @loaded="() => onLoaded()"
-        v-if="!barcode"
-      ></StreamBarcodeReader>
+      ></stream-barcode-reader>
       <span v-if="barcode"
-        >¿Es este el UPC: <b>{{ barcode }}</b
-        >?</span
+      >¿Es este el UPC: <b>{{ barcode }}</b
+      >?</span
       >
       <template #modal-footer="{ ok, hide }">
         <div v-if="barcode">
@@ -30,42 +30,44 @@
     </b-modal>
   </div>
 </template>
+
 <script>
-import { mapState, mapMutations } from "vuex";
-import StreamBarcodeReader from "@/components/StreamBarcodeReader.vue";
+import { mapState, mapMutations } from 'vuex';
+import StreamBarcodeReader from '@/components/StreamBarcodeReader.vue';
+
 export default {
-  name: "UPCReader",
+  name: 'UPCReader',
   components: {
     StreamBarcodeReader,
   },
   data() {
     return {
       showBarcode: false,
-      barcode: "",
+      barcode: '',
     };
   },
+  computed: {
+    ...mapState('productos', ['newProductMobile', 'calledFrom']),
+  },
+  watch: {
+    calledFrom() {
+      this.barcode = '';
+    },
+  },
   methods: {
-    ...mapMutations("productos", ["setFiltroUPC"]),
+    ...mapMutations('productos', ['setFiltroUPC']),
     onDecode(a) {
       console.log(this.calledFrom);
-      if (this.calledFrom === "FiltrosProductos.vue") {
+      if (this.calledFrom === 'FiltrosProductos.vue') {
         this.setFiltroUPC(a);
       }
-      if (this.calledFrom === "AddEditProdMovile.vue") {
+      if (this.calledFrom === 'AddEditProdMovile.vue') {
         this.newProductMobile.doc.upc = a;
       }
       this.barcode = a;
     },
     onLoaded() {
-      console.log("cargado");
-    },
-  },
-  computed: {
-    ...mapState("productos", ["newProductMobile", "calledFrom"]),
-  },
-  watch: {
-    calledFrom() {
-      this.barcode = "";
+      console.log('cargado');
     },
   },
 };

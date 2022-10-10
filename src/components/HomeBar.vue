@@ -8,7 +8,7 @@
         overflow: hidden;
       "
     >
-      <img src="src/assets/img/acosta.png" alt="acosta img" style="max-width: 100%"/>
+      <img src="src/assets/img/acosta.png" alt="acosta img" style="max-width: 100%">
     </div>
     <h1 style="text-align: center; margin-top: 2rem; margin-bottom: 0">
       Esto es lo que puedes hacer:
@@ -16,7 +16,7 @@
     <div class="cuadros-home">
       <div class="cuadro1-home">
         <router-link to="/productos">
-          <img src="src/assets/img/motul.png" alt="..." style="max-width: 100%" />
+          <img src="src/assets/img/motul.png" alt="..." style="max-width: 100%" >
           <div
             class="font-weight-bold d-block"
             style="margin: 1rem; font-size: 2.5rem"
@@ -30,7 +30,7 @@
       </div>
       <div class="cuadro2-home">
         <router-link to="/marcas">
-          <img src="src/assets/img/2.png" alt="..." style="max-width: 100%" />
+          <img src="src/assets/img/2.png" alt="..." style="max-width: 100%" >
           <div
             class="font-weight-bold d-block"
             style="margin: 1rem; font-size: 2.5rem"
@@ -46,7 +46,7 @@
     <div class="cuadros-home">
       <div class="cuadro3-home">
         <router-link to="/categorias">
-          <img src="src/assets/img/3.png" alt="..." style="max-width: 100%" />
+          <img src="src/assets/img/3.png" alt="..." style="max-width: 100%" >
           <div
             class="font-weight-bold d-block"
             style="margin: 1rem; font-size: 2.5rem"
@@ -60,7 +60,7 @@
       </div>
       <div class="cuadro4-home">
         <router-link to="/ordenes">
-          <img src="src/assets/img/4.png" alt="..." style="max-width: 100%" />
+          <img src="src/assets/img/4.png" alt="..." style="max-width: 100%" >
           <div
             class="font-weight-bold d-block"
             style="margin: 1rem; font-size: 2.5rem"

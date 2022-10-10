@@ -7,10 +7,10 @@
           <div class="col-md-9">
             <input
               v-if="usuario"
+              v-model="usuario.nombre"
               type="text"
               class="form-control"
-              v-model="usuario.nombre"
-            />
+            >
           </div>
         </div>
       </div>
@@ -36,20 +36,20 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
-  name: "EditUserName",
+  name: 'EditUserName',
   data() {
     return {};
   },
-  methods: {
-    ...mapMutations("usuarios", ["setModalEditShow"]),
-    ...mapActions("usuarios", ["editRegistro"]),
-  },
   computed: {
-    ...mapState("usuarios", ["usuario"]),
+    ...mapState('usuarios', ['usuario']),
   },
   mounted() {},
+  methods: {
+    ...mapMutations('usuarios', ['setModalEditShow']),
+    ...mapActions('usuarios', ['editRegistro']),
+  },
 };
 </script>

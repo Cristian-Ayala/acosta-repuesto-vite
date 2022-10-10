@@ -1,8 +1,9 @@
 <template>
+  <!-- eslint-disable vue/no-mutating-props -->
   <el-dialog
-  v-model="show.modalEditarMar"
-  title="Editar Marca"
-  width="90%"
+    v-model="show.modalEditarMar"
+    title="Editar Marca"
+    width="90%"
   >
     <div class="card-body">
       <div class="form-group row">
@@ -10,10 +11,10 @@
         <div class="col-md-9">
           <input
             v-if="marSelected.doc"
+            v-model="marSelected.doc.nombreMarca"
             type="text"
             class="form-control"
-            v-model="marSelected.doc.nombreMarca"
-          />
+          >
         </div>
       </div>
       <div class="line"></div>
@@ -22,10 +23,10 @@
         <div class="col-md-9">
           <textarea
             v-if="marSelected.doc"
-            class="form-control"
             id="exampleFormControlTextarea1"
-            rows="3"
             v-model="marSelected.doc.descripMarca"
+            class="form-control"
+            rows="3"
           ></textarea>
         </div>
       </div>
@@ -38,19 +39,24 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions } from 'vuex';
 
 export default {
-  name: "EditMar",
-  props: ['show'],
+  name: 'EditMar',
+  props: {
+    show: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {};
   },
-  methods: {
-    ...mapActions("marcas", ["edithRegistro"]),
-  },
   computed: {
-    ...mapState("marcas", ["marSelected"]),
+    ...mapState('marcas', ['marSelected']),
+  },
+  methods: {
+    ...mapActions('marcas', ['edithRegistro']),
   },
 };
 </script>

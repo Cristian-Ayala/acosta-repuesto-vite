@@ -1,19 +1,20 @@
 <template>
+  <!-- eslint-disable vue/no-mutating-props -->
   <el-dialog
-      v-model="show.modalEditCat"
-      title="Editar categoria"
-      width="90%"
+    v-model="show.modalEditCat"
+    title="Editar categoria"
+    width="90%"
   >
     <div class="card-body">
       <div class="form-group row">
         <label class="col-md-3 form-control-label">Nombre</label>
         <div class="col-md-9">
           <input
-          v-if="catSelected.doc"
+            v-if="catSelected.doc"
+            v-model="catSelected.doc.nombreCategoria"
             type="text"
             class="form-control"
-            v-model="catSelected.doc.nombreCategoria"
-          />
+          >
         </div>
       </div>
       <div class="line"></div>
@@ -21,11 +22,11 @@
         <label class="col-md-3 form-control-label">Descripción</label>
         <div class="col-md-9">
           <textarea
-          v-if="catSelected.doc"
-            class="form-control"
+            v-if="catSelected.doc"
             id="exampleFormControlTextarea1"
-            rows="3"
             v-model="catSelected.doc.descripcion"
+            class="form-control"
+            rows="3"
           ></textarea>
         </div>
       </div>
@@ -38,22 +39,27 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions } from 'vuex';
 
 export default {
-  name: "EditCat",
-  props: ['show'],
+  name: 'EditCat',
+  props: {
+    show: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
     };
   },
-  methods: {
-    ...mapActions("categorias",["edithRegistro"]),
-  },
   computed: {
-    ...mapState("categorias",["catSelected"]),
+    ...mapState('categorias',['catSelected']),
   },
   mounted() {
+  },
+  methods: {
+    ...mapActions('categorias',['edithRegistro']),
   },
 };
 </script>
