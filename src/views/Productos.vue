@@ -97,10 +97,11 @@
           </div>
         </div>
       </div>
+      <!-- eslint-disable  vue/component-name-in-template-casing -->
+      <AddEditProdMovile :title="title" :mostrar=show></AddEditProdMovile>
       <!-- 
         <ConfirmarTransacciones :show=show></ConfirmarTransacciones>
         <EliminarProdMovil :show=show></EliminarProdMovil>
-        <AddEditProdMovile :title="title" :show=show></AddEditProdMovile>
         <FiltrosProductos :show=show></FiltrosProductos> 
       -->
     </div>
@@ -112,12 +113,12 @@ import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
   name: 'ProductosIndex',
-  // components: {
-  //   ConfirmarTransacciones: () => import('@/components/Productos/ConfirmarTransacciones.vue'),
-  //   EliminarProdMovil: () => import('@/components/Productos/EliminarProdMovil.vue'),
-  //   AddEditProdMovile: () => import('@/components/Productos/AddEditProdMovile.vue'),
-  //   FiltrosProductos: () => import('@/components/Productos/FiltrosProductos.vue'),
-  // },
+  components: {
+    AddEditProdMovile: () => import('@/components/Productos/AddEditProdMovile.vue'),
+    // ConfirmarTransacciones: () => import('@/components/Productos/ConfirmarTransacciones.vue'),
+    // EliminarProdMovil: () => import('@/components/Productos/EliminarProdMovil.vue'),
+    // FiltrosProductos: () => import('@/components/Productos/FiltrosProductos.vue'),
+  },
   data() {
     return {
       displayOption: '',

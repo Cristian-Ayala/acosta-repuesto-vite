@@ -1,7 +1,16 @@
 <template>
   <div>
+    <!-- eslint-disable vue/no-mutating-props -->
     <!-- inicio del modal para eliminar (mobile) -->
-    <b-modal id="addEditProdMovile" :title="title" centered @show="modalIsActive()" @hide="modalWillHide()">
+    <el-dialog
+      v-model="mostrar.addEditProdMovile"
+      :title="title"
+      width="90%"
+      destroy-on-close
+      :before-close="modalWillHide()"
+      top="5vh"
+    >
+      <!--  @show="modalIsActive()" @hide=""> -->
       <div v-if="newProductMobile">
         <div class="form-group row">
           <label class="col-md-3 form-control-label">UPC:</label>
@@ -11,15 +20,16 @@
               v-model="newProductMobile.doc.upc"
               type="text"
               class="form-control"
-            ><span
-              v-b-modal.barCode
+            >
+            <span
               class="input-group-text"
               @click="
-                showBarcode = !showBarcode;
+                show.modalUPCBarcode = true;
                 setCalledFrom('AddEditProdMovile.vue');
               "
-            ><i class="fas fa-barcode"
-            ></i></span>
+            >
+              <i class="fas fa-barcode"></i>
+            </span>
           </div>
         </div>
         <div class="line"></div>
@@ -66,9 +76,7 @@
                 width="150"
                 height="100%"
               >
-              <b-button variant="danger" @click="imagePreview = ''"
-              >Quitar</b-button
-              >
+              <el-button type="danger" @click="imagePreview = ''">Quitar</el-button>
             </div>
           </div>
         </div>
@@ -77,29 +85,20 @@
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Marca</label>
           <div v-if="newProductMobile.doc" class="col-md-9">
-            <b-dropdown
-              :text="marcaDropdown"
-              split
-              lazy
-              split-variant="outline-dark"
-              variant="dark"
-              class="m-2"
-            >
-              <b-dropdown-item
+            <el-select v-model="marcaDropdown" class="m-2" placeholder="Seleccione una marca" size="large">
+              <el-option
                 v-for="marca in marcas"
                 :key="marca.doc.nombreMarca"
-                href="#"
+                :label="marca.doc.nombreMarca"
+                :value="marca.doc.nombreMarca"
                 @click="marcaSel(marca.doc)"
-              >{{ marca.doc.nombreMarca }}</b-dropdown-item
-              >
-              <b-button
-                v-b-modal.modalAgregarMar
-                variant="success"
-                class="btn-circle"
-                @click="clearData()"
-              ><i class="fa fa-plus" aria-hidden="true"></i>
-              </b-button>
-            </b-dropdown>
+              />
+              <div class="plusWrapper">
+                <el-button type="success" circle @click="clearData(); show.modalAgregarMar = true;">
+                  <el-icon><Plus/></el-icon>
+                </el-button>
+              </div>
+            </el-select>
           </div>
         </div>
         <div class="line"></div>
@@ -107,29 +106,20 @@
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Categoria</label>
           <div v-if="newProductMobile.doc" class="col-md-9">
-            <b-dropdown
-              :text="descripcionDropdown"
-              split
-              lazy
-              split-variant="outline-dark"
-              variant="dark"
-              class="m-2"
-            >
-              <b-dropdown-item
+            <el-select v-model="descripcionDropdown" class="m-2" placeholder="Seleccione una categoria" size="large">
+              <el-option
                 v-for="categoria in categorias"
                 :key="categoria.doc.nombreCategoria"
-                href="#"
+                :label="categoria.doc.nombreCategoria"
+                :value="categoria.doc.nombreCategoria"
                 @click="catSel(categoria.doc)"
-              >{{ categoria.doc.nombreCategoria }}</b-dropdown-item
-              >
-              <b-button
-                v-b-modal.modal-1
-                variant="success"
-                class="btn-circle"
-                @click="clearDataCat()"
-              ><i class="fa fa-plus" aria-hidden="true"></i>
-              </b-button>
-            </b-dropdown>
+              />
+              <div class="plusWrapper">
+                <el-button type="success" circle @click="clearData(); show.modalAgregarCat = true;">
+                  <el-icon><Plus/></el-icon>
+                </el-button>
+              </div>
+            </el-select>
           </div>
         </div>
         <div class="line"></div>
@@ -178,42 +168,36 @@
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Stock:</label>
           <div v-if="newProductMobile.doc" class="col-md-9">
-            <b-form-spinbutton
+            <el-input-number
               id="decrementIncrement"
               v-model="newProductMobile.doc.stockProd"
-              min="0"
-              max="1000000"
-            ></b-form-spinbutton>
+              :min="0"
+              :max="1000000"/>
           </div>
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
       </div>
-      <template #modal-footer="{ ok, cancel }">
-        <b-button size="md" variant="danger" @click="cancel()">
-          Cancelar
-        </b-button>
-        <b-button
-          size="md"
-          variant="success"
-          @click="
-            ok();
-            confirmation(newProductMobile);
-          "
-        >
-          Confirmar
-        </b-button>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="show.addEditProdMovile = false">Cancelar</el-button>
+          <el-button
+            type="primary"
+            @click="show.addEditProdMovile = false;confirmation(newProductMobile);"
+          >
+            Confirmar
+          </el-button>
+        </span>
       </template>
-    </b-modal>
+    </el-dialog>
     <!-- Fin del modal para eliminar (mobile) -->
-    <agregar-mar></agregar-mar>
-    <agregar-cat></agregar-cat>
-    <u-p-c-reader></u-p-c-reader>
+    <agregar-mar :show="show"></agregar-mar>
+    <agregar-cat :show="show"></agregar-cat>
+    <u-p-c-reader :show="show"></u-p-c-reader>
   </div>
 </template>
 
 <script>
-import Vue from 'vue';
 import { mapState, mapMutations, mapActions } from 'vuex';
 import { blobToURL, fromBlob } from 'image-resize-compress';
 import AgregarMar from '@/components/Marcas/AgregarMar.vue';
@@ -238,6 +222,10 @@ export default {
       marcaDropdown: '',
       descripcionDropdown: '',
     },
+    mostrar: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -245,6 +233,11 @@ export default {
       showBarcode: false,
       loadingEffect: false,
       error: '',
+      show: {
+        modalAgregarMar: false,
+        modalAgregarCat: false,
+        modalUPCBarcode: false,
+      },
     };
   },
   computed: {
@@ -279,6 +272,9 @@ export default {
     // barcode() {
     //   this.newProductMobile = this.barcode;
     // },
+  },
+  mounted() {
+    this.modalIsActive();
   },
   methods: {
     ...mapMutations('productos', [
@@ -336,11 +332,11 @@ export default {
       });
     },
     marcaSel(marca) {
-      Vue.set(this, 'marcaDropdown', marca.nombreMarca);
+      this.marcaDropdown = marca.nombreMarca;
       this.marcaSelected(marca.nombreMarca);
     },
     catSel(categoria) {
-      Vue.set(this, 'descripcionDropdown', categoria.nombreCategoria);
+      this.descripcionDropdown = categoria.nombreCategoria;
       this.categoriaSelected(categoria.nombreCategoria);
     },
     modalIsActive() {
@@ -460,6 +456,17 @@ display: inline-flex;
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+
+.plusWrapper {
+  display: flex;
+  place-content: center;
+  border-top: 1px solid #cfcfcf;
+  padding: 0.5rem 0;
+}
+img.image-preview {
+  height: 100%;
+  margin-right: 2rem;
 }
 </style>
 

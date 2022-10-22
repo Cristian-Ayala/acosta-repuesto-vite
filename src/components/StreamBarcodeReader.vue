@@ -1,9 +1,14 @@
 <template>
   <div class="scanner-container">
+    <div v-show="!isLoading && showTorchBtn" class="scanner-ui">
+      <ul class="torch">
+        <li :class="{ 'leave': !torch, 'enter': torch }" @click="torchChange(!torch)"></li>
+      </ul>
+    </div>
     <div v-show="!isLoading">
       <video ref="scanner" poster="data:image/gif,AAAA"></video>
       <div class="overlay-element">
-        <div v-if="listOfCameras" class="div-buttoms">
+        <div v-if="showListCameras && listOfCameras" class="div-buttoms">
           <button
             v-for="(camera, index) in listOfCameras"
             :key="index"
@@ -31,6 +36,16 @@ import {
 
 export default {
   name: 'StreamBarcodeReader',
+  props: {
+    showListCameras: {
+      type: Boolean,
+      default: false,
+    },
+    showTorchBtn: {
+      type: Boolean,
+      default: false,
+    },
+  },
   emits: ['loaded', 'decode'],
   data() {
     return {
@@ -42,6 +57,7 @@ export default {
         'enumerateDevices' in navigator.mediaDevices,
       listOfCameras: [],
       selectedCamera: null,
+      torch: false,
     };
   },
   mounted() {
@@ -62,7 +78,6 @@ export default {
       this.isLoading = true;
       this.selectedCamera = idCamera;
       this.codeReader.reset();
-      console.log('Reseted, new id is: ', idCamera);
       this.codeReader.decodeFromVideoDevice(
         idCamera,
         this.$refs.scanner,
@@ -72,7 +87,7 @@ export default {
             this.$emit('decode', result.text);
           }
           if (err && !(err instanceof NotFoundException)) {
-            console.log('error: ', err);
+            throw new Exception(err);
           }
         }
       );
@@ -86,13 +101,18 @@ export default {
             this.selectedCamera = this.listOfCameras[0].deviceId;
             this.start(this.selectedCamera);
           } else {
-            console.log('No cameras found.');
+            throw new Exception('No cameras found.');
           }
         })
         .catch((err) => {
           console.error(err);
         });
     },
+    torchChange(value) {
+      document.getElementsByTagName('video')[0]
+      .srcObject.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: value }] });
+      this.torch = value;
+    }
   },
 };
 </script>
@@ -188,9 +208,68 @@ video {
 }
 .div-buttoms {
   display: flex;
-  align-items: center;
+  align-items: end;
   height: 100%;
   place-content: center;
   padding-bottom: 1rem;
+}
+/* torch */
+.torch {
+  position: absolute;
+  z-index: 1;
+  padding-right: 2rem;
+  right: 0;
+}
+.torch li.enter, .torch li.leave {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: 2rem;
+  margin: 20px;
+  display: inline-block;
+  background: #00f7a5;
+  box-shadow: 0px 4.6666666667px 24px 3px #00f7a5;
+}
+
+.torch li.enter {
+  animation: flash-1-enter 1.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+.torch li.leave {
+  animation: flash-1-leave 1.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+.torch {
+  animation: appear 1s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+@keyframes appear {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+}
+@keyframes flash-1-enter {
+  0% {
+    background: #a0a0a0;
+    box-shadow: 0px 4.6666666667px 24px 3px #999999;
+  }
+  100% {
+    background: #ffffff;
+    box-shadow: 0px 4.6666666667px 24px 3px #ffffff;
+  }
+}
+@keyframes flash-1-leave {
+  0% {
+    background: #ffffff;
+    box-shadow: 0px 4.6666666667px 24px 3px #ffffff;
+  }
+  100% {
+    background: #a0a0a0;
+    box-shadow: 0px 4.6666666667px 24px 3px #999999;
+  }
 }
 </style>
