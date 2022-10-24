@@ -1,5 +1,4 @@
 import { createApp } from 'vue';
-// import './registerServiceWorker'
 import { createRouter, createWebHistory } from 'vue-router';
 import ElementPlus from 'element-plus';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
