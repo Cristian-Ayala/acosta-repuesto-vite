@@ -8,7 +8,7 @@
         overflow: hidden;
       "
     >
-      <img src="../assets/img/acosta.png" alt="acosta img" style="max-width: 100%">
+      <img src="../assets/img/acosta.webp" alt="acosta img" style="max-width: 100%">
     </div>
     <h1 style="text-align: center; margin-top: 2rem; margin-bottom: 0">
       Esto es lo que puedes hacer:
