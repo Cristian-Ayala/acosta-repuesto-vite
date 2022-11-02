@@ -85,13 +85,17 @@
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Marca</label>
           <div v-if="newProductMobile.doc" class="col-md-9">
-            <el-select v-model="marcaDropdown" class="m-2" placeholder="Seleccione una marca" size="large">
+            <el-select
+              v-model="newProductMobile.doc.nombreMarca"
+              class="m-2"
+              placeholder="Seleccione una marca"
+              size="large"
+            >
               <el-option
                 v-for="marca in marcas"
                 :key="marca.doc.nombreMarca"
                 :label="marca.doc.nombreMarca"
                 :value="marca.doc.nombreMarca"
-                @click="marcaSel(marca.doc)"
               />
               <div class="plusWrapper">
                 <el-button type="success" circle @click="clearData(); show.modalAgregarMar = true;">
@@ -106,13 +110,17 @@
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Categoria</label>
           <div v-if="newProductMobile.doc" class="col-md-9">
-            <el-select v-model="descripcionDropdown" class="m-2" placeholder="Seleccione una categoria" size="large">
+            <el-select 
+              v-model="newProductMobile.doc.nombreCategoria" 
+              class="m-2" 
+              placeholder="Seleccione una categoria" 
+              size="large"
+            >
               <el-option
                 v-for="categoria in categorias"
                 :key="categoria.doc.nombreCategoria"
                 :label="categoria.doc.nombreCategoria"
                 :value="categoria.doc.nombreCategoria"
-                @click="catSel(categoria.doc)"
               />
               <div class="plusWrapper">
                 <el-button type="success" circle @click="clearData(); show.modalAgregarCat = true;">
@@ -180,10 +188,10 @@
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="show.addEditProdMovile = false">Cancelar</el-button>
+          <el-button @click="mostrar.addEditProdMovile = false">Cancelar</el-button>
           <el-button
             type="primary"
-            @click="show.addEditProdMovile = false;confirmation(newProductMobile);"
+            @click="confirmation(newProductMobile);mostrar.addEditProdMovile = false;"
           >
             Confirmar
           </el-button>
@@ -219,8 +227,6 @@ export default {
     title: {
       type: String,
       default: 'Editar',
-      marcaDropdown: '',
-      descripcionDropdown: '',
     },
     mostrar: {
       type: Object,
@@ -310,7 +316,6 @@ export default {
     },
     checkSize(myFile, quality, width, height, format) {
       fromBlob(myFile, quality, width, height, format).then((blob) => {
-        console.log(blob);
         if (blob.size > 400000) {
           if (quality > 20) this.checkSize(myFile, quality -20, width, height, format);
           else if (quality === 20) this.checkSize(myFile, 10, width, height, format);
@@ -330,14 +335,6 @@ export default {
           // console.log(`MB: ${  blob.size / 1e6}`);
         });
       });
-    },
-    marcaSel(marca) {
-      this.marcaDropdown = marca.nombreMarca;
-      this.marcaSelected(marca.nombreMarca);
-    },
-    catSel(categoria) {
-      this.descripcionDropdown = categoria.nombreCategoria;
-      this.categoriaSelected(categoria.nombreCategoria);
     },
     modalIsActive() {
       document.addEventListener('keypress', this.listenerFunction);

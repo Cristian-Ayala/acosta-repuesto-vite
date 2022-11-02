@@ -1,112 +1,70 @@
 <template>
-  <div>
-    <b-modal
-      id="modalFiltros"
-      scrollable
-      centered
-      size="xl"
-      title=""
-      @show="getFilters()"
-      @hide="clearFilters()"
-    >
-      <h5>UPC</h5>
-      <div class="input-group">
-        <input v-model="tmpFiltroUPC" type="text" class="form-control" ><span
-          v-b-modal.barCode
-          class="input-group-text"
-          @click="
-            showBarcode = !showBarcode;
-            setCalledFrom('FiltrosProductos.vue');
-          "
-        ><i class="fas fa-barcode"
-        ></i></span>
-      </div>
-      <hr >
-      <div class="nombreProducto">
-        <h5>Nombre</h5>
-        <input v-model="tmpFiltroNombre" type="search" placeholder="Buscar" >
-      </div>
-      <hr >
-      <div v-if="marcas.length > 0" class="marcas">
-        <h5>Marcas:</h5>
-        <b-button
-          v-for="mar in marcas"
-          :key="mar.doc.nombreMarca"
-          class="btn-sm p-1 m-1"
-          variant="outline-info"
-          :class="{
-            active: tmpFiltroMarcasActivas.includes(mar.doc),
-          }"
-          @click="
-            tmpFiltroMarcasActivas.includes(mar.doc)
-              ? tmpFiltroMarcasActivas.splice(
-                tmpFiltroMarcasActivas.indexOf(mar.doc),
-                1,
-              )
-              : tmpFiltroMarcasActivas.push(mar.doc)
-          "
-        >
-          {{ mar.doc.nombreMarca }}
-        </b-button>
-      </div>
-      <hr >
-      <div v-if="categorias.length > 0" class="categorias">
-        <h5>Categorias:</h5>
-        <b-button
+  <!-- eslint-disable vue/no-mutating-props -->
+  <el-dialog
+    v-model="mostrar.modalFiltros"
+    title="Eliminar Producto"
+    destroy-on-close
+    width="90%"
+    :before-close="clearFilters()"
+    top="5vh"
+  >
+    <h5>UPC</h5>
+    <div class="input-group">
+      <!-- v-b-modal.barCode -->
+      <input v-model="tmpFiltroUPC" type="text" class="form-control" ><span
+        class="input-group-text"
+        @click="
+          showBarcode = !showBarcode;
+          setCalledFrom('FiltrosProductos.vue');
+        "
+      ><i class="fas fa-barcode"
+      ></i></span>
+    </div>
+    <hr >
+    <div class="nombreProducto">
+      <h5>Nombre</h5>
+      <input v-model="tmpFiltroNombre" type="search" placeholder="Buscar" >
+    </div>
+    <hr >
+    <div v-if="marcas.length > 0" class="marcas">
+      <h5>Marcas:</h5>
+      <el-checkbox-group v-model="tmpFiltroMarcasActivas">
+        <el-checkbox v-for="mar in marcas" :key="mar.doc.nombreMarca" :label="mar.doc.nombreMarca" border/>
+      </el-checkbox-group>
+    </div>
+    <hr >
+    <div v-if="categorias.length > 0" class="categorias">
+      <h5>Categorias:</h5>
+      <el-checkbox-group v-model="tmpFiltroCategoriasActivas">
+        <el-checkbox
           v-for="categoria in categorias"
           :key="categoria.doc.nombreCategoria"
-          class="btn-sm p-1 m-1"
-          variant="outline-info"
-          :class="{
-            active: tmpFiltroCategoriasActivas.includes(categoria.doc),
-          }"
-          @click="
-            tmpFiltroCategoriasActivas.includes(categoria.doc)
-              ? tmpFiltroCategoriasActivas.splice(
-                tmpFiltroCategoriasActivas.indexOf(categoria.doc),
-                1,
-              )
-              : tmpFiltroCategoriasActivas.push(categoria.doc)
-          "
-        >
-          {{ categoria.doc.nombreCategoria }}
-        </b-button>
-      </div>
-
-      <template #modal-footer="{ ok, cancel }">
-        <!-- Emulate built in modal footer ok and cancel button actions -->
-        <b-button
-          size="sm"
-          variant="outline-info"
-          @click="
-            cancel();
-            borrarFiltros();
-          "
-        >
-          Borrar Filtros
-        </b-button>
-        <b-button
-          size="sm"
-          variant="info"
-          @click="
-            ok();
-            aplicarFiltros({
-              cat: tmpFiltroCategoriasActivas,
-              mar: tmpFiltroMarcasActivas,
-              upc: tmpFiltroUPC,
-              nom: tmpFiltroNombre,
-            });
-          "
+          :label="categoria.doc.nombreCategoria"
+          border
+        />
+      </el-checkbox-group>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="borrarFiltros();mostrar.modalFiltros = false;">Borrar Filtros</el-button>
+        <el-button
+          type="primary"
+          @click="aplicarFiltros({
+                    cat: tmpFiltroCategoriasActivas,
+                    mar: tmpFiltroMarcasActivas,
+                    upc: tmpFiltroUPC,
+                    nom: tmpFiltroNombre,
+                  });
+                  mostrar.modalFiltros = false;"
         >
           Aplicar Filtros
-        </b-button>
-      </template>
-    </b-modal>
-  </div>
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
-// import { mapState, mapMutations, mapActions } from "vuex";
 import { mapActions, mapMutations, mapState } from 'vuex';
 
 // Variables for upc barcode scanner
@@ -115,6 +73,12 @@ let reading = false;
 
 export default {
   name: 'FiltrosProductos',
+  props: {
+    mostrar: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
   data: () => ({
       tmpFiltroMarcasActivas: [],
       tmpFiltroCategoriasActivas: [],
@@ -150,6 +114,9 @@ export default {
     tempFiltroUPC (tempFiltroUPC) {
       this.tmpFiltroUPC = tempFiltroUPC;
     },
+  },
+  mounted () {
+    this.getFilters()
   },
   methods: {
     ...mapActions('productos', ['aplicarFiltros', 'borrarFiltros']),

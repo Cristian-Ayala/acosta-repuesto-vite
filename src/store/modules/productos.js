@@ -194,26 +194,22 @@ export default (app) => ({
         productoDoc.precioPublico = Math.round(productoDoc.precioPublico * 100) / 100;
         productoDoc.precioTaller = Math.round(productoDoc.precioTaller * 100) / 100;
         const totalNumberOfUPCs = await dispatch('validarDatos', productoDoc);
-        if (!(typeof totalNumberOfUPCs.length === 'number')) {
-          throw new Error(totalNumberOfUPCs);
-        }
+        if (typeof totalNumberOfUPCs.length !== 'number') throw new Error(totalNumberOfUPCs);
         if (totalNumberOfUPCs.length > 0) {
           if (productoDoc._id !== totalNumberOfUPCs[0]._id) {
-            window.console.log(
+            window.console.error(
               'No es el mismo doc así que no se modifica, se arroja error que el upc ya existe',
             );
             throw new Error('El UPC ya existente. Sólo puede haber 1.');
           }
         }
-        window.console.log('se cambia el upc, y todo el doc se actualiza');
         state.localProductos
           .put(productoDoc)
           .then(() => {
             dispatch('readProducto').then(() => commit('successNotification', 'Producto modificado con éxito'));
-          })
-          .catch((err) => commit('errorNotification', `Error al modificar el producto ${err}`));
+          });
       } catch (err) {
-        commit('errorNotification', `Error al modificar el producto ${err}`);
+        commit('errorNotification', `Error al modificar el producto. ${err}`);
       }
     },
     deleteProducto({ state, commit, dispatch }, productoDel) {
@@ -261,8 +257,7 @@ export default (app) => ({
               live: true,
               retry: true,
             })
-            .on('change', (change) => {
-              window.console.log('yo, something changed!', change);
+            .on('change', () => {
               dispatch('readProducto');
             });
         });
@@ -375,14 +370,12 @@ export default (app) => ({
       }
       if (state.filtroMarcas.length > 0) {
         selector.nombreMarca = {
-          $in: state.filtroMarcas.map((marca) => marca.nombreMarca),
+          $in: [...state.filtroMarcas],
         };
       }
       if (state.filtroCategorias.length > 0) {
         selector.nombreCategoria = {
-          $in: state.filtroCategorias.map(
-            (categoria) => categoria.nombreCategoria,
-          ),
+          $in: [...state.filtroCategorias],
         };
       }
       // Put code below on an if, it will be called just once
@@ -506,7 +499,7 @@ export default (app) => ({
     confirmation({ dispatch }, producto) {
       // Verify in confirmation is for update o create new
       if (producto.doc._rev) {
-        dispatch('updateProducto', [producto]);
+        dispatch('updateProducto', { ...producto.doc });
       } else {
         dispatch('createProducto', [producto]);
       }

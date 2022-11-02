@@ -14,7 +14,7 @@
             </div>
             <div class="filtros">
               <div class="d-inline-flex pr-2 pb-2">
-                <el-button type="primary" round @click="show.modalFiltros"
+                <el-button type="primary" round @click="show.modalFiltros = true"
                 >Filtros ({{ allFilters.length }})</el-button>
               </div>
               <div
@@ -99,11 +99,9 @@
       </div>
       <!-- eslint-disable  vue/component-name-in-template-casing -->
       <AddEditProdMovile :title="title" :mostrar=show></AddEditProdMovile>
-      <!-- 
-        <ConfirmarTransacciones :show=show></ConfirmarTransacciones>
-        <EliminarProdMovil :show=show></EliminarProdMovil>
-        <FiltrosProductos :show=show></FiltrosProductos> 
-      -->
+      <EliminarProdMovil :mostrar=show></EliminarProdMovil>
+      <FiltrosProductos :mostrar=show></FiltrosProductos> 
+      <!-- <ConfirmarTransacciones :show=show></ConfirmarTransacciones> -->
     </div>
   </div>
 </template>
@@ -116,8 +114,8 @@ export default {
   components: {
     AddEditProdMovile: () => import('@/components/Productos/AddEditProdMovile.vue'),
     // ConfirmarTransacciones: () => import('@/components/Productos/ConfirmarTransacciones.vue'),
-    // EliminarProdMovil: () => import('@/components/Productos/EliminarProdMovil.vue'),
-    // FiltrosProductos: () => import('@/components/Productos/FiltrosProductos.vue'),
+    EliminarProdMovil: () => import('@/components/Productos/EliminarProdMovil.vue'),
+    FiltrosProductos: () => import('@/components/Productos/FiltrosProductos.vue'),
   },
   data() {
     return {
@@ -154,16 +152,16 @@ export default {
     ]),
     ...mapState('categorias', ['categorias']),
     allFilters() {
-      console.log('allFilters');
-      const categories = this.filtroCategorias.map((cat) => cat.nombreCategoria);
-      const brands = this.filtroMarcas.map((marca) => marca.nombreMarca);
+      const filters = [];
+      const categories = this.filtroCategorias.map((cat) => cat);
+      const brands = this.filtroMarcas.map((marca) => marca);
       if (this.filtroNombre) {
-        categories.push(this.filtroNombre);
+        filters.push(this.filtroNombre);
       }
       if (this.filtroUPC) {
-        categories.push(this.filtroUPC);
+        filters.push(this.filtroUPC);
       }
-      return categories.concat(brands);
+      return filters.concat(categories).concat(brands);
     },
   },
   watch: {
@@ -352,5 +350,8 @@ td input {
   border: 1px solid #409eff;
   padding: 0.2rem;
   transform: scale(0.9);
+}
+div:deep(.el-pagination.is-background.el-pagination--small) {
+    justify-content: center;
 }
 </style>

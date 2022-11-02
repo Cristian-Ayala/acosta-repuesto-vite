@@ -1,29 +1,27 @@
 <template>
-  <div>
-    <!-- inicio del modal para eliminar (mobile) -->
-    <b-modal id="deleteProduc" title="Eliminar Producto" centered>
-      <p v-if="newProductMobile.doc" class="my-4">
-        ¿Seguro quiere eliminar el producto:
-        {{ newProductMobile.doc.nombreProd }}?
-      </p>
-      <template #modal-footer="{ ok, cancel }">
-        <b-button size="sm" variant="danger" @click="cancel()">
-          Cancelar
-        </b-button>
-        <b-button
-          size="sm"
-          variant="success"
-          @click="
-            ok();
-            deleteProducto(newProductMobile);
-          "
+  <!-- eslint-disable vue/no-mutating-props -->
+  <el-dialog
+    v-model="mostrar.deleteProduc"
+    title="Eliminar Producto"
+    width="90%"
+    top="5vh"
+  >
+    <p v-if="newProductMobile.doc" class="my-4" style="word-break: break-word;">
+      ¿Seguro quiere eliminar el producto:
+      {{ newProductMobile.doc.nombreProd }}?
+    </p>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="mostrar.deleteProduc = false">Cancelar</el-button>
+        <el-button
+          type="danger"
+          @click="deleteProducto(newProductMobile);mostrar.deleteProduc = false;"
         >
-          Si
-        </b-button>
-      </template>
-    </b-modal>
-    <!-- Fin del modal para eliminar (mobile) -->
-  </div>
+          Confirmar
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
@@ -31,6 +29,12 @@ import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'EliminarProdMovil',
+  props: {
+    mostrar: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
   computed: {
     ...mapState('productos', [
       'newProductMobile',
@@ -39,7 +43,6 @@ export default {
   methods: {
     ...mapActions('productos', [
       'deleteProducto',
-      // "applyAllChanges"
     ]),
   },
 };
