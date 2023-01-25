@@ -6,6 +6,13 @@ import router from '../../router/index';
 PouchDB.plugin(PouchDBFind);
 // PouchDB.plugin(PouchDBQuickSearch);
 
+function regexSearch(keyword) {
+  if (!keyword || keyword.trim() === '') return 'nonexistent';
+  const arrayOfWords = keyword.split(' ');
+  const joinedRegex = arrayOfWords.map((word) => word !== ' ' ? `(?=.*${word})`: '').join('');
+  return `^${joinedRegex}.+`;
+}
+
 export default (app) => ({
   namespaced: true,
   state: {
@@ -518,5 +525,44 @@ export default (app) => ({
       state.filtroNombre = '';
       dispatch('firstPage');
     },
+    async searchProductos({ state }, variables) {
+      if (!variables.keyword) return [];
+      let resultado = null;
+      await state.localProductos
+        .find({
+          selector: {
+            $or: [
+              { upc: variables.keyword },
+              { nombreProd: { $regex: RegExp(regexSearch(variables.keyword), 'i') } }
+            ]
+          },
+          limit: variables.limit,
+          skip: variables.skip,
+        })
+        .then((res) => {
+          resultado = res.docs;
+          // state.findProductos = res.rows;
+          // state.searchTotalRows = res.total_rows;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+        return resultado;
+    },
+    reduceQuantity(store, detalleOrden) {
+      Promise.all(detalleOrden.map((producto) => {
+        const settings = {
+            method: 'PUT',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cantidad: producto.cantidad }),
+            credentials: 'include',
+        };
+        return fetch(`${app.config.globalProperties.$url}productos/_design/productHandler/_update/reduceQuantity/${producto._id}`, settings);
+      }));
+      // .then(resp => resp.json()).then(console.log);
+    }
   },
 });

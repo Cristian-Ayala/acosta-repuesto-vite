@@ -1,74 +1,64 @@
 <template>
-  <div>
-    <b-modal
-      v-if="showDetOrd"
-      id="detalleOrden"
-      v-model="alwaysTrue"
-      centered
-      title="Detalle Orden"
-    >
-      <div class="card-body">
-        <h5>Fecha:</h5>
-        <p>{{ formatDate(ordSelected._id) }}</p>
+  <!-- eslint-disable vue/no-mutating-props -->
+  <el-dialog
+    v-model="show.detOrd"
+    title="Detalle Orden"
+    width="90%"
+    top="5vh"
+  >
+    <div class="card-body">
+      <h5>Fecha:</h5>
+      <p>{{ formatDate(ordSelected._id) }}</p>
 
-        <h5 v-if="ordSelected.nombreCliente">Nombre del cliente:</h5>
-        <p>{{ ordSelected.nombreCliente }}</p>
+      <h5 v-if="ordSelected.nombreCliente">Nombre del cliente:</h5>
+      <p>{{ ordSelected.nombreCliente }}</p>
 
-        <h5>Método de pago:</h5>
-        <p>{{ ordSelected.metodoPago }}</p>
+      <h5>Método de pago:</h5>
+      <p>{{ ordSelected.metodoPago }}</p>
 
-        <div class="line"></div>
-        <div>
-          <b-card no-body class="text-center">
-            <div class="bg-success text-light roundedBorder">
-              <h4>
-                <b>Productos:</b>
-              </h4>
-            </div>
-          </b-card>
-          <!-- tabla de productos -->
-          <b-table
-            striped
-            hover
-            :items="ordSelected.productos"
-            :fields="headerLabels"
-          ></b-table>
-        </div>
-        <h6 style="margin-top: 1rem; font-weight: 900; text-align: center">
-          Total: {{ ordSelected.totalOrden }}
-        </h6>
-        <div class="line"></div>
-        <h5 v-if="ordSelected.observacionesOrden">Descripción:</h5>
-        <p>{{ ordSelected.observacionesOrden }}</p>
-
-        <h5>Tipo de orden:</h5>
-        <p>{{ ordSelected.tipoOrden }}</p>
-
-        <h5>Tipo de distribución:</h5>
-        <p>{{ ordSelected.tipoDistribucion }}</p>
-        
-        <div class="line"></div>
+      <div class="line"></div>
+      <div>
+        <h5>Productos:</h5>
+        <!-- tabla de productos -->
+        <el-table :data="ordSelected.productos" style="width: 100%" stripe>
+          <!-- <el-table-column prop="upc" label="UPC" /> -->
+          <el-table-column prop="nombreProd" label="Nombre" width="300"/>
+          <el-table-column prop="precioPublico" label="Precio unitario" />
+          <el-table-column prop="cantidad" label="Cantidad" />
+          <!-- <el-table-column prop="descuento" label="Descuento" /> -->
+          <el-table-column prop="subtotal" label="Sub-Total" />
+        </el-table>
       </div>
+      <h6 style="margin-top: 1rem; font-weight: 900; text-align: center">
+        Total: {{ ordSelected.totalOrden }}
+      </h6>
+      <div class="line"></div>
+      <h5 v-if="ordSelected.observacionesOrden">Descripción:</h5>
+      <p>{{ ordSelected.observacionesOrden }}</p>
 
-      <template #modal-footer="{ cancel, ok }">
-        <b-button size="m" variant="secondary" @click="cancel()">
-          Cancelar
-        </b-button>
-        <b-button size="m" variant="primary" @click="ok()">
-          Efectuar Cambios
-        </b-button>
-      </template>
-    </b-modal>
-  </div>
+      <h5>Tipo de orden:</h5>
+      <p>{{ ordSelected.tipoOrden }}</p>
+
+      <h5>Tipo de distribución:</h5>
+      <p>{{ ordSelected.tipoDistribucion }}</p>
+
+      <div class="line"></div>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="showDetOrd = false">Confirmar</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
 export default {
   name: 'DetalleOrden',
   props: {
-    showDetOrd: {
-      type: Boolean,
-      required: true,
+    show: {
+      type: Object,
+      default: () => ({ detOrd: false }),
     },
     ordSelected: {
       type: Object,
@@ -77,25 +67,9 @@ export default {
   },
   data() {
     return {
-      headerLabels: [
-        { key: 'upc', label: 'UPC' },
-        { key: 'nombreProd', label: 'Nombre' },
-        { key: 'nombreMarca', label: 'Marca' },
-        { key: 'nombreCategoria', label: 'Categoria' },
-        { key: 'precioUnit', label: 'Precio unitario' },
-        'cantidad',
-        'descuento',
-        { key: 'subtotal', label: 'Sub-Total' },
-      ],
-      alwaysTrue: true,
     };
   },
   watch: {
-    alwaysTrue: {
-      handler(newValue) {
-        if (!newValue) this.alwaysTrue = true;
-      }
-    }
   },
   methods: {
     formatDate(id) {

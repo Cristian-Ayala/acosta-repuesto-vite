@@ -98,9 +98,9 @@
         </div>
       </div>
       <!-- eslint-disable  vue/component-name-in-template-casing -->
-      <AddEditProdMovile :title="title" :mostrar=show></AddEditProdMovile>
+      <AddEditProdMovile v-if="show.addEditProdMovile" :title="title" :mostrar=show></AddEditProdMovile>
       <EliminarProdMovil :mostrar=show></EliminarProdMovil>
-      <FiltrosProductos :mostrar=show></FiltrosProductos> 
+      <FiltrosProductos ref="filtrosRef" :mostrar=show></FiltrosProductos>
       <!-- <ConfirmarTransacciones :show=show></ConfirmarTransacciones> -->
     </div>
   </div>
@@ -171,6 +171,17 @@ export default {
     currentPage(valor) {
       this.currentPageLocal = valor;
     },
+    // 'show.addEditProdMovile': {
+    //   handler(valor) {
+    //     if (!this.$refs || !this.$refs.filtrosRef) return;
+    //     if (valor) {
+    //       this.$refs.filtrosRef.removeScannerListener(() => ({}));
+    //     } else {
+    //       this.$refs.filtrosRef.addScannerListener();
+    //     }
+    //   },
+    //   immediate: true,
+    // },
   },
   methods: {
     ...mapMutations('productos', [
@@ -353,5 +364,8 @@ td input {
 }
 div:deep(.el-pagination.is-background.el-pagination--small) {
     justify-content: center;
+}
+:global(footer.el-dialog__footer) {
+  padding: var(--el-dialog-padding-primary);
 }
 </style>

@@ -2,10 +2,8 @@
   <!-- eslint-disable vue/no-mutating-props -->
   <el-dialog
     v-model="mostrar.modalFiltros"
-    title="Eliminar Producto"
-    destroy-on-close
+    title="Filtrar Productos"
     width="90%"
-    :before-close="clearFilters()"
     top="5vh"
   >
     <h5>UPC</h5>
@@ -14,7 +12,7 @@
       <input v-model="tmpFiltroUPC" type="text" class="form-control" ><span
         class="input-group-text"
         @click="
-          showBarcode = !showBarcode;
+          show.modalUPCBarcode = true;
           setCalledFrom('FiltrosProductos.vue');
         "
       ><i class="fas fa-barcode"
@@ -62,17 +60,34 @@
       </span>
     </template>
   </el-dialog>
+  <u-p-c-reader :show="show"></u-p-c-reader>
 </template>
 
 <script>
 import { mapActions, mapMutations, mapState } from 'vuex';
+import UPCReader from '@/components/Productos/UPCReader.vue';
 
 // Variables for upc barcode scanner
 let code = '';
 let reading = false;
 
+// const LoggerServiceInstance1 = (function () {
+//     function LoggerService() {
+//         this.log = console.log.bind(window.console);
+//         this.error = console.error.bind(window.console);
+//         this.warning = console.warn.bind(window.console);
+//     }
+//     return LoggerService;
+// }());
+
+// const logger1 = new LoggerServiceInstance1();
+// logger1.log('What line was this on?');
+
 export default {
   name: 'FiltrosProductos',
+  components: {
+    UPCReader,
+  },
   props: {
     mostrar: {
       type: Object,
@@ -84,7 +99,9 @@ export default {
       tmpFiltroCategoriasActivas: [],
       tmpFiltroNombre: '',
       tmpFiltroUPC: '',
-      showBarcode: false,
+      show: {
+        modalUPCBarcode: false,
+      },
     }),
   computed: {
     ...mapState('categorias', ['categorias']),
@@ -116,25 +133,24 @@ export default {
     },
   },
   mounted () {
-    this.getFilters()
+    this.getFilters();
+    this.addScannerListener();
   },
   methods: {
     ...mapActions('productos', ['aplicarFiltros', 'borrarFiltros']),
     ...mapMutations('productos', ['setCalledFrom','setFiltroUPC']),
     getFilters() {
-      // console.log(JSON.parse(JSON.stringify(this.filtroMarcas)));
-      // console.log(this.filtroMarcas);
-      // console.log(JSON.parse(JSON.stringify(this.filtroMarcas)) == this.filtroMarcas);
-      // console.log([...this.filtroMarcas]);
-      // this.tmpFiltroMarcasActivas = JSON.parse(JSON.stringify(this.filtroMarcas));
       this.tmpFiltroMarcasActivas = [...this.filtroMarcas];
       this.tmpFiltroCategoriasActivas = [...this.filtroCategorias];
       this.tmpFiltroNombre = this.filtroNombre.toString();
       this.tmpFiltroUPC = this.filtroUPC.toString();
+    },
+    addScannerListener() {
       document.addEventListener('keypress', this.listenerFunction);
     },
-    clearFilters() {
+    removeScannerListener(done) {
       document.removeEventListener('keypress', this.listenerFunction);
+      done();
     },
     listenerFunction(e) {
       // usually scanners throw an 'Enter' key at the end of read
@@ -147,7 +163,8 @@ export default {
               upc: this.tmpFiltroUPC,
               nom: '',
             });
-          this.$bvModal.hide('modalFiltros');
+          // eslint-disable-next-line
+          this.mostrar.modalFiltros = false;
           /// code ready to use
           code = '';
         }

@@ -42,14 +42,14 @@ export default {
     this.initDbCategorias();
     this.initDbProductos();
     // // this.initDBUsuarios();
-    // this.initDbOrdenes();
+    this.initDbOrdenes();
   },
   methods: {
     ...mapActions('marcas', ['initDB']),
     ...mapActions('categorias', ['initDbCategorias']),
     ...mapActions('productos', ['initDbProductos']),
     // ...mapActions("usuarios", ["initDBUsuarios"]),
-    // ...mapActions("ordenes", ["initDbOrdenes"]),
+    ...mapActions('ordenes', ['initDbOrdenes']),
   },
 };
 </script>

@@ -16,7 +16,16 @@ const router = createRouter({
 });
 
 const app = createApp(App);
-app.config.globalProperties.$url = 'https://www.couchdb.tk/';
+app.config.globalProperties.$url = 'http://127.0.0.1:5984/';
+app.config.errorHandler = function errorHandler(err, instance, info) {
+  window.console.error(err, instance, info);
+  console.log(`Error: ${err.toString()}\nInfo: ${info}`);
+  throw err;
+};
+app.config.warnHandler = (msg, instance, trace) => {
+  window.console.warn(msg, instance, trace);
+};
+app.config.performance = true;
 const store = createStore(app);
 app.use(store);
 app.use(router);

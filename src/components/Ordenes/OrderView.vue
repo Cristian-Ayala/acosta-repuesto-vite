@@ -1,10 +1,10 @@
 <template>
   <div class="order">
     <div id="leftSide">
-      <b-avatar :variant="statusColor">
+      <el-button :type="statusColor" circle>
         <i v-if="orden.tipoOrden === 'Local'" class="fas fa-store"></i>
         <i v-else class="fas fa-motorcycle"></i>
-      </b-avatar>
+      </el-button>
     </div>
     <div id="rigthSide">
       <div v-if="orden && orden.nombreCliente" class="orderName">
@@ -19,9 +19,9 @@
       <div v-if="orden && typeof orden.totalOrden === 'number'">
         $ {{ orden.totalOrden }}
       </div>
-      <a href="#" @click="showModalViewDetails = !showModalViewDetails"> Ver detalles </a>
+      <a href="#" @click="show.detOrd = true"> Ver detalles </a>
     </div>
-    <detalle-orden :ord-selected="orden" :show-det-ord="showModalViewDetails"></detalle-orden>
+    <detalle-orden :ord-selected="orden" :show="show"></detalle-orden>
   </div>
 </template>
 
@@ -41,13 +41,14 @@ export default {
   },
   data() {
     return {
-      showModalViewDetails: false,
+      show: {
+        detOrd: false,
+      },
     };
   },
   computed: {
     statusColor () {
         if (!this.orden) return 'danger';
-        
         switch (this.orden.status) {
             case 'Completado':
                 return 'success';
@@ -75,10 +76,10 @@ export default {
 
 <style scoped>
 .order {
-  padding: 1rem;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
-  margin: 1rem 0;
+  margin: 0.5rem .5rem;
   box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
   background-color: #fff;
   border-radius: 1rem;

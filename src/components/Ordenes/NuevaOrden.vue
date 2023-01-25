@@ -1,260 +1,200 @@
+<!-- eslint-disable vue/v-on-function-call -->
+<!-- eslint-disable vue/no-mutating-props -->
+<!-- eslint-disable vue/v-on-event-hyphenation -->
 <template>
-  <!-- eslint-disable vue/v-on-event-hyphenation -->
-  <div>
-    <b-modal id="nuevaOrden" centered title="Nueva Orden" @show="modalIsActive()" @hide="modalWillHide()">
-      <template v-if="paso === 'productos'" #modal-header>
-        <a class="ltStepBack" @click="paso = 'datos'"> &lt; </a>
-        <h4 class="d-flex align-items-center">
-          <b>Nueva Orden</b>
-        </h4>
-      </template>
-      <div class="cuerpoModal">
-        <div class="bodyMenu">
-          <div v-if="paso === 'datos'" class="datosPersonales">
-            <b-form class="d-flex justify-content-center mb-4 mt-4 ml-3" inline>
-              <label for="fecha">Fecha de venta:&nbsp;&nbsp;&nbsp; </label>
-              <date-pick
-                id="fecha"
+  <el-dialog
+    v-model="show.detOrden"
+    title="Nueva Orden"
+    width="90%"
+    fullscreen
+    destroy-on-close
+    :before-close="modalWillHide"
+  >
+    <template v-if="paso === 'productos'" #modal-header>
+      <a class="ltStepBack" @click="paso = 'datos'"> &lt; </a>
+      <h4 class="d-flex align-items-center">
+        <b>Nueva Orden</b>
+      </h4>
+    </template>
+    <div class="cuerpoModal">
+      <div class="bodyMenu">
+        <div v-if="paso === 'datos'" class="datosPersonales">
+          <!-- :model="sizeForm" -->
+          <el-form
+            ref="formDatos"
+            label-width="auto"
+            label-position="top"
+            size="default"
+          >
+            <el-form-item label="Fecha y hora de venta:">
+              <el-date-picker
                 v-model="date"
-                :input-attributes="{ readonly: true }"
-                :pick-time="true"
-                :use12-hour-clock="true"
-                format="MM-DD-YYYY HH:mm"
-                display-format="DD-MM-YYYY H:mm A"
-                :selectable-year-range="{ from: 2020, to: 2050 }"
-              ></date-pick>
-            </b-form>
-            <b-form class="justifySpace ml-3" inline>
-              <div>
-                <label for="nombre">Nombre:&nbsp;&nbsp;&nbsp; </label>
-                <b-form-input
-                  id="nombre"
-                  v-model="orden.nombreCliente"
-                  class="mb-2 mr-sm-2 mb-sm-0"
-                ></b-form-input>
-              </div>
-              <div>
-                <label for="tel">Teléfono:&nbsp;&nbsp;&nbsp; </label>
-                <b-form-input
-                  id="tel"
-                  v-model="orden.telefono"
-                  class="mb-2 mr-sm-2 mb-sm-0"
-                ></b-form-input>
-              </div>
-              <div>
-                <label for="tel">Descripción:&nbsp;&nbsp;&nbsp; </label>
-                <b-form-textarea
-                  id="textareaDesc"
-                  v-model="orden.observacionesOrden"
-                  class="mb-2 mr-sm-2 mb-sm-0"
-                  rows="3"
-                  max-rows="6"
-                ></b-form-textarea>
-              </div>
-            </b-form>
-            <b-form class="d-flex justify-content-center mb-4 mt-5" inline>
-              <div>
-                <label for="tipoOrdenSelection"
-                >Tipo de orden:&nbsp;&nbsp;&nbsp;
-                </label>
-                <!--
-                  <dropdown
-                  id="tipoOrdenSelection"
-                  class="dropdown"
-                  :options="dropDownTypeOfOrder.data"
-                  :selected="dropDownTypeOfOrder.selected"
-                  v-on:updateOption="(payload) => dropDownTypeOfOrder.selected = payload"
-                  :placeholder="dropDownTypeOfOrder.data[0].name"
-                  :closeOnOutsideClick="true"
-                  >
-                  </dropdown> 
-                -->
-              </div>
-              <div>
-                <label for="tipoDistribucionDropDown"
-                >Tipo de Distribución:&nbsp;&nbsp;&nbsp;
-                </label>
-                <!--
-                  <dropdown
-                  id="tipoDistribucionDropDown"
-                  class="dropdown"
-                  :options="tipoDistribucionArray"
-                  :selected="tipoDistribucion"
-                  v-on:updateOption="(payload) => tipoDistribucion = payload"
-                  :placeholder="'Público'"
-                  :closeOnOutsideClick="true"
-                  >
-                  </dropdown> 
-                -->
-              </div>
-            </b-form>
-            <div class="ml-3 pr-3">
-              <blockquote>
-                <p><b>Público:</b> Todos los clientes.</p>
-
-                <p>
-                  <b>Mayorista:</b> Cuando la compra de productos excede lo
-                  normal.
-                </p>
-
-                <p>
-                  <b>Taller:</b> Cuando un taller asociado realiza una compra.
-                </p>
-              </blockquote>
-            </div>
-          </div>
-          <div v-show="paso === 'productos'" class="selProductos">
-            <div class="pl-3 pt-3 pb-3">
-              <input
-                v-model="searchProduct"
-                type="search"
-                placeholder="Buscar"
+                type="datetime"
+                placeholder="Seleccione una fecha y hora"
+              />
+            </el-form-item>
+            <el-form-item label="Nombre:">
+              <el-input id="nombre" v-model="orden.nombreCliente" placeholder="" />
+            </el-form-item>
+            <el-form-item label="Teléfono:">
+              <el-input id="nombre" v-model="orden.telefono" placeholder="" />
+            </el-form-item>
+            <el-form-item label="Descripción:">
+              <el-input v-model="orden.observacionesOrden" type="textarea" />
+            </el-form-item>
+            <el-form-item label="Tipo de orden:">
+              <el-select
+                id="tipoOrdenSelection"
+                v-model="tipoDeOrden.selected"
+                placeholder="Select"
+                size="large"
               >
-              <p>Productos encontrados ({{ searchTotalRows }})</p>
-            </div>
-            <!-- Aquí tienen que ir los productos -->
-            <table class="table card-text">
-              <tbody v-if="findProductos">
-                <find-productos
-                  v-for="(prod, index) in findProductos"
-                  :key="prod.id"
-                  :prod="prod"
-                  :index="index"
-                  :orden-detalle-productos="ordenDetalleProductos"
-                  @addTmpProducts="addTmpProducts()"
-                ></find-productos>
-              </tbody>
-            </table>
-            <div class="endPagination">
-              <b-button
-                :disabled="!(currentPage > 1)"
-                class="btn btn-outline-success button-product"
-                @click="
-                  paginationNavPlugin({ prevOrNext: 'prev', searchProduct })
-                "
-              >
-                <span> &lt; </span>
-              </b-button>
-              <b-button class="btn btn-outline-success button-product">
-                {{ currentPage }}
-              </b-button>
-              <b-button
-                :disabled="
-                  !(currentPage < Math.ceil(searchTotalRows / 10))
-                "
-                class="btn btn-outline-success button-product"
-                @click="
-                  paginationNavPlugin({ prevOrNext: 'next', searchProduct })
-                "
-              >
-                <span> &gt; </span>
-              </b-button>
-            </div>
-          </div>
-          <div v-if="paso === 'resumen'" class="resumenClass">
-            <h3 class="pl-2" style="text-align: center;padding: 1rem 0;">Resumen de la orden</h3>
-            <table class="table card-text">
-              <tbody v-if="ordenDetalleProductos">
-                <resumen-nueva-orden
-                  v-for="(prod, index) in ordenDetalleProductos"
-                  :key="prod.id"
-                  :prod="prod"
-                  :index-for-component="index"
-                  :orden-detalle-productos="ordenDetalleProductos"
-                  @addTmpProducts="addTmpProducts()"
+                <el-option
+                  v-for="(item, index) in dropDownTypeOfOrder"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.name"
                 />
-                <div style="text-align: center;margin: 2rem 0;">
-                  Total:
-                  <h5 style="display: inline;">${{ total }}</h5>
-                </div>
-              </tbody>
-            </table>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="Tipo de Distribución:">
+              <el-select
+                id="tipoDistribucionDropDown"
+                v-model="tipoDistribucion.selected"
+                placeholder="Select"
+                size="large"
+              >
+                <el-option
+                  v-for="(item, index) in tipoDistribucionArray"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.name"
+                />
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <blockquote>
+            <p><b>Público:</b> Todos los clientes.</p>
+
+            <p>
+              <b>Mayorista:</b> Cuando la compra de productos excede lo
+              normal.
+            </p>
+
+            <p>
+              <b>Taller:</b> Cuando un taller asociado realiza una compra.
+            </p>
+          </blockquote>
+        </div>
+        <div v-show="paso === 'productos'" class="selProductos">
+          <div>
+            <input
+              v-model.trim="searchProductKeyword"
+              type="search"
+              placeholder="Buscar"
+            >
+            <!-- <p>Productos encontrados ({{ searchTotalRows }})</p> -->
           </div>
-          <div v-if="paso === 'pago'" class="metPago">
-            <h3 class="pl-2" style="text-align: center;padding: 1rem 0;">Método de pago</h3>
-            <div style="text-align: center;margin: 2rem 0;">
-              Total:
-              <h5 style="display: inline;">${{ total }}</h5>
-            </div>
-            <div id="metPagoDropdown">
-              <!--
-                <dropdown
-                id="metPagoSelection"
-                class="dropdown"
-                :options="dropDownMetodoPago.data"
-                :selected="dropDownMetodoPago.selected"
-                v-on:updateOption="(payload) => dropDownMetodoPago.selected = payload"
-                :placeholder="dropDownMetodoPago.data[0].name"
-                :closeOnOutsideClick="true"
-                >
-                </dropdown> 
-              -->
-            </div>
+          <!-- Aquí tienen que ir los productos -->
+          <table class="table card-text">
+            <tbody v-if="findProductos">
+              <find-productos
+                v-for="(prod, index) in findProductos"
+                :key="prod._id"
+                :prod="prod"
+                :index="index"
+                :orden-detalle-productos="ordenDetalleProductos"
+                :tipo-dist="tipoDistribucion.selected"
+                @addTmpProducts="addTmpProducts"
+                @reCalculateSubTotal="reCalculateSubTotal"
+              ></find-productos>
+            </tbody>
+          </table>
+          <div class="endPagination">
+            <!-- page-size is lower than total rows, so pagination will be shown -->
+            <el-pagination
+              layout="prev, pager, next"
+              :page-size="paginator.pageSize"
+              :current-page="paginator.currentPage"
+              :total="searchTotalRows"
+              :hide-on-single-page="true"
+              @current-change="handleChangePage($event)"
+            />
+          </div>
+        </div>
+        <div v-if="paso === 'resumen'" class="resumenClass">
+          <h3 class="pl-2" style="text-align: center;padding: 1rem 0;">Resumen de la orden</h3>
+          <table class="table card-text">
+            <tbody v-if="ordenDetalleProductos">
+              <resumen-nueva-orden
+                v-for="(prod, index) in Object.values(ordenDetalleProductos)"
+                :key="prod.id"
+                :prod="prod"
+                :index-for-component="index"
+                :orden-detalle-productos="ordenDetalleProductos"
+                @addTmpProducts="addTmpProducts"
+              />
+              <div style="text-align: center;margin: 2rem 0;">
+                Total:
+                <h5 style="display: inline;">${{ total }}</h5>
+              </div>
+            </tbody>
+          </table>
+          <el-divider />
+          <h3 class="pl-2" style="text-align: center;padding: 1rem 0;">Método de pago</h3>
+          <div id="metPagoDropdown">
+            <el-select
+              id="tipoDistribucionDropDown"
+              v-model="dropDownMetodoPago.selected"
+              class="m-2"
+              placeholder="Select"
+              size="large"
+            >
+              <el-option
+                v-for="(item, index) in dropDownMetodoPago.data"
+                :key="index"
+                :label="item.name"
+                :value="item.name"
+              />
+            </el-select>
           </div>
         </div>
       </div>
-      <template #modal-footer="{ cancel, ok }">
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
         <div v-if="paso === 'datos'" class="customFooter">
-          <b-button size="m" variant="secondary" @click="cancel()">
-            Cancelar
-          </b-button>
-          <b-button size="m" variant="success" @click="paso = 'productos'">
-            Siguiente
-          </b-button>
+          <b style="display:none;">{{renderFooter()}}</b>
+          <el-button @click="show.detOrden = false">Cancelar</el-button>
+          <el-button type="primary" @click="paso = 'productos'">Siguiente</el-button>
         </div>
         <div v-else-if="paso === 'productos'" class="total">
           <div>
             Total:
             <h5 style="display: inline">${{ total }}</h5>
           </div>
-          <b-button
-            size="m"
-            variant="success"
+          <el-button
+            type="primary"
             class="active rounded"
             :disabled="total <= 0"
             @click="paso = 'resumen'"
-          >
-            Siguiente
-          </b-button>
+          >Siguiente</el-button>
         </div>
         <div v-else-if="paso === 'resumen'" class="customFooter">
-          <b-button size="m" class="stepBack" @click="paso = 'productos'">
-            Atras
-          </b-button>
-          <b-button
-            size="m"
-            variant="success"
+          <el-button @click="paso = 'productos'">Atras</el-button>
+          <el-button
+            type="success"
             :disabled="total <= 0"
-            @click="paso = 'pago'"
-          >
-            Pagar
-          </b-button>
+            @click="createOrder();paso = 'datos';show.detOrden = false;"
+          >Pagar</el-button>
         </div>
-        <div v-else-if="paso === 'pago'" class="customFooter">
-          <b-button size="m" class="stepBack" @click="paso = 'resumen'">
-            Atras
-          </b-button>
-          <b-button
-            size="m"
-            variant="success"
-            @click="
-              createOrder();
-              paso = 'datos';
-              ok();
-            "
-          >
-            Confirmar
-          </b-button>
-        </div>
-      </template>
-    </b-modal>
-  </div>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
-// import dropdown from "vue-dropdowns";
 import { mapState, mapMutations, mapActions } from 'vuex';
-import DatePick from '@/components/Calendario/vueDatePick.vue';
 import FindProductos from '@/components/Ordenes/FindProductos.vue';
 import ResumenNuevaOrden from './ResumenNuevaOrden.vue';
 
@@ -284,9 +224,14 @@ export default {
   name: 'NuevaOrden',
   components: {
     // dropdown,
-    DatePick,
     FindProductos,
     ResumenNuevaOrden,
+  },
+  props: {
+    show: {
+      type: Object,
+      default: () => {},
+    },
   },
   data() {
     return {
@@ -304,18 +249,12 @@ export default {
         },
       ],
       tipoDistribucion: {
-        name: 'Público',
+        selected: 'Público',
       },
-      dropDownTypeOfOrder: {
-        data: [{
-            'name': 'Local'
-        }, {
-            'name': 'Delivery'
-        }],
-        selected: {
-            'name': 'Local'
-        },
+      tipoDeOrden: {
+        selected: 'Local',
       },
+      dropDownTypeOfOrder: [{ name: 'Local' }, { name: 'Delivery' }],
       dropDownMetodoPago: {
         data: [{
             'name': 'Tarjeta de Crédito'
@@ -328,13 +267,18 @@ export default {
         }, {
             'name': 'Criptomoneda'
         }],
-        selected: {
-            'name': 'Efectivo'
-        },
+        selected: 'Efectivo'
       },
-      searchProduct: '',
+      searchProductKeyword: '',
       ordenDetalleProductos: {},
       total: 0.0,
+      paginator: {
+        pageSize: 10,
+        currentPage: 1,
+      },
+      findProductos: null,
+      searchTotalRows: 0,
+      searchTimeout: null,
     };
   },
   computed: {
@@ -344,23 +288,39 @@ export default {
       'orden',
       'metPago',
       'prodSearch',
-      'searchTotalRows',
-      'findProductos',
       'currentPage',
     ]),
     ...mapState('productos', ['productos']),
   },
   watch: {
-    searchProduct (val) {
+    searchProductKeyword () {
       // console.log("Watcheme prro", val);
-      this.searchProductos(val);
+      // call method after 2 seconds and restart counter if called again
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        this.paginator.currentPage = 1;
+        this.searchProductosLocal();
+      }, 500);
+    },
+    'paginator.currentPage': function currentPageWatch() {
+      window.console.log('flag 1 paginator');
+      this.searchProductosLocal();
     },
   },
   mounted() {
     this.date = todayDate();
-    console.log('Mounted');
+    this.modalIsActive();
   },
   methods: {
+    renderFooter() {
+      try {
+        this.$nextTick(() => {
+          document.querySelector('footer.el-dialog__footer').style.setProperty('padding', '0px');
+        });
+      } catch (err) {
+        if (!err) window.console.error('err', err);
+      }
+    },
     ...mapMutations('ordenes', [
       'change',
       'decProducto',
@@ -368,38 +328,58 @@ export default {
       'filtroProd',
       'dosDecimalesProd',
     ]),
-    ...mapActions('ordenes', ['searchProductos', 'paginationNavPlugin', 'createRegistroOrdenes']),
-    addTmpProducts(ordenDetalleProductos, index, add = true, triggeredFromComponent = false) {
+    ...mapActions('productos', ['searchProductos']),
+    ...mapActions('ordenes', ['createRegistroOrdenes']),
+    async searchProductosLocal() {
+      const {pageSize, currentPage} = this.paginator;
+      const searchVariables = {
+        offset: pageSize * (currentPage - 1),
+        limit: pageSize + 5,
+        keyword: this.searchProductKeyword,
+      }
+      const res = await this.searchProductos(searchVariables);
+      this.searchTotalRows = res.length;
+      this.findProductos = [];
+      this.$nextTick(() => {
+        if (res.length > pageSize) this.findProductos = res.slice(0, pageSize);
+        else this.findProductos = res;
+      });
+    },
+    reCalculateSubTotal(index, prod) {
+      const tmpProd = { ...prod };
+      if (!this.ordenDetalleProductos[prod?.upc] ) return;
+      if (prod.price == null || typeof(prod.price) !== 'number' || prod.price <= 0) {
+        tmpProd.price = 0;
+      }
+      tmpProd.subtotal = twoDecimalsOnly(prod.cantidad * prod.price);
+      this.ordenDetalleProductos[prod.upc] = { ...tmpProd };
+      this.reRender(index);
+      this.calculateTotal();
+    },
+    addTmpProducts(product, index, add = true, triggeredFromComponent = false) {
+      if (!product) return;
       let prod;
       // Check if product is already in the dictionary
-      if (this.ordenDetalleProductos[ordenDetalleProductos?.upc]) {
-        // console.log("Exist");
+      if (this.ordenDetalleProductos[product?.upc]) {
         // True: modify by 1 the quantity and update the total. Whether you add or decrease quantity
-        prod = this.ordenDetalleProductos[ordenDetalleProductos.upc];
+        prod = this.ordenDetalleProductos[product.upc];
         if (add) {
           // check if quantity is in stock range
-          if (prod.cantidad <= prod.stockProd) {
-            prod.cantidad += 1;
-            prod.subtotal = twoDecimalsOnly(prod.cantidad * prod.precioPublico);
-          }
-        } else if (prod.cantidad >= 1) {
-            prod.cantidad -= 1;
-            prod.subtotal = twoDecimalsOnly(prod.cantidad * prod.precioPublico);
-          }
+          if (prod.cantidad <= prod.stockProd) prod.cantidad += 1;
+        } else if (prod.cantidad >= 1) prod.cantidad -= 1;
+        prod.subtotal = twoDecimalsOnly(prod.cantidad * prod.price);
       } else {
+        if (!add) return; // substrac from 0 is not allowed
         // False: add the product to the dictionary
-        // console.log("does not exist");
         prod = {
-          ...ordenDetalleProductos,
+          ...product,
           cantidad: 1,
-          subtotal: twoDecimalsOnly(ordenDetalleProductos.precioPublico),
+          subtotal: twoDecimalsOnly(product.price),
         };
       }
       delete prod.foto;
-      this.ordenDetalleProductos[prod.upc] = { ...prod};
+      this.ordenDetalleProductos[prod.upc] = { ...prod };
       if (triggeredFromComponent) {
-        console.log(ordenDetalleProductos);
-        console.log(index);
         // Index is returned as the UPC of the product
         Object.assign(this.ordenDetalleProductos[prod.upc], { ...prod });
       } else {
@@ -408,9 +388,7 @@ export default {
       this.calculateTotal();
     },
     reRender(index) {
-      const render = this.findProductos[index];
-      render.id += 'a';
-      this.$set(this.findProductos, index, render);
+      this.findProductos[index]._id += 'a';
     },
     calculateTotal() {
       try {
@@ -424,16 +402,16 @@ export default {
       }
     },
     async createOrder() {
-      const localOrder = { ...this.orden }
+      const localOrder = { ...this.orden };
       delete localOrder.totalOrden;
       const orden = {
         _id: `${new Date(this.date).toISOString().slice(0, -7)}${new Date().toISOString().slice(17)}`,
-        metodoPago: this.dropDownMetodoPago.selected.name,
-        tipoDistribucion: this.tipoDistribucion.name,
+        metodoPago: this.dropDownMetodoPago.selected,
+        tipoDistribucion: this.tipoDistribucion.selected,
         totalOrden: this.total,
         productos: Object.values(this.ordenDetalleProductos),
-        status: this.dropDownTypeOfOrder.selected.name === 'Local' ? 'Completado' : 'En proceso',
-        tipoOrden: this.dropDownTypeOfOrder.selected.name, // Ir a dejar
+        status: this.tipoDeOrden.selected === 'Local' ? 'Completado' : 'En proceso',
+        tipoOrden: this.tipoDeOrden.selected,
         ...localOrder
       };
       await this.createRegistroOrdenes(orden);
@@ -444,16 +422,17 @@ export default {
       this.total = 0.0;
       this.paso = 'datos';
       this.orden = {
-          'nombreCliente': '',
-          'observacionesOrden': '',
+        nombreCliente: '',
+        observacionesOrden: '',
       }
-      this.searchProduct = '';
-      this.searchProductos('');
+      this.searchProductKeyword = '';
     },
     modalIsActive() {
       document.addEventListener('keypress', this.listenerFunction);
     },
     modalWillHide() {
+      // eslint-disable-next-line
+      this.show.detOrden = false;
       document.removeEventListener('keypress', this.listenerFunction);
       this.clearData();
     },
@@ -461,7 +440,7 @@ export default {
       // usually scanners throw an 'Enter' key at the end of read
       if (e.key === 'Enter') {
         if (code.length > 10) {
-          this.searchProduct = code;
+          this.searchProductKeyword = code;
           console.log(code);
           /// code ready to use
           code = '';
@@ -477,6 +456,9 @@ export default {
           reading = false;
         }, 200); // 200 works fine for me but you can adjust it
       }
+    },
+    handleChangePage(currentPage) {
+      this.paginator.currentPage = currentPage;
     },
   },
 };
@@ -609,14 +591,14 @@ export default {
 }
 blockquote {
   color: rgba(0, 0, 0, 0.5);
-  padding-left: 1.5em;
+  padding-left: 0.5em;
   border-left: 5px solid rgba(0, 0, 0, 0.1);
 }
 .selProductos {
   width: 100%;
   height: 100%;
-  padding: 0 0.5rem;
-  background: #f8f9fb;
+  padding: 0;
+  background: transparent;
 }
 /* search input */
 input {
@@ -655,11 +637,11 @@ input[type="search"] {
 input[type="search"]:focus {
   width: 70vw;
   background-color: #fff;
-  border-color: #66cc75;
+  border-color: #cc6666;
 
-  -webkit-box-shadow: 0 0 5px rgba(109, 207, 246, 0.5);
-  -moz-box-shadow: 0 0 5px rgba(109, 207, 246, 0.5);
-  box-shadow: 0 0 5px rgba(109, 207, 246, 0.5);
+  -webkit-box-shadow: 0 0 5px rgba(246, 109, 109, 0.5);
+  -moz-box-shadow: 0 0 5px rgba(246, 109, 109, 0.5);
+  box-shadow: 0 0 5px rgba(246, 109, 109, 0.5);
 }
 
 input:-moz-placeholder {
@@ -716,7 +698,7 @@ input::-webkit-input-placeholder {
   background: transparent;
 }
 .total {
-  background-color: #28a745;
+  background-color: var(--el-color-primary-dark-2);
   color: #fff;
   display: flex;
   align-items: center;
@@ -738,11 +720,20 @@ input::-webkit-input-placeholder {
 #metPagoDropdown {
   text-align: center;
 }
-.metPago {
-  background-image: url(https://media0.giphy.com/media/dmmBhPUnCSF9ibuTEo/giphy.gif?cid=ecf05e47r8zkck2cj8uf4ukx8lxvo9mo5ye41w242dtjk5qi&rid=giphy.gif&ct=g);
-  background-repeat: no-repeat;
-  background-size: 100%;
-  background-position: bottom;
-  height: 100%;
+:global(footer.el-dialog__footer) {
+  margin-top: auto;
 }
+:global(.el-dialog.is-fullscreen) {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 100vh;
+}
+/* .el-radio-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 0.5rem;
+    align-items: center;
+} */
 </style>

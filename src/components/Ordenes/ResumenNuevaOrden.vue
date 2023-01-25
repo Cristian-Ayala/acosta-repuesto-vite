@@ -1,5 +1,5 @@
 <template>
-  <tr class="w-100">
+  <tr v-if="prod.cantidad > 0" class="w-100">
     <td>
       <div class="h-100">
         <!-- eslint-disable-next-line -->
@@ -18,20 +18,20 @@
       <div
         v-if="!showQuantity"
         class="add"
-        @click="$emit('addTmpProducts', prod, true, indexForComponent, true)"
+        @click="$emit('addTmpProducts', prod, indexForComponent, true, true)"
       >
         <i class="fas fa-plus"></i>
       </div>
       <div v-else class="h-100">
         <div
           class="plus_minus"
-          @click="$emit('addTmpProducts', prod, true, indexForComponent, true)"
+          @click="$emit('addTmpProducts', prod, indexForComponent, true, true)"
         >
           <i class="fas fa-plus"></i>
         </div>
         <div
           class="plus_minus"
-          @click="$emit('addTmpProducts', prod, false, indexForComponent, true)"
+          @click="$emit('addTmpProducts', prod, indexForComponent, false, true)"
         >
           <i class="fas fa-minus"></i>
         </div>

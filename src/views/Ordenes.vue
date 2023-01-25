@@ -7,12 +7,9 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Ordenes
             </h6>
-            <b-button
-              v-b-modal.nuevaOrden
-              variant="success"
-              style="float: right"
-            ><i class="fa fa-plus" aria-hidden="true"></i
-            ></b-button>
+            <el-button type="success" style="float: right" @click="show.detOrden = true">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </el-button>
           </div>
           <div class="card-body">
             <div class="form-group position-relative mb-0">
@@ -33,7 +30,9 @@
             </div>
           </div>
         </div>
-        <order-view v-for="orden in ordenes" :key="orden.id" :orden="orden.doc"></order-view>
+        <div style="display: grid;grid-template-columns: 1fr 1fr;">
+          <order-view v-for="orden in ordenes" :key="orden.id" :orden="orden.doc"></order-view>
+        </div>
       </div>
       <button
         id="btnDetOrden"
@@ -47,7 +46,7 @@
       </button>
     </div>
     <!-- Fin del Cuerpo a escribir -->
-    <nueva-orden></nueva-orden>
+    <nueva-orden v-if="show.detOrden" :show="show"></nueva-orden>
   </div>
 </template>
 
@@ -59,12 +58,15 @@ import OrderView from '../components/Ordenes/OrderView.vue';
 export default {
   name: 'OrdenesIndex',
   components: {
-    NuevaOrden,
     OrderView,
+    NuevaOrden,
   },
   data: () => ({
       displayOption: '',
       searchDisplay: '',
+      show: {
+        detOrden: false,
+      }
   }),
   computed: {
     ...mapState('ordenes', ['ordenes', 'ordSelected', 'showDetOrd',]),

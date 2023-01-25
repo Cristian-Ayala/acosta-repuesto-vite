@@ -7,10 +7,9 @@
       :title="title"
       width="90%"
       destroy-on-close
-      :before-close="modalWillHide()"
+      :before-close="modalWillHide"
       top="5vh"
     >
-      <!--  @show="modalIsActive()" @hide=""> -->
       <div v-if="newProductMobile">
         <div class="form-group row">
           <label class="col-md-3 form-control-label">UPC:</label>
@@ -339,14 +338,18 @@ export default {
     modalIsActive() {
       document.addEventListener('keypress', this.listenerFunction);
     },
-    modalWillHide() {
+    modalWillHide(done) {
+      window.console.log('remove modal');
       document.removeEventListener('keypress', this.listenerFunction);
+      done();
     },
     listenerFunction(e) {
       // usually scanners throw an 'Enter' key at the end of read
       if (e.key === 'Enter') {
         if (code.length > 10) {
+          window.console.log('code', code);
           this.newProductMobile.doc.upc = code;
+          this.$refs.dewdew.cwrcv();
           /// code ready to use
           code = '';
         }
