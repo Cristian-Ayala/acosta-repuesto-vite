@@ -312,12 +312,11 @@ export default (app) => ({
     },
     readAllProducts({ state }) {
       if (state.currentPage === 1) {
-        state.localProductos
-          .query('totalProd/totalProd')
-          .then((response) => {
-            state.totalRows = response.rows[0].value;
-          })
-          .catch(window.console.error);
+        const settings = { method: 'GET', credentials: 'include' };
+        fetch(`${app.config.globalProperties.$url}productos/_design/docs/totalProd/_view/totalProd`, settings).then((response) => {
+          console.log(response);
+        })
+        .catch(window.console.error);
       }
       const totalLimit = state.optionsPagination.skip + state.optionsPagination.limit;
       state.localProductos

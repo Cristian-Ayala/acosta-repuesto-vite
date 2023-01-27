@@ -16,7 +16,7 @@ const router = createRouter({
 });
 
 const app = createApp(App);
-app.config.globalProperties.$url = import.meta.env.BACKEND_URL;
+app.config.globalProperties.$url = import.meta.env.VITE_BACKEND_URL;
 app.config.errorHandler = function errorHandler(err, instance, info) {
   window.console.error(err, instance, info);
   console.log(`Error: ${err.toString()}\nInfo: ${info}`);
