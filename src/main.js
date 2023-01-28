@@ -5,6 +5,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 import { createStore } from './store';
 import App from './App.vue';
 import routes from './router';
+import isLoggedIn from './router/middleware/auth';
 import 'element-plus/dist/index.css';
 
 const router = createRouter({
@@ -14,6 +15,13 @@ const router = createRouter({
   linkActiveClass: 'active-link',
   linkExactActiveClass: 'exact-active-link',
 });
+
+router.beforeEach(async (to, from, next) => {
+  if (to.matched.some(record => record.meta.allowAnonymous)) next()
+  else if (await isLoggedIn()) next({ name: 'Login' })
+  else next()
+  // to.name !== 'Login' &&
+})
 
 const app = createApp(App);
 app.config.globalProperties.$url = import.meta.env.VITE_BACKEND_URL;

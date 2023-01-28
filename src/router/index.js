@@ -43,12 +43,18 @@ const routes = [{
     children: [{
         path: '/',
         name: 'Login',
-        component: () => import('../views/Login.vue')
+        component: () => import('../views/Login.vue'),
+        meta: {
+          allowAnonymous: true,
+        },
       },
       {
         path: '/cookies',
         name: 'Cookies',
-        component: () => import('../views/Cookies.vue')
+        component: () => import('../views/Cookies.vue'),
+        meta: {
+          allowAnonymous: true,
+        },
       }
     ]
   }

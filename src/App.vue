@@ -38,6 +38,7 @@ export default {
     };
   },
   created() {
+    // import { isLoggedIn } from './router/middleware/auth';
     this.initDB();
     this.initDbCategorias();
     this.initDbProductos();

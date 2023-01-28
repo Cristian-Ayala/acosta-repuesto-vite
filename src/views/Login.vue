@@ -54,7 +54,7 @@ export default {
   },
   mounted() {
     // Trigger para comenzar script para probar si las cookies de terceros estan habilitadas
-    const url = `${this.$url}/step1.js.php`;
+    const url = `${import.meta.env.VITE_BACKEND_URL}step1.js.php`;
     const step1El = document.createElement('script');
     step1El.setAttribute('src', url);
     document.body.appendChild(step1El);
@@ -63,15 +63,15 @@ export default {
   created() {
     // Inicio de script para probar si las cookies de terceros estan habilitadas
     const that = this;
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
     window._3rd_party_test_step1_loaded = function () {
       // At this point, a third-party domain has now attempted to set a cookie (if all went to plan!)
       const step2El = document.createElement('script');
-      const url = `${that.$url}/step2.js.php`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}/step2.js.php`;
       step2El.setAttribute('src', url);
       document.head.appendChild(step2El);
     };
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
     window._3rd_party_test_step2_loaded = function (cookieSuccess) {
       // If true, the third-party domain cookies are enabled
       // If false, the third-party domain cookies are disable
@@ -88,35 +88,35 @@ export default {
   },
   methods: {
     async login() {
-      // const settings = {
-      //     method: 'POST',
-      //     headers: {
-      //         Accept: 'application/json',
-      //         'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //         name: '',
-      //         password: '',
-      //     }),
-      //     credentials: 'include',
-      // };
       /**
        * * My man
        * ! deprecated
        * ? questions
        * TODO: Some task
        */
+      const settings = {
+          method: 'POST',
+          headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              name: this.username,
+              password: this.password,
+          }),
+          credentials: 'include',
+      };
       try {
-        // const fetchResponse = await fetch('https://www.couchdb.tk/_session', settings);
+        await fetch(`${import.meta.env.VITE_BACKEND_URL}_session`, settings);
+        // const fetchResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}_session`, settings);
         // const data = await fetchResponse.json();
         // console.log(data);
-        // this.$router.push({ path: '/' });
-        window.console.log('hola');
+        this.$router.push({ path: '/' });
         // const result = await remoteUsuarios.logIn(this.username, this.password)
         // if (result.ok) this.$router.push({ path: '/' });
       } catch (error) {
           console.error(JSON.stringify(error));
-          this.error = true;        
+          this.error = true;
       }
     },
     areCookiesEnabled() {

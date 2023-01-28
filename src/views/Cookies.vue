@@ -51,13 +51,12 @@ export default {
       visible: false,
     }),
   created() {
-    const url = `${this.$url  }/step1.js.php`;
+    const url = `${import.meta.env.VITE_BACKEND_URL}step1.js.php`;
     const step1El = document.createElement('script');
     step1El.setAttribute('src', url);
     document.head.appendChild(step1El);
   },
   mounted() {
-    const that = this;
     // eslint-disable-next-line
     window._3rd_party_test_step1_loaded = function () {
       // At this point, a third-party domain has now attempted to set a cookie (if all went to plan!)
@@ -67,7 +66,7 @@ export default {
       // Update loading / results message
       resultsEl.innerHTML = 'Etapa uno completada, cargando etapa 2&hellip;';
       // And load the second part of the test (reading the cookie)
-      const url = `${that.$url  }/step2.js.php`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}step2.js.php`;
       step2El.setAttribute('src', url);
       //   document.head.appendChild(step2El)
       resultsEl.appendChild(step2El);
