@@ -6,8 +6,7 @@ export default async function isLoggedIn() {
       settings,
     );
     const response = await resp.json();
-    window.console.log('response', response);
-    if (response != null && response.userCtx?.name !== '') return true;
+    if (response != null && response.userCtx?.name != null && response.userCtx?.name.trim() !== '') return true;
     return false;
   } catch (error) {
     window.console.error(error);

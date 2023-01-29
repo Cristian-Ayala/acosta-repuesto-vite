@@ -18,7 +18,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.allowAnonymous)) next()
-  else if (await isLoggedIn()) next({ name: 'Login' })
+  else if (!(await isLoggedIn())) next({ name: 'Login' })
   else next()
   // to.name !== 'Login' &&
 })

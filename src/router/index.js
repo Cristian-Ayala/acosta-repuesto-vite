@@ -46,6 +46,7 @@ const routes = [{
         component: () => import('../views/Login.vue'),
         meta: {
           allowAnonymous: true,
+          layout: 'Blank',
         },
       },
       {
@@ -54,6 +55,7 @@ const routes = [{
         component: () => import('../views/Cookies.vue'),
         meta: {
           allowAnonymous: true,
+          layout: 'Blank',
         },
       }
     ]
