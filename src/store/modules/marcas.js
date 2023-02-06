@@ -74,8 +74,11 @@ export default (app) => ({
         .catch((err) => commit('errorNotification', `Error al listar la marca. ${err}`));
     },
     edithRegistro({ state, commit, dispatch }) {
+      const marcaDoc = state.marSelected.doc;
+      marcaDoc.nombreMarca = marcaDoc.nombreMarca.trim().toLocaleUpperCase();
+      if (marcaDoc.nombreMarca === '') return;
       state.localMarca
-        .put(state.marSelected.doc)
+        .put(marcaDoc)
         .then(() => {
           dispatch('getAll').then(() => commit('successNotification', 'Marca editada con éxito'));
         })

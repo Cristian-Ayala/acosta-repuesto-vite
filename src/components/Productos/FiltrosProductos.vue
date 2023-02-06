@@ -26,21 +26,38 @@
     <hr >
     <div v-if="marcas.length > 0" class="marcas">
       <h5>Marcas:</h5>
-      <el-checkbox-group v-model="tmpFiltroMarcasActivas">
-        <el-checkbox v-for="mar in marcas" :key="mar.doc.nombreMarca" :label="mar.doc.nombreMarca" border/>
-      </el-checkbox-group>
+      <el-select
+        v-model="tmpFiltroMarcasActivas"
+        multiple
+        collapse-tags
+        collapse-tags-tooltip
+        placeholder="Filtro por marcas"
+      >
+        <el-option
+          v-for="mar in marcas"
+          :key="mar.doc.nombreMarca"
+          :label="mar.doc.nombreMarca"
+          :value="mar.doc.nombreMarca"
+        />
+      </el-select>
     </div>
     <hr >
     <div v-if="categorias.length > 0" class="categorias">
       <h5>Categorias:</h5>
-      <el-checkbox-group v-model="tmpFiltroCategoriasActivas">
-        <el-checkbox
+      <el-select
+        v-model="tmpFiltroCategoriasActivas"
+        multiple
+        collapse-tags
+        collapse-tags-tooltip
+        placeholder="Filtro por categorias"
+      >
+        <el-option
           v-for="categoria in categorias"
           :key="categoria.doc.nombreCategoria"
           :label="categoria.doc.nombreCategoria"
-          border
+          :value="categoria.doc.nombreCategoria"
         />
-      </el-checkbox-group>
+      </el-select>
     </div>
     <template #footer>
       <span class="dialog-footer">

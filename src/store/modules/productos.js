@@ -179,20 +179,9 @@ export default (app) => ({
       }
     },
     readProducto({ state, dispatch }) {
-      // filtroNombre: "",
-      if (state.filtroUPC.trim() !== '') {
-        dispatch('readProductsUPC');
-        return;
-      }
-      if (
-        state.filtroNombre.trim() !== ''
-        || state.filtroCategorias.length > 0
-        || state.filtroMarcas.length > 0
-      ) {
-        dispatch('readProductoCategoriaMarcaNombre');
-        return;
-      }
-      dispatch('readAllProducts');
+      if (state.filtroUPC.trim() !== '') dispatch('readProductsUPC');
+      else if (state.filtroCategorias.length > 0 || state.filtroMarcas.length > 0) dispatch('readProductoCategoriaMarcaNombre');
+      else dispatch('readAllProducts');
     },
     async updateProducto({ state, commit, dispatch }, producto) {
       try {
@@ -242,7 +231,6 @@ export default (app) => ({
       });
       remoteProductos.info().catch((err) => {
         if (err.status === 401) {
-          window.console.log('no autorizado');
           router
             .push({
               path: '/login',
@@ -338,11 +326,12 @@ export default (app) => ({
           if (state.optionsPagination.descending) {
             // response.docs = response.docs.reverse();
           }
-          state.paginationHelper.firstDoc = response.docs[0]._id;
-          state.paginationHelper.lastDoc = response.docs[response.docs.length - 1]._id;
           state.productos = response.docs.map((el) => ({
             doc: el,
           })); // para darle formato a la respuesta
+          if (response.docs.length === 0) return;
+          state.paginationHelper.firstDoc = response.docs[0]._id;
+          state.paginationHelper.lastDoc = response.docs[response.docs.length - 1]._id;
         })
         .catch(window.console.error);
     },
@@ -390,8 +379,9 @@ export default (app) => ({
       // Pagination purposes
       if (state.currentPage === 1) {
         state.localProductos
-          .find({ selector })
+          .find({ selector, fields: ['_id'] })
           .then((response) => {
+            window.console.log('response productos', response);
             state.totalRows = response.docs.length;
           })
           .catch(window.console.error);
@@ -430,13 +420,13 @@ export default (app) => ({
       state.optionsPagination.selectorFilter = {
         $gt: null,
       };
-      state.optionsPagination.skip = 0;
+      state.optionsPagination.skip = 1;
       state.optionsPagination.descending = true;
       state.currentPage = Math.ceil(state.totalRows / state.perPage);
       // numer of pages full of products
       const pagesFullofProducts = Math.trunc(state.totalRows / state.perPage);
       // calculate new limit
-      const newLimit = state.totalRows - state.perPage * pagesFullofProducts;
+      const newLimit = state.totalRows - (state.perPage * pagesFullofProducts);
       // New limit must be calculates because the last page is not full of products,
       // so it will be less than the perPage
       state.optionsPagination.limit = newLimit;

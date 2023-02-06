@@ -1,6 +1,43 @@
 import { ElMessage } from 'element-plus';
 import PouchDB from 'pouchdb-browser';
 import router from '../../router/index';
+import isLoggedIn from '../../router/middleware/auth';
+
+function dateFilterSelector(dates = {}) {
+  const selector = {};
+  let start = new Date();
+  let end = new Date();
+  if (dates.start) start = new Date(dates.start);
+  if (dates.end) end = new Date(dates.end);
+  start.setHours(0,0,0,0);
+  end.setHours(23,59,59,999);
+  selector.$gte = start.toISOString();
+  selector.$lte = end.toISOString();
+  return selector;
+}
+
+function priceFilterSelector(price = {}) {
+  if (price.priceGte == null && price.priceLte == null) return {};
+  const selector = { totalOrden: {} };
+  if (price.priceGte != null) selector.totalOrden.$gte = price.priceGte || 0;
+  if (price.priceLte != null && price.priceLte > 0) selector.totalOrden.$lte = price.priceLte;
+  return selector;
+}
+
+function orderTypeFilterSelector(orderType = 'Todas') {
+  if (orderType === 'Todas') return {};
+  return { tipoOrden: { $eq: orderType } };
+}
+
+function distributionOrderTypeFilterSelector(distributionOrderType = 'Todas') {
+  if (distributionOrderType === 'Todas') return {};
+  return { tipoDistribucion: { $eq: distributionOrderType } };
+}
+
+function orderStatusFilterSelector(status = 'Todas') {
+  if (status === 'Todas') return {};
+  return { status: { $eq: status } };
+}
 
 export default (app) => ({
     namespaced: true,
@@ -23,6 +60,8 @@ export default (app) => ({
       skipPagination: 0,
       localOrdenes: null,
       PouchDB,
+      defaultPageSize: 10,
+      totalRows: 0,
     },
     mutations: {
       /*
@@ -87,7 +126,7 @@ export default (app) => ({
       },
     },
     actions: {
-      initDbOrdenes({ state, dispatch }) {
+      initDbOrdenes({ state }) {
         const remoteOrdenes = new state.PouchDB(`${app.config.globalProperties.$url}ordenes`, {
           fetch (url, opts) {
             return state.PouchDB.fetch(url, opts, {
@@ -97,7 +136,6 @@ export default (app) => ({
         });
         remoteOrdenes.info().catch((err) => {
           if (err.status === 401) {
-            console.log('no autorizado');
             router
               .push({
                 path: '/login',
@@ -109,24 +147,21 @@ export default (app) => ({
         state.localOrdenes = new state.PouchDB('ordenes');
         // do one way, one-off sync from the server until completion
         state.localOrdenes.replicate.from(remoteOrdenes).on('complete', () => {
-          dispatch('readAllOrdenes'); // Get all de ordenes
           // then two-way, continuous, retriable sync
           state.localOrdenes
             .sync(remoteOrdenes, {
               live: true,
               retry: true,
-            })
-            .on('change', () => {
-              dispatch('readAllOrdenes'); // Get all de ordenes
             });
         });
       },
       async createRegistroOrdenes({ state, commit, dispatch }, orden) {
-        // For puchDB we need to add an _id field
+        if (!isLoggedIn()) return;
+        // eslint-disable-next-line no-param-reassign
+        orden.creation_user = localStorage.getItem('user_name');
         await state.localOrdenes
           .put(orden)
           .then(() => {
-            dispatch('readAllOrdenes');
             commit('successNotification', 'Orden agregada con éxito');
           })
           .catch((err) => {
@@ -135,18 +170,48 @@ export default (app) => ({
           });
         dispatch('productos/reduceQuantity', orden.productos, {root:true})
       },
-      readAllOrdenes({ state }) {
-        return state.localOrdenes
-          .allDocs({
-            include_docs: true,
-            descending: true,
+      getTotalRows({ state }, selector) {
+        state.localOrdenes
+          .find({ selector, fields: ['_id'] })
+          .then((response) => {
+            state.totalRows = response.docs.length;
           })
-          .then((result) => {
-            state.ordenes = result.rows;
-          })
-          .catch((err) => {
-            console.error('error trying read all orders', err);
-          });
+          .catch(window.console.error);
+      },
+      readAllOrdenes({ state, dispatch }, options = {}) {
+        if (!isLoggedIn()) return;
+        let skip = 0;
+        if (options.pagination?.limit != null && options.pagination?.page != null) {
+          skip = options.pagination.limit * (options.pagination.page - 1);
+        }
+        const selector = {
+          selector: {
+            _id: {
+              ...dateFilterSelector(options.date),
+            },
+            creation_user: {
+              $eq: localStorage.getItem('user_name'),
+            },
+            ...priceFilterSelector(options.price),
+            ...orderTypeFilterSelector(options.orderType),
+            ...distributionOrderTypeFilterSelector(options.tipoDistribucion),
+            ...orderStatusFilterSelector(options.status),
+          },
+          limit: options.pagination?.limit || state.defaultPageSize,
+          skip,
+          sort: [
+            {
+              _id: 'desc',
+            },
+          ],
+        };
+        if (options.pagination?.page === 1) dispatch('getTotalRows', selector.selector);
+        state.localOrdenes
+        .find(selector)
+        .then((response) => {
+          state.ordenes = response.docs;
+        })
+        .catch(window.console.error);
       },
     },
   });

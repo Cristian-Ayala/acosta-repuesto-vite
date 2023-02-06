@@ -233,6 +233,7 @@ export default {
       default: () => {},
     },
   },
+  emits: ['clearOrderFilters'],
   data() {
     return {
       paso: 'datos',
@@ -415,6 +416,7 @@ export default {
         ...localOrder
       };
       await this.createRegistroOrdenes(orden);
+      this.$emit('clearOrderFilters');
       this.clearData();
     },
     clearData() {

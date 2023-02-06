@@ -93,6 +93,7 @@
               layout="prev, pager, next"
               :total="totalRows"
               :page-size="perPage"
+              hide-on-single-page
             />
           </div>
         </div>
@@ -367,5 +368,14 @@ div:deep(.el-pagination.is-background.el-pagination--small) {
 }
 :global(footer.el-dialog__footer) {
   padding: var(--el-dialog-padding-primary);
+}
+:deep(ul.el-pager > li.number) {
+    display: none;
+}
+:deep(ul.el-pager > li.number.is-active), :deep(ul.el-pager > li:first-child), :deep(ul.el-pager > li:last-child) {
+    display: block;
+}
+:deep(ul.el-pager > li.more) {
+    pointer-events: none;
 }
 </style>

@@ -6,6 +6,7 @@ export default async function isLoggedIn() {
       settings,
     );
     const response = await resp.json();
+    localStorage.setItem('user_name', response.userCtx?.name || null);
     if (response != null && response.userCtx?.name != null && response.userCtx?.name.trim() !== '') return true;
     return false;
   } catch (error) {

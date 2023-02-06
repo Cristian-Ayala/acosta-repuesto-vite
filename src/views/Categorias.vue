@@ -83,7 +83,6 @@ export default {
   data: () => ({
       displayOption: '',
       searchDisplay: '',
-      urlApi: 'http://localhost:8080/categoria',
       show: {
         modalAgregarCat: false,
         modalEditCat: false,
@@ -98,7 +97,7 @@ export default {
     filtro(index) {
       if (this.searchDisplay === '') return true;
       const array = (
-        this.categorias[index].doc.nombreCat +
+        this.categorias[index].doc.nombreCategoria +
         this.categorias[index].doc.descripcion
       ).toUpperCase();
       return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;

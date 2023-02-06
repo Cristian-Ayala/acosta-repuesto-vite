@@ -81,7 +81,7 @@ export default (app) => ({
           })
           .then((doc) => {
             state.categorias = doc.rows.sort((a, b) => {
-              if (a.doc.nombreCategoria > b.doc.nombreCategoria) return 1 
+              if (a.doc.nombreCategoria > b.doc.nombreCategoria) return 1
               if (b.doc.nombreCategoria > a.doc.nombreCategoria) return -1;
               return 0;
             });
@@ -91,8 +91,11 @@ export default (app) => ({
           );
       },
       edithRegistro({ state, commit, dispatch }) {
+        const catDoc = state.catSelected.doc;
+        catDoc.nombreCategoria = catDoc.nombreCategoria.trim().toLocaleUpperCase();
+        if (catDoc.nombreCategoria === '') return;
         state.localCategorias
-          .put(state.catSelected.doc)
+          .put(catDoc)
           .then(() => {
             dispatch('getAllCategorias').then(() =>
               commit('successNotification', 'Categoria editada con éxito'),
@@ -131,7 +134,6 @@ export default (app) => ({
         );
         remoteCategorias.info().catch((err) => {
           if (err.status === 401) {
-            console.log('no autorizado');
             router
               .push({
                 path: '/login',
