@@ -17,10 +17,10 @@ function dateFilterSelector(dates = {}) {
 }
 
 function priceFilterSelector(price = {}) {
-  if (price.priceGte == null && price.priceLte == null) return {};
+  if (price.priceGte === 0 && price.priceLte === 0) return {};
   const selector = { totalOrden: {} };
-  if (price.priceGte != null) selector.totalOrden.$gte = price.priceGte || 0;
-  if (price.priceLte != null && price.priceLte > 0) selector.totalOrden.$lte = price.priceLte;
+  selector.totalOrden.$gte = price.priceGte || 0;
+  if (price.priceLte > 0) selector.totalOrden.$lte = price.priceLte;
   return selector;
 }
 
@@ -43,10 +43,6 @@ export default (app) => ({
     namespaced: true,
     state: {
       ordenes: [],
-      orden: {
-        nombreCliente: '',
-        observacionesOrden: '',
-      },
       searchDisplay: '',
       ordSelected: {},
       detalleOrden: [],

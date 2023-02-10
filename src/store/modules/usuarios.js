@@ -217,19 +217,7 @@ export default () => ({
           .catch(console.log);
       },
       logout() {
-        // console.log('out');
-        // const timeOut = setTimeout(() => {
-        //   window.location.reload(true);
-        // }, 1000); // wait 1 seconds
-        // remoteUsuarios.logout().then(() => {
-        //     clearTimeout(timeOut);
-        //     router.push({
-        //         path: "/login"
-        //     }).catch(console.error);
-        // }).catch((error) => {
-        //     console.error(error);
-        //     window.location.reload(true);
-        // });
+        return fetch(`${import.meta.env.VITE_BACKEND_URL}_session`, { method: 'DELETE', credentials: 'include' });
       },
     },
   });

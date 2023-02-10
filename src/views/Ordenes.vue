@@ -56,7 +56,7 @@
     <!-- Fin del Cuerpo a escribir -->
     <nueva-orden v-if="show.detOrden" :show="show" @clear-order-filters="clearOrderFilters()"></nueva-orden>
     <!-- eslint-disable-next-line vue/v-on-function-call -->
-    <order-filters :show="show" @filters-confirmed="filtersConfirmed"></order-filters>
+    <order-filters ref="filterOder" :show="show" @filters-confirmed="filtersConfirmed"></order-filters>
   </div>
 </template>
 
@@ -103,8 +103,8 @@ export default {
       if (this.filtersArray.date.end != null) filters.push(`Antes de: ${new Date(this.filtersArray.date.end).toLocaleDateString()}`);
       if (this.filtersArray.date.start != null && this.filtersArray.date.end != null) filters.push(`Despues de: ${new Date(this.filtersArray.date.start).toLocaleDateString()}`);
       else filters.push(`Día: ${new Date().toLocaleDateString()}`);
-      if (this.filtersArray.price.priceLte !== 0) filters.push(`<= $${this.filtersArray.price.priceLte}`);
-      if (this.filtersArray.price.priceGte !== 0) filters.push(`>= $${this.filtersArray.price.priceGte}`);
+      if (this.filtersArray.price.priceLte != null && this.filtersArray.price.priceLte !== 0) filters.push(`<= $${this.filtersArray.price.priceLte}`);
+      if (this.filtersArray.price.priceGte != null && this.filtersArray.price.priceGte !== 0) filters.push(`>= $${this.filtersArray.price.priceGte}`);
       if (this.filtersArray.orderType !== 'Todas') filters.push(this.filtersArray.orderType);
       if (this.filtersArray.tipoDistribucion !== 'Todas') filters.push(this.filtersArray.tipoDistribucion);
       if (this.filtersArray.status !== 'Todas') filters.push(this.filtersArray.status);
@@ -128,20 +128,8 @@ export default {
       this.readAllOrdenes({ ...this.filtersArray, pagination: this.pagination});
     },
     clearOrderFilters() {
-      this.filtersArray = {
-        date: {
-          start: null,
-          end: null,
-        },
-        price: {
-          priceLte: 0.0,
-          priceGte: 0.0,
-        },
-        orderType: 'Todas',
-        tipoDistribucion: 'Todas',
-        status: 'Todas',
-      };
-      this.readAllOrdenes({ pagination: this.pagination});
+      window.console.log('Called clearOrderFilters', );
+      this.$refs.filterOder.clearFilters();
     },
   },
 };

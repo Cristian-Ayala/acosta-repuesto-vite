@@ -11,7 +11,7 @@
         to="/"
         custom
       >
-        <a 
+        <a
           :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
           @click="navigate()">
           <i class="fas fa-home mr-4 text-gray my-2"></i><span>Home</span>
@@ -22,7 +22,7 @@
         to="/categorias"
         custom
       >
-        <a 
+        <a
           :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
           @click="navigate()">
           <i class="fa fa-list-alt mr-4 text-gray my-2"></i
@@ -34,8 +34,8 @@
         to="/marcas"
         custom
       >
-        <a 
-          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }" 
+        <a
+          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
           @click="navigate()">
           <i class="fas fa-list-ul mr-4 text-gray my-2"></i>
           <span>Marca</span>
@@ -46,8 +46,8 @@
         to="/productos"
         custom
       >
-        <a 
-          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }" 
+        <a
+          :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
           @click="navigate()">
           <i class="fas fa-boxes mr-3 text-gray my-2"></i><span>Productos</span>
         </a>
@@ -57,7 +57,7 @@
         to="/ordenes"
         custom
       >
-        <a 
+        <a
           :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
           @click="navigate()">
           <i class="fas fa-clipboard-check mr-3 text-gray my-2"></i
@@ -69,7 +69,7 @@
         to="/actualizar"
         custom
       >
-        <a 
+        <a
           :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
           @click="navigate()">
           <i class="fa fa-upload mr-3 text-gray my-2" aria-hidden="true"></i>
@@ -82,7 +82,7 @@
         to="/usuarios"
         custom
       >
-        <a 
+        <a
           :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
           @click="navigate()">
           <i class="fa fa-user mr-3 text-gray my-2" aria-hidden="true"></i>
@@ -96,7 +96,7 @@
       @click="logout()"
     >
       <i class="fas fa-door-open mr-3 text-black my-2" aria-hidden="true"></i>
-      <span v-if="actualUser">Salir {{ actualUser.user }}</span>
+      <span v-if="actualUser">Salir {{ userName }}</span>
     </a>
   </div>
 </template>
@@ -108,6 +108,10 @@ export default {
   name: 'LeftSideBar',
   computed: {
     ...mapState('usuarios', ['actualUser']),
+    userName() {
+      const username = window.localStorage.getItem('user_name');
+      return username || null;
+    },
   },
   methods: {
     ...mapActions('usuarios', ['logout']),

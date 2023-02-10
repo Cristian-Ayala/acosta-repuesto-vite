@@ -220,22 +220,12 @@ function twoDecimalsOnly(value) {
   }
 }
 
-export default {
-  name: 'NuevaOrden',
-  components: {
-    // dropdown,
-    FindProductos,
-    ResumenNuevaOrden,
-  },
-  props: {
-    show: {
-      type: Object,
-      default: () => {},
-    },
-  },
-  emits: ['clearOrderFilters'],
-  data() {
-    return {
+function initialState() {
+  return {
+      orden: {
+        nombreCliente: '',
+        observacionesOrden: '',
+      },
       paso: 'datos',
       date: '20-01-2021 14:30',
       tipoDistribucionArray: [
@@ -281,12 +271,29 @@ export default {
       searchTotalRows: 0,
       searchTimeout: null,
     };
+}
+
+export default {
+  name: 'NuevaOrden',
+  components: {
+    // dropdown,
+    FindProductos,
+    ResumenNuevaOrden,
+  },
+  props: {
+    show: {
+      type: Object,
+      default: () => {},
+    },
+  },
+  emits: ['clearOrderFilters'],
+  data() {
+    return initialState();
   },
   computed: {
     ...mapState('ordenes', [
       'ordSelected',
       'showDetOrd',
-      'orden',
       'metPago',
       'prodSearch',
       'currentPage',
@@ -420,14 +427,7 @@ export default {
       this.clearData();
     },
     clearData() {
-      this.ordenDetalleProductos = {};
-      this.total = 0.0;
-      this.paso = 'datos';
-      this.orden = {
-        nombreCliente: '',
-        observacionesOrden: '',
-      }
-      this.searchProductKeyword = '';
+      Object.assign(this.$data, initialState());
     },
     modalIsActive() {
       document.addEventListener('keypress', this.listenerFunction);

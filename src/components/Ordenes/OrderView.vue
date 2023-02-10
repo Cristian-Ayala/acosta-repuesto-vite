@@ -1,6 +1,6 @@
 <template>
   <div class="order">
-    <div id="leftSide">
+    <div id="leftSide" :style="`background-color: var(--el-color-${statusColor});`">
       <el-button :type="statusColor" circle>
         <i v-if="orden.tipoOrden === 'Local'" class="fas fa-store"></i>
         <i v-else class="fas fa-motorcycle"></i>
@@ -90,6 +90,11 @@ export default {
 }
 #leftSide {
   width: 4rem;
-  text-align: center;
+  border-radius: 1rem 0 0 1rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
 }
 </style>

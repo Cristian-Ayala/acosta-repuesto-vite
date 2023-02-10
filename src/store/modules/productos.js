@@ -234,8 +234,7 @@ export default (app) => ({
           router
             .push({
               path: '/login',
-            })
-            .catch(() => {});
+            });
         }
       });
 

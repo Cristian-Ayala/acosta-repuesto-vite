@@ -87,7 +87,7 @@
     </el-form>
     <template #footer>
       <div style="flex: auto">
-        <el-button @click="show.orderFilterDrawer = false">Cancelar</el-button>
+        <el-button @click="clearFilters();show.orderFilterDrawer = false">Limpiar filtros</el-button>
         <el-button type="success" @click="confirmClick();">Aplicar filtros</el-button>
       </div>
     </template>
@@ -95,6 +95,26 @@
 </template>
 
 <script>
+function initialState() {
+  return {
+    dateType: 'Por día',
+    filters: {
+      date: {
+        start: new Date(),
+        end: null,
+      },
+      price: {
+        priceLte: 0.0,
+        priceGte: 0.0,
+      },
+      orderType: 'Todas',
+      tipoDistribucion: 'Todas',
+      status: 'Todas',
+    },
+  };
+}
+
+
 export default {
   name: 'OrderFilters',
   props: {
@@ -105,22 +125,7 @@ export default {
   },
   emits: ['filtersConfirmed'],
   data() {
-    return {
-      dateType: 'Por día',
-      filters: {
-        date: {
-          start: new Date(),
-          end: null,
-        },
-        price: {
-          priceLte: 0.0,
-          priceGte: 0.0,
-        },
-        orderType: 'Todas',
-        tipoDistribucion: 'Todas',
-        status: 'Todas',
-      },
-    };
+    return initialState();
   },
   watch: {
     dateType() {
@@ -141,11 +146,15 @@ export default {
     },
     confirmClick() {
       const options = { ...this.filters };
-      if (typeof(options.price.priceGte) !== 'number') options.price.priceGte = null;
-      if (typeof(options.price.priceLte) !== 'number') options.price.priceLte = null;
+      if (typeof(options.price.priceGte) !== 'number') options.price.priceGte = 0;
+      if (typeof(options.price.priceLte) !== 'number') options.price.priceLte = 0;
       this.$emit('filtersConfirmed', options);
       // eslint-disable-next-line
       this.show.orderFilterDrawer = false;
+    },
+    clearFilters() {
+      Object.assign(this.$data, initialState());
+      this.confirmClick();
     },
   },
 }
