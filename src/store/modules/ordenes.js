@@ -209,5 +209,22 @@ export default (app) => ({
         })
         .catch(window.console.error);
       },
+      changeDeliveryStatus({ state, commit }, { id, status }) {
+        if (!isLoggedIn()) return;
+        state.localOrdenes
+          .get(id)
+          .then((doc) => {
+            // eslint-disable-next-line no-param-reassign
+            doc.status = status;
+            return state.localOrdenes.put(doc);
+          })
+          .then(() => {
+            commit('successNotification', 'Estado de la orden actualizado con éxito');
+          })
+          .catch((err) => {
+            commit('errorNotification', 'Error al actualizar el estado de la orden');
+            console.error('error trying update order status', err);
+          });
+      },
     },
   });

@@ -37,7 +37,12 @@
           </div>
         </div>
         <div style="display: grid;grid-template-columns: 1fr 1fr;">
-          <order-view v-for="orden in ordenes" :key="orden._id" :orden="orden"></order-view>
+          <order-view
+            v-for="orden in ordenes"
+            :key="orden._id"
+            :orden="orden"
+            @update-orders="updateOrders()"
+          ></order-view>
         </div>
         <el-empty v-if="ordenes.length === 0" description="No hay ordenes" />
       </div>
@@ -114,7 +119,7 @@ export default {
   watch: {
     'pagination.page': function handler(newPage) {
       this.pagination.page = newPage;
-      this.readAllOrdenes({ ...this.filtersArray, pagination: this.pagination});
+      this.updateOrders();
     },
   },
   created() {
@@ -124,12 +129,14 @@ export default {
     ...mapMutations('ordenes', ['clickRow']),
     ...mapActions('ordenes', ['readAllOrdenes']),
     filtersConfirmed(filters) {
-      this.filtersArray = filters;
+      this.filtersArray = { ...filters };
       this.readAllOrdenes({ ...this.filtersArray, pagination: this.pagination});
     },
     clearOrderFilters() {
-      window.console.log('Called clearOrderFilters', );
       this.$refs.filterOder.clearFilters();
+    },
+    updateOrders() {
+      this.readAllOrdenes({ ...this.filtersArray, pagination: this.pagination});
     },
   },
 };

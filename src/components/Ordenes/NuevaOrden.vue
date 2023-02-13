@@ -93,7 +93,7 @@
               type="search"
               placeholder="Buscar"
             >
-            <!-- <p>Productos encontrados ({{ searchTotalRows }})</p> -->
+            <p>Productos encontrados ({{ prodSearchInOrdtotRows }})</p>
           </div>
           <!-- Aquí tienen que ir los productos -->
           <table class="table card-text">
@@ -116,7 +116,7 @@
               layout="prev, pager, next"
               :page-size="paginator.pageSize"
               :current-page="paginator.currentPage"
-              :total="searchTotalRows"
+              :total="prodSearchInOrdtotRows"
               :hide-on-single-page="true"
               @current-change="handleChangePage($event)"
             />
@@ -185,7 +185,7 @@
           <el-button
             type="success"
             :disabled="total <= 0"
-            @click="createOrder();paso = 'datos';show.detOrden = false;"
+            @click="createOrder();paso = 'datos';"
           >Pagar</el-button>
         </div>
       </span>
@@ -268,7 +268,6 @@ function initialState() {
         currentPage: 1,
       },
       findProductos: null,
-      searchTotalRows: 0,
       searchTimeout: null,
     };
 }
@@ -298,11 +297,10 @@ export default {
       'prodSearch',
       'currentPage',
     ]),
-    ...mapState('productos', ['productos']),
+    ...mapState('productos', ['productos', 'prodSearchInOrdtotRows']),
   },
   watch: {
     searchProductKeyword () {
-      // console.log("Watcheme prro", val);
       // call method after 2 seconds and restart counter if called again
       clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(() => {
@@ -311,7 +309,6 @@ export default {
       }, 500);
     },
     'paginator.currentPage': function currentPageWatch() {
-      window.console.log('flag 1 paginator');
       this.searchProductosLocal();
     },
   },
@@ -341,12 +338,14 @@ export default {
     async searchProductosLocal() {
       const {pageSize, currentPage} = this.paginator;
       const searchVariables = {
-        offset: pageSize * (currentPage - 1),
-        limit: pageSize + 5,
+        skip: pageSize * (currentPage - 1),
+        limit: pageSize,
         keyword: this.searchProductKeyword,
+        pagination: {
+          page: currentPage,
+        }
       }
       const res = await this.searchProductos(searchVariables);
-      this.searchTotalRows = res.length;
       this.findProductos = [];
       this.$nextTick(() => {
         if (res.length > pageSize) this.findProductos = res.slice(0, pageSize);
@@ -425,6 +424,8 @@ export default {
       await this.createRegistroOrdenes(orden);
       this.$emit('clearOrderFilters');
       this.clearData();
+      // eslint-disable-next-line
+      this.show.detOrden = false;
     },
     clearData() {
       Object.assign(this.$data, initialState());

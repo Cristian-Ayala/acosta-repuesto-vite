@@ -42,17 +42,36 @@
       <h5>Tipo de distribución:</h5>
       <p>{{ ordSelected.tipoDistribucion }}</p>
 
+      <h5>Estado:</h5>
+      <p>{{ ordSelected.status }}</p>
+
       <div class="line"></div>
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="showDetOrd = false">Confirmar</el-button>
+        <el-button @click="show.detOrd = false">Cerrar</el-button>
+        <el-button
+          v-if="ordSelected.status === 'En proceso'"
+          type="warning"
+          @click="changeDeliveryStatusLocal('En camino')"
+        >
+          En camino
+        </el-button>
+        <el-button
+          v-if="ordSelected.status === 'En camino'"
+          type="success"
+          @click="changeDeliveryStatusLocal('Completado')"
+        >
+          Completar
+        </el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   name: 'DetalleOrden',
   props: {
@@ -65,6 +84,7 @@ export default {
       required: true,
     },
   },
+  emits: ['updateOrders'],
   data() {
     return {
     };
@@ -72,10 +92,17 @@ export default {
   watch: {
   },
   methods: {
+    ...mapActions('ordenes', ['changeDeliveryStatus']),
     formatDate(id) {
         const date = new Date(id);
         return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
     },
+    async changeDeliveryStatusLocal (status){
+      await this.changeDeliveryStatus({ id: this.ordSelected._id, status });
+      this.$emit('updateOrders');
+      // eslint-disable-next-line
+      this.show.detOrd = false;
+    }
   },
 };
 </script>

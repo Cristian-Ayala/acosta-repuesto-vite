@@ -1,11 +1,11 @@
 body {
-  --el-color-primary: #e94c63;
-  --el-color-primary-light-3: #ef8091;
-  --el-color-primary-light-5: #f4a4b0;
-  --el-color-primary-light-7: #f8c9d0;
-  --el-color-primary-light-8: #fadbe0;
-  --el-color-primary-light-9: #fdedf0;
-  --el-color-primary-dark-2: #e63752;
+  --el-color-primary: #5C95EB;
+  --el-color-primary-light-3: #80ACEF;
+  --el-color-primary-light-5: #A4C4F4;
+  --el-color-primary-light-7: #C9DCF8;
+  --el-color-primary-light-8: #DBE7FA;
+  --el-color-primary-light-9: #EDF3FD;
+  --el-color-primary-dark-2: #377DE6;
 }
 
 .el-input.el-input--prefix.el-input--suffix.el-date-editor.el-date-editor--date.el-tooltip__trigger.el-tooltip__trigger {

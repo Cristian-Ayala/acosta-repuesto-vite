@@ -21,7 +21,7 @@
       </div>
       <a href="#" @click="show.detOrd = true"> Ver detalles </a>
     </div>
-    <detalle-orden :ord-selected="orden" :show="show"></detalle-orden>
+    <detalle-orden :ord-selected="orden" :show="show" @update-orders="updateOrders()"></detalle-orden>
   </div>
 </template>
 
@@ -39,6 +39,7 @@ export default {
       required: true,
     },
   },
+  emits: ['updateOrders'],
   data() {
     return {
       show: {
@@ -69,6 +70,9 @@ export default {
     formatDate(id) {
         const date = new Date(id);
         return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
+    },
+    updateOrders() {
+      this.$emit('updateOrders');
     },
   },
 };

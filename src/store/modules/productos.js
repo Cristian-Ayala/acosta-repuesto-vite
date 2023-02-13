@@ -55,6 +55,7 @@ export default (app) => ({
     filtroUPC: '',
     tempFiltroUPC: '',
     calledFrom: '',
+    prodSearchInOrdtotRows: 0,
   },
   mutations: {
     prodSelected(state, productoSelected) {
@@ -514,24 +515,35 @@ export default (app) => ({
       state.filtroNombre = '';
       dispatch('firstPage');
     },
-    async searchProductos({ state }, variables) {
-      if (!variables.keyword) return [];
-      let resultado = null;
-      await state.localProductos
-        .find({
-          selector: {
-            $or: [
-              { upc: variables.keyword },
-              { nombreProd: { $regex: RegExp(regexSearch(variables.keyword), 'i') } }
-            ]
-          },
-          limit: variables.limit,
-          skip: variables.skip,
+    getTotalProductosSearchOrdenes({ state }, selector) {
+      state.localProductos
+        .find({ selector, fields: ['_id'] })
+        .then((response) => {
+          state.prodSearchInOrdtotRows = response.docs.length;
         })
+        .catch(window.console.error);
+    },
+    async searchProductos({ state, dispatch }, variables) {
+      if (!variables.keyword) {
+        state.prodSearchInOrdtotRows = 0;
+        return [];
+      }
+      let resultado = null;
+      const searchParameters = {
+        selector: {
+          $or: [
+            { upc: variables.keyword },
+            { nombreProd: { $regex: RegExp(regexSearch(variables.keyword), 'i') } }
+          ]
+        },
+        limit: variables.limit,
+        skip: variables.skip,
+      };
+      if (variables.pagination?.page === 1) dispatch('getTotalProductosSearchOrdenes', searchParameters.selector);
+      await state.localProductos
+        .find(searchParameters)
         .then((res) => {
           resultado = res.docs;
-          // state.findProductos = res.rows;
-          // state.searchTotalRows = res.total_rows;
         })
         .catch((err) => {
           console.error(err);
