@@ -18,10 +18,10 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
 
 export default {
-  name: 'DeleteMar',
+  name: "DeleteMar",
   props: {
     show: {
       type: Object,
@@ -32,10 +32,10 @@ export default {
     return {};
   },
   computed: {
-    ...mapState('marcas', ['marca']),
+    ...mapState("marcas", ["marca"]),
   },
   methods: {
-    ...mapActions('marcas', ['removeRegistro']),
+    ...mapActions("marcas", ["removeRegistro"]),
   },
 };
 </script>

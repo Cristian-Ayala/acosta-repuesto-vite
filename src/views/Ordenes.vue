@@ -66,43 +66,43 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
-import NuevaOrden from '@/components/Ordenes/NuevaOrden.vue';
-import OrderView from '@/components/Ordenes/OrderView.vue';
-import OrderFilters from '@/components/Ordenes/OrderFilters.vue';
+import { mapState, mapMutations, mapActions } from "vuex";
+import NuevaOrden from "@/components/Ordenes/NuevaOrden.vue";
+import OrderView from "@/components/Ordenes/OrderView.vue";
+import OrderFilters from "@/components/Ordenes/OrderFilters.vue";
 
 export default {
-  name: 'OrdenesIndex',
+  name: "OrdenesIndex",
   components: {
     OrderView,
     NuevaOrden,
     OrderFilters,
   },
   data: () => ({
-      show: {
-        detOrden: false,
-        orderFilterDrawer: false,
+    show: {
+      detOrden: false,
+      orderFilterDrawer: false,
+    },
+    filtersArray: {
+      date: {
+        start: null,
+        end: null,
       },
-      filtersArray: {
-        date: {
-          start: null,
-          end: null,
-        },
-        price: {
-          priceLte: 0.0,
-          priceGte: 0.0,
-        },
-        orderType: 'Todas',
-        tipoDistribucion: 'Todas',
-        status: 'Todas',
+      price: {
+        priceLte: 0.0,
+        priceGte: 0.0,
       },
-      pagination: {
-        page: 1,
-        limit: 10,
-      },
+      orderType: "Todas",
+      tipoDistribucion: "Todas",
+      status: "Todas",
+    },
+    pagination: {
+      page: 1,
+      limit: 10,
+    },
   }),
   computed: {
-    ...mapState('ordenes', ['ordenes', 'ordSelected', 'showDetOrd', 'totalRows']),
+    ...mapState("ordenes", ["ordenes", "ordSelected", "showDetOrd", "totalRows"]),
     allFilters() {
       const filters = [];
       if (this.filtersArray.date.end != null) filters.push(`Antes de: ${new Date(this.filtersArray.date.end).toLocaleDateString()}`);
@@ -110,14 +110,14 @@ export default {
       else filters.push(`Día: ${new Date().toLocaleDateString()}`);
       if (this.filtersArray.price.priceLte != null && this.filtersArray.price.priceLte !== 0) filters.push(`<= $${this.filtersArray.price.priceLte}`);
       if (this.filtersArray.price.priceGte != null && this.filtersArray.price.priceGte !== 0) filters.push(`>= $${this.filtersArray.price.priceGte}`);
-      if (this.filtersArray.orderType !== 'Todas') filters.push(this.filtersArray.orderType);
-      if (this.filtersArray.tipoDistribucion !== 'Todas') filters.push(this.filtersArray.tipoDistribucion);
-      if (this.filtersArray.status !== 'Todas') filters.push(this.filtersArray.status);
+      if (this.filtersArray.orderType !== "Todas") filters.push(this.filtersArray.orderType);
+      if (this.filtersArray.tipoDistribucion !== "Todas") filters.push(this.filtersArray.tipoDistribucion);
+      if (this.filtersArray.status !== "Todas") filters.push(this.filtersArray.status);
       return filters;
     },
   },
   watch: {
-    'pagination.page': function handler(newPage) {
+    "pagination.page": function handler(newPage) {
       this.pagination.page = newPage;
       this.updateOrders();
     },
@@ -126,8 +126,8 @@ export default {
     this.readAllOrdenes({ pagination: this.pagination});
   },
   methods: {
-    ...mapMutations('ordenes', ['clickRow']),
-    ...mapActions('ordenes', ['readAllOrdenes']),
+    ...mapMutations("ordenes", ["clickRow"]),
+    ...mapActions("ordenes", ["readAllOrdenes"]),
     filtersConfirmed(filters) {
       this.filtersArray = { ...filters };
       this.readAllOrdenes({ ...this.filtersArray, pagination: this.pagination});

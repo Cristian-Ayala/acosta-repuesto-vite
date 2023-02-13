@@ -194,18 +194,18 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
-import FindProductos from '@/components/Ordenes/FindProductos.vue';
-import ResumenNuevaOrden from './ResumenNuevaOrden.vue';
+import { mapState, mapMutations, mapActions } from "vuex";
+import FindProductos from "@/components/Ordenes/FindProductos.vue";
+import ResumenNuevaOrden from "./ResumenNuevaOrden.vue";
 
 // Variables for upc barcode scanner
-let code = '';
+let code = "";
 let reading = false;
 
 function todayDate() {
   const today = new Date();
-  const dd = String(today.getDate()).padStart(2, '0');
-  const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+  const dd = String(today.getDate()).padStart(2, "0");
+  const mm = String(today.getMonth() + 1).padStart(2, "0"); // January is 0!
   const yyyy = today.getFullYear();
   const horas = today.getHours();
   const minutos = today.getMinutes();
@@ -222,58 +222,58 @@ function twoDecimalsOnly(value) {
 
 function initialState() {
   return {
-      orden: {
-        nombreCliente: '',
-        observacionesOrden: '',
+    orden: {
+      nombreCliente: "",
+      observacionesOrden: "",
+    },
+    paso: "datos",
+    date: "20-01-2021 14:30",
+    tipoDistribucionArray: [
+      {
+        name: "Público",
       },
-      paso: 'datos',
-      date: '20-01-2021 14:30',
-      tipoDistribucionArray: [
-        {
-          name: 'Público',
-        },
-        {
-          name: 'Mayoreo',
-        },
-        {
-          name: 'Taller',
-        },
-      ],
-      tipoDistribucion: {
-        selected: 'Público',
+      {
+        name: "Mayoreo",
       },
-      tipoDeOrden: {
-        selected: 'Local',
+      {
+        name: "Taller",
       },
-      dropDownTypeOfOrder: [{ name: 'Local' }, { name: 'Delivery' }],
-      dropDownMetodoPago: {
-        data: [{
-            'name': 'Tarjeta de Crédito'
-        }, {
-            'name': 'Tarjeta de Débito'
-        }, {
-            'name': 'Efectivo'
-        }, {
-            'name': 'Credito Fiscal'
-        }, {
-            'name': 'Criptomoneda'
-        }],
-        selected: 'Efectivo'
-      },
-      searchProductKeyword: '',
-      ordenDetalleProductos: {},
-      total: 0.0,
-      paginator: {
-        pageSize: 10,
-        currentPage: 1,
-      },
-      findProductos: null,
-      searchTimeout: null,
-    };
+    ],
+    tipoDistribucion: {
+      selected: "Público",
+    },
+    tipoDeOrden: {
+      selected: "Local",
+    },
+    dropDownTypeOfOrder: [{ name: "Local" }, { name: "Delivery" }],
+    dropDownMetodoPago: {
+      data: [{
+        "name": "Tarjeta de Crédito"
+      }, {
+        "name": "Tarjeta de Débito"
+      }, {
+        "name": "Efectivo"
+      }, {
+        "name": "Credito Fiscal"
+      }, {
+        "name": "Criptomoneda"
+      }],
+      selected: "Efectivo"
+    },
+    searchProductKeyword: "",
+    ordenDetalleProductos: {},
+    total: 0.0,
+    paginator: {
+      pageSize: 10,
+      currentPage: 1,
+    },
+    findProductos: null,
+    searchTimeout: null,
+  };
 }
 
 export default {
-  name: 'NuevaOrden',
+  name: "NuevaOrden",
   components: {
     // dropdown,
     FindProductos,
@@ -285,19 +285,19 @@ export default {
       default: () => {},
     },
   },
-  emits: ['clearOrderFilters'],
+  emits: ["clearOrderFilters"],
   data() {
     return initialState();
   },
   computed: {
-    ...mapState('ordenes', [
-      'ordSelected',
-      'showDetOrd',
-      'metPago',
-      'prodSearch',
-      'currentPage',
+    ...mapState("ordenes", [
+      "ordSelected",
+      "showDetOrd",
+      "metPago",
+      "prodSearch",
+      "currentPage",
     ]),
-    ...mapState('productos', ['productos', 'prodSearchInOrdtotRows']),
+    ...mapState("productos", ["productos", "prodSearchInOrdtotRows"]),
   },
   watch: {
     searchProductKeyword () {
@@ -308,7 +308,7 @@ export default {
         this.searchProductosLocal();
       }, 500);
     },
-    'paginator.currentPage': function currentPageWatch() {
+    "paginator.currentPage": function currentPageWatch() {
       this.searchProductosLocal();
     },
   },
@@ -320,21 +320,21 @@ export default {
     renderFooter() {
       try {
         this.$nextTick(() => {
-          document.querySelector('footer.el-dialog__footer').style.setProperty('padding', '0px');
+          document.querySelector("footer.el-dialog__footer").style.setProperty("padding", "0px");
         });
       } catch (err) {
-        if (!err) window.console.error('err', err);
+        if (!err) window.console.error("err", err);
       }
     },
-    ...mapMutations('ordenes', [
-      'change',
-      'decProducto',
-      'incProducto',
-      'filtroProd',
-      'dosDecimalesProd',
+    ...mapMutations("ordenes", [
+      "change",
+      "decProducto",
+      "incProducto",
+      "filtroProd",
+      "dosDecimalesProd",
     ]),
-    ...mapActions('productos', ['searchProductos']),
-    ...mapActions('ordenes', ['createRegistroOrdenes']),
+    ...mapActions("productos", ["searchProductos"]),
+    ...mapActions("ordenes", ["createRegistroOrdenes"]),
     async searchProductosLocal() {
       const {pageSize, currentPage} = this.paginator;
       const searchVariables = {
@@ -355,7 +355,7 @@ export default {
     reCalculateSubTotal(index, prod) {
       const tmpProd = { ...prod };
       if (!this.ordenDetalleProductos[prod?.upc] ) return;
-      if (prod.price == null || typeof(prod.price) !== 'number' || prod.price <= 0) {
+      if (prod.price == null || typeof(prod.price) !== "number" || prod.price <= 0) {
         tmpProd.price = 0;
       }
       tmpProd.subtotal = twoDecimalsOnly(prod.cantidad * prod.price);
@@ -395,7 +395,7 @@ export default {
       this.calculateTotal();
     },
     reRender(index) {
-      this.findProductos[index]._id += 'a';
+      this.findProductos[index]._id += "a";
     },
     calculateTotal() {
       try {
@@ -417,12 +417,12 @@ export default {
         tipoDistribucion: this.tipoDistribucion.selected,
         totalOrden: this.total,
         productos: Object.values(this.ordenDetalleProductos),
-        status: this.tipoDeOrden.selected === 'Local' ? 'Completado' : 'En proceso',
+        status: this.tipoDeOrden.selected === "Local" ? "Completado" : "En proceso",
         tipoOrden: this.tipoDeOrden.selected,
         ...localOrder
       };
       await this.createRegistroOrdenes(orden);
-      this.$emit('clearOrderFilters');
+      this.$emit("clearOrderFilters");
       this.clearData();
       // eslint-disable-next-line
       this.show.detOrden = false;
@@ -431,22 +431,22 @@ export default {
       Object.assign(this.$data, initialState());
     },
     modalIsActive() {
-      document.addEventListener('keypress', this.listenerFunction);
+      document.addEventListener("keypress", this.listenerFunction);
     },
     modalWillHide() {
       // eslint-disable-next-line
       this.show.detOrden = false;
-      document.removeEventListener('keypress', this.listenerFunction);
+      document.removeEventListener("keypress", this.listenerFunction);
       this.clearData();
     },
     listenerFunction(e) {
       // usually scanners throw an 'Enter' key at the end of read
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         if (code.length > 10) {
           this.searchProductKeyword = code;
           console.log(code);
           /// code ready to use
-          code = '';
+          code = "";
         }
       } else {
         code += e.key; // while this is not an 'enter' it stores the every key
@@ -455,7 +455,7 @@ export default {
       if (!reading) {
         reading = true;
         setTimeout(() => {
-          code = '';
+          code = "";
           reading = false;
         }, 200); // 200 works fine for me but you can adjust it
       }

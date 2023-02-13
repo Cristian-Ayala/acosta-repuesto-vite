@@ -68,34 +68,34 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
-import AgregarCat from '@/components/Categorias/AgregarCat.vue';
-import DeleteCat from '@/components/Categorias/DeleteCat.vue';
-import EditCat from '@/components/Categorias/EditCat.vue';
+import { mapState, mapMutations } from "vuex";
+import AgregarCat from "@/components/Categorias/AgregarCat.vue";
+import DeleteCat from "@/components/Categorias/DeleteCat.vue";
+import EditCat from "@/components/Categorias/EditCat.vue";
 
 export default {
-  name: 'CategoriasIndex',
+  name: "CategoriasIndex",
   components: {
     AgregarCat,
     DeleteCat,
     EditCat,
   },
   data: () => ({
-      displayOption: '',
-      searchDisplay: '',
-      show: {
-        modalAgregarCat: false,
-        modalEditCat: false,
-        modalEliminarCat: false,
-      }
-    }),
+    displayOption: "",
+    searchDisplay: "",
+    show: {
+      modalAgregarCat: false,
+      modalEditCat: false,
+      modalEliminarCat: false,
+    }
+  }),
   computed: {
-    ...mapState('categorias', ['categorias', 'categoria']),
+    ...mapState("categorias", ["categorias", "categoria"]),
   },
   methods: {
-    ...mapMutations('categorias', ['clearDataCat', 'getCategoriaSelected']),
+    ...mapMutations("categorias", ["clearDataCat", "getCategoriaSelected"]),
     filtro(index) {
-      if (this.searchDisplay === '') return true;
+      if (this.searchDisplay === "") return true;
       const array = (
         this.categorias[index].doc.nombreCategoria +
         this.categorias[index].doc.descripcion

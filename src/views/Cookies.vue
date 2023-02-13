@@ -46,50 +46,50 @@
 
 <script>
 export default {
-  name: 'CookiesView',
+  name: "CookiesView",
   data: () => ({
-      visible: false,
-    }),
+    visible: false,
+  }),
   created() {
     const url = `${import.meta.env.VITE_BACKEND_URL}step1.js.php`;
-    const step1El = document.createElement('script');
-    step1El.setAttribute('src', url);
+    const step1El = document.createElement("script");
+    step1El.setAttribute("src", url);
     document.head.appendChild(step1El);
   },
   mounted() {
     // eslint-disable-next-line
     window._3rd_party_test_step1_loaded = function () {
       // At this point, a third-party domain has now attempted to set a cookie (if all went to plan!)
-      const resultsEl = document.getElementById('3rd_party_cookie_test_results');
-        const step2El = document.createElement('script');
+      const resultsEl = document.getElementById("3rd_party_cookie_test_results");
+      const step2El = document.createElement("script");
 
       // Update loading / results message
-      resultsEl.innerHTML = 'Etapa uno completada, cargando etapa 2&hellip;';
+      resultsEl.innerHTML = "Etapa uno completada, cargando etapa 2&hellip;";
       // And load the second part of the test (reading the cookie)
       const url = `${import.meta.env.VITE_BACKEND_URL}step2.js.php`;
-      step2El.setAttribute('src', url);
+      step2El.setAttribute("src", url);
       //   document.head.appendChild(step2El)
       resultsEl.appendChild(step2El);
     };
     // eslint-disable-next-line
     window._3rd_party_test_step2_loaded = function (cookieSuccess) {
-      const resultsEl = document.getElementById('3rd_party_cookie_test_results');
-        const errorEl = document.getElementById('3rd_party_cookie_test_error');
+      const resultsEl = document.getElementById("3rd_party_cookie_test_results");
+      const errorEl = document.getElementById("3rd_party_cookie_test_error");
       // Show message
       resultsEl.innerHTML = cookieSuccess
-        ? 'Las cookies de terceros estan <b>funcionando</b> en tu navegador.'
-        : 'Las cookies de terceros estan <b>desabilitadas</b>.';
+        ? "Las cookies de terceros estan <b>funcionando</b> en tu navegador."
+        : "Las cookies de terceros estan <b>desabilitadas</b>.";
 
       // Done, so remove loading class
-      resultsEl.className = resultsEl.className.replace(/\bloading\b/, ' ');
+      resultsEl.className = resultsEl.className.replace(/\bloading\b/, " ");
       // And remove error message
-      errorEl.className = 'hidden';
+      errorEl.className = "hidden";
     };
     window.setTimeout(() => {
-      const errorEl = document.getElementById('3rd_party_cookie_test_error');
+      const errorEl = document.getElementById("3rd_party_cookie_test_error");
       if (errorEl.className.match(/\berror\b/)) {
         // Show error message
-        errorEl.className = errorEl.className.replace(/\bhidden\b/, ' ');
+        errorEl.className = errorEl.className.replace(/\bhidden\b/, " ");
       }
     }, 7 * 1000); // 7 sec timeout
   },
@@ -97,8 +97,8 @@ export default {
     onClickCookies() {
       //   !timedOut ? this.$router.push({ path: "/login" }) : (this.visible = true);
       // this.$router.go();
-      this.$router.push({ path: '/login' })
-      console.log('click');
+      this.$router.push({ path: "/login" })
+      console.log("click");
     },
   },
 };

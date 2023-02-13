@@ -78,28 +78,28 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations } from "vuex";
 
 export default {
-  name: 'ConfirmarTransacciones',
+  name: "ConfirmarTransacciones",
   data() {
     return {
       headerLabels: [
-        { key: 'upc', label: 'UPC' },
-        { key: 'nombreProd', label: 'Nombre' },
-        { key: 'nombreMarca', label: 'Marca' },
-        { key: 'nombreCategoria', label: 'Categoria' },
-        { key: 'precioUnit', label: 'Precio unitario' },
-        { key: 'descripcion', label: 'Descripcion' },
-        { key: 'stockProd', label: 'Stock' },
+        { key: "upc", label: "UPC" },
+        { key: "nombreProd", label: "Nombre" },
+        { key: "nombreMarca", label: "Marca" },
+        { key: "nombreCategoria", label: "Categoria" },
+        { key: "precioUnit", label: "Precio unitario" },
+        { key: "descripcion", label: "Descripcion" },
+        { key: "stockProd", label: "Stock" },
       ],
     };
   },
   computed: {
-    ...mapState('productos', [
-      'newProd',
-      'deleteTransaction',
-      'editTransaction',
+    ...mapState("productos", [
+      "newProd",
+      "deleteTransaction",
+      "editTransaction",
     ]),
     filteredArrayNewProd() {
       const cachedProd = JSON.parse(JSON.stringify(this.newProd));
@@ -113,7 +113,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations('productos', ['applyAllChanges']),
+    ...mapMutations("productos", ["applyAllChanges"]),
   },
 };
 </script>

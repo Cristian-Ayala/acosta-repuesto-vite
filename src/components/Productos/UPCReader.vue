@@ -31,11 +31,11 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
-import StreamBarcodeReader from '@/components/StreamBarcodeReader.vue';
+import { mapState, mapMutations } from "vuex";
+import StreamBarcodeReader from "@/components/StreamBarcodeReader.vue";
 
 export default {
-  name: 'UPCReader',
+  name: "UPCReader",
   components: {
     StreamBarcodeReader,
   },
@@ -48,31 +48,31 @@ export default {
   data() {
     return {
       showBarcode: false,
-      barcode: '',
+      barcode: "",
     };
   },
   computed: {
-    ...mapState('productos', ['newProductMobile', 'calledFrom']),
+    ...mapState("productos", ["newProductMobile", "calledFrom"]),
   },
   watch: {
     calledFrom() {
-      this.barcode = '';
+      this.barcode = "";
     },
   },
   methods: {
-    ...mapMutations('productos', ['setFiltroUPC']),
+    ...mapMutations("productos", ["setFiltroUPC"]),
     onDecode(a) {
       console.log(this.calledFrom);
-      if (this.calledFrom === 'FiltrosProductos.vue') {
+      if (this.calledFrom === "FiltrosProductos.vue") {
         this.setFiltroUPC(a);
       }
-      if (this.calledFrom === 'AddEditProdMovile.vue') {
+      if (this.calledFrom === "AddEditProdMovile.vue") {
         this.newProductMobile.doc.upc = a;
       }
       this.barcode = a;
     },
     onLoaded() {
-      console.log('cargado');
+      console.log("cargado");
     },
   },
 };

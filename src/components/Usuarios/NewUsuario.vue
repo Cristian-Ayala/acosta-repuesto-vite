@@ -45,18 +45,18 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
 
 export default {
-  name: 'NewUser',
+  name: "NewUser",
   data() {
     return {};
   },
   computed: {
-    ...mapState('usuarios', ['usuario']),
+    ...mapState("usuarios", ["usuario"]),
   },
   methods: {
-    ...mapActions('usuarios', ['createRegistro']),
+    ...mapActions("usuarios", ["createRegistro"]),
   },
 };
 </script>

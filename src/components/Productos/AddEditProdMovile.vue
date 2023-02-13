@@ -205,18 +205,18 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
-import { blobToURL, fromBlob } from 'image-resize-compress';
-import AgregarMar from '@/components/Marcas/AgregarMar.vue';
-import AgregarCat from '@/components/Categorias/AgregarCat.vue';
-import UPCReader from '@/components/Productos/UPCReader.vue';
+import { mapState, mapMutations, mapActions } from "vuex";
+import { blobToURL, fromBlob } from "image-resize-compress";
+import AgregarMar from "@/components/Marcas/AgregarMar.vue";
+import AgregarCat from "@/components/Categorias/AgregarCat.vue";
+import UPCReader from "@/components/Productos/UPCReader.vue";
 
 // Variables for upc barcode scanner
-let code = '';
+let code = "";
 let reading = false;
 
 export default {
-  name: 'AddEditProdMovile',
+  name: "AddEditProdMovile",
   components: {
     AgregarMar,
     AgregarCat,
@@ -225,7 +225,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: 'Editar',
+      default: "Editar",
     },
     mostrar: {
       type: Object,
@@ -234,10 +234,10 @@ export default {
   },
   data() {
     return {
-      imagePreview: '',
+      imagePreview: "",
       showBarcode: false,
       loadingEffect: false,
-      error: '',
+      error: "",
       show: {
         modalAgregarMar: false,
         modalAgregarCat: false,
@@ -246,9 +246,9 @@ export default {
     };
   },
   computed: {
-    ...mapState('productos', ['newProductMobile']),
-    ...mapState('marcas', ['marcas']),
-    ...mapState('categorias', ['categorias']),
+    ...mapState("productos", ["newProductMobile"]),
+    ...mapState("marcas", ["marcas"]),
+    ...mapState("categorias", ["categorias"]),
   },
   watch: {
     newProductMobile: {
@@ -259,17 +259,17 @@ export default {
             this.descripcionDropdown =
               this.newProductMobile.doc.nombreCategoria;
           } else {
-            this.descripcionDropdown = '';
+            this.descripcionDropdown = "";
           }
           if (this.newProductMobile.doc.nombreMarca) {
             this.marcaDropdown = this.newProductMobile.doc.nombreMarca;
           } else {
-            this.marcaDropdown = '';
+            this.marcaDropdown = "";
           }
           if (this.newProductMobile.doc.foto) {
             this.imagePreview = this.newProductMobile.doc.foto;
           } else {
-            this.imagePreview = '';
+            this.imagePreview = "";
           }
         }
       },
@@ -282,32 +282,32 @@ export default {
     this.modalIsActive();
   },
   methods: {
-    ...mapMutations('productos', [
-      'removeRegistro',
-      'applyAllChanges',
-      'marcaSelected',
-      'categoriaSelected',
-      'fotoSelected',
-      'setCalledFrom',
+    ...mapMutations("productos", [
+      "removeRegistro",
+      "applyAllChanges",
+      "marcaSelected",
+      "categoriaSelected",
+      "fotoSelected",
+      "setCalledFrom",
     ]),
-    ...mapActions('productos', ['confirmation']),
-    ...mapMutations('marcas', ['clearData']),
-    ...mapMutations('categorias', ['clearDataCat']),
+    ...mapActions("productos", ["confirmation"]),
+    ...mapMutations("marcas", ["clearData"]),
+    ...mapMutations("categorias", ["clearDataCat"]),
     upload() {
       return new Promise((resolve, reject) => {
-        const filePicker = document.getElementById('uploadPictures');
+        const filePicker = document.getElementById("uploadPictures");
 
         if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {
-          reject(new Error('No hay imagen seleccionada'));
+          reject(new Error("No hay imagen seleccionada"));
           return;
         }
         const myFile = filePicker.files[0];
 
         // Options for file
         const quality = 100;
-        const width = 'auto';
-        const height = 'auto';
-        const format = 'webp';
+        const width = "auto";
+        const height = "auto";
+        const format = "webp";
         this.checkSize(myFile, quality, width, height, format);
         // console.log(myFile);//prints the file in JSON
         resolve();
@@ -320,7 +320,7 @@ export default {
           else if (quality === 20) this.checkSize(myFile, 10, width, height, format);
           else if (quality === 10) this.checkSize(myFile, 1, width, height, format);
           else{
-            this.error = 'La imagen es demasiado grande';
+            this.error = "La imagen es demasiado grande";
             this.loadingEffect = false;
           }
           return;
@@ -336,22 +336,22 @@ export default {
       });
     },
     modalIsActive() {
-      document.addEventListener('keypress', this.listenerFunction);
+      document.addEventListener("keypress", this.listenerFunction);
     },
     modalWillHide(done) {
-      window.console.log('remove modal');
-      document.removeEventListener('keypress', this.listenerFunction);
+      window.console.log("remove modal");
+      document.removeEventListener("keypress", this.listenerFunction);
       done();
     },
     listenerFunction(e) {
       // usually scanners throw an 'Enter' key at the end of read
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         if (code.length > 10) {
-          window.console.log('code', code);
+          window.console.log("code", code);
           this.newProductMobile.doc.upc = code;
           this.$refs.dewdew.cwrcv();
           /// code ready to use
-          code = '';
+          code = "";
         }
       } else {
         code += e.key; // while this is not an 'enter' it stores the every key
@@ -360,7 +360,7 @@ export default {
       if (!reading) {
         reading = true;
         setTimeout(() => {
-          code = '';
+          code = "";
           reading = false;
         }, 200); // 200 works fine for me but you can adjust it
       }

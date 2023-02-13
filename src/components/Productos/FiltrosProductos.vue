@@ -81,11 +81,11 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from 'vuex';
-import UPCReader from '@/components/Productos/UPCReader.vue';
+import { mapActions, mapMutations, mapState } from "vuex";
+import UPCReader from "@/components/Productos/UPCReader.vue";
 
 // Variables for upc barcode scanner
-let code = '';
+let code = "";
 let reading = false;
 
 // const LoggerServiceInstance1 = (function () {
@@ -101,7 +101,7 @@ let reading = false;
 // logger1.log('What line was this on?');
 
 export default {
-  name: 'FiltrosProductos',
+  name: "FiltrosProductos",
   components: {
     UPCReader,
   },
@@ -112,23 +112,23 @@ export default {
     },
   },
   data: () => ({
-      tmpFiltroMarcasActivas: [],
-      tmpFiltroCategoriasActivas: [],
-      tmpFiltroNombre: '',
-      tmpFiltroUPC: '',
-      show: {
-        modalUPCBarcode: false,
-      },
-    }),
+    tmpFiltroMarcasActivas: [],
+    tmpFiltroCategoriasActivas: [],
+    tmpFiltroNombre: "",
+    tmpFiltroUPC: "",
+    show: {
+      modalUPCBarcode: false,
+    },
+  }),
   computed: {
-    ...mapState('categorias', ['categorias']),
-    ...mapState('marcas', ['marcas']),
-    ...mapState('productos', [
-      'filtroCategorias',
-      'filtroMarcas',
-      'filtroNombre',
-      'filtroUPC',
-      'tempFiltroUPC'
+    ...mapState("categorias", ["categorias"]),
+    ...mapState("marcas", ["marcas"]),
+    ...mapState("productos", [
+      "filtroCategorias",
+      "filtroMarcas",
+      "filtroNombre",
+      "filtroUPC",
+      "tempFiltroUPC"
     ]),
   },
   watch: {
@@ -154,8 +154,8 @@ export default {
     this.addScannerListener();
   },
   methods: {
-    ...mapActions('productos', ['aplicarFiltros', 'borrarFiltros']),
-    ...mapMutations('productos', ['setCalledFrom','setFiltroUPC']),
+    ...mapActions("productos", ["aplicarFiltros", "borrarFiltros"]),
+    ...mapMutations("productos", ["setCalledFrom","setFiltroUPC"]),
     getFilters() {
       this.tmpFiltroMarcasActivas = [...this.filtroMarcas];
       this.tmpFiltroCategoriasActivas = [...this.filtroCategorias];
@@ -163,27 +163,27 @@ export default {
       this.tmpFiltroUPC = this.filtroUPC.toString();
     },
     addScannerListener() {
-      document.addEventListener('keypress', this.listenerFunction);
+      document.addEventListener("keypress", this.listenerFunction);
     },
     removeScannerListener(done) {
-      document.removeEventListener('keypress', this.listenerFunction);
+      document.removeEventListener("keypress", this.listenerFunction);
       done();
     },
     listenerFunction(e) {
       // usually scanners throw an 'Enter' key at the end of read
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         if (code.length > 10) {
           this.tmpFiltroUPC = code;
           this.aplicarFiltros({
-              cat: [],
-              mar: [],
-              upc: this.tmpFiltroUPC,
-              nom: '',
-            });
+            cat: [],
+            mar: [],
+            upc: this.tmpFiltroUPC,
+            nom: "",
+          });
           // eslint-disable-next-line
           this.mostrar.modalFiltros = false;
           /// code ready to use
-          code = '';
+          code = "";
         }
       } else {
         code += e.key; // while this is not an 'enter' it stores the every key
@@ -192,7 +192,7 @@ export default {
       if (!reading) {
         reading = true;
         setTimeout(() => {
-          code = '';
+          code = "";
           reading = false;
         }, 200); // 200 works fine for me but you can adjust it
       }

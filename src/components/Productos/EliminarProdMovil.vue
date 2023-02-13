@@ -25,10 +25,10 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
 
 export default {
-  name: 'EliminarProdMovil',
+  name: "EliminarProdMovil",
   props: {
     mostrar: {
       type: Object,
@@ -36,13 +36,13 @@ export default {
     },
   },
   computed: {
-    ...mapState('productos', [
-      'newProductMobile',
+    ...mapState("productos", [
+      "newProductMobile",
     ]),
   },
   methods: {
-    ...mapActions('productos', [
-      'deleteProducto',
+    ...mapActions("productos", [
+      "deleteProducto",
     ]),
   },
 };

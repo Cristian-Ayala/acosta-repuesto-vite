@@ -20,13 +20,13 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-import HeaderComp from '@/components/Header.vue';
-import LeftSideBar from '@/components/Left-SideBar.vue';
+import { mapActions } from "vuex";
+import HeaderComp from "@/components/Header.vue";
+import LeftSideBar from "@/components/Left-SideBar.vue";
 // import InstallPrompt from "@/components/InstallPrompt.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     HeaderComp,
     LeftSideBar,
@@ -46,11 +46,11 @@ export default {
     this.initDbOrdenes();
   },
   methods: {
-    ...mapActions('marcas', ['initDB']),
-    ...mapActions('categorias', ['initDbCategorias']),
-    ...mapActions('productos', ['initDbProductos']),
+    ...mapActions("marcas", ["initDB"]),
+    ...mapActions("categorias", ["initDbCategorias"]),
+    ...mapActions("productos", ["initDbProductos"]),
     // ...mapActions("usuarios", ["initDBUsuarios"]),
-    ...mapActions('ordenes', ['initDbOrdenes']),
+    ...mapActions("ordenes", ["initDbOrdenes"]),
   },
 };
 </script>

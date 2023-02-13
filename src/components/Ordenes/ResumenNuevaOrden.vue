@@ -42,7 +42,7 @@
 
 <script>
 export default {
-  name: 'ResumenNuevaOrden',
+  name: "ResumenNuevaOrden",
   props: {
     prod: {
       type: Object,
@@ -57,7 +57,7 @@ export default {
       required: true,
     },
   },
-  emits: ['addTmpProducts'],
+  emits: ["addTmpProducts"],
   data() {
     return {
       showQuantity: false,

@@ -20,10 +20,10 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
 
 export default {
-  name: 'AgregarCat',
+  name: "AgregarCat",
   props: {
     show: {
       type: Object,
@@ -34,10 +34,10 @@ export default {
     return {};
   },
   computed: {
-    ...mapState('categorias', ['categoria']),
+    ...mapState("categorias", ["categoria"]),
   },
   methods: {
-    ...mapActions('categorias', ['removeRegistro']),
+    ...mapActions("categorias", ["removeRegistro"]),
   },
 };
 </script>

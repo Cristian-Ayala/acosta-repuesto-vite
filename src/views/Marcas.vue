@@ -89,22 +89,22 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
-import AgregarMar from '@/components/Marcas/AgregarMar.vue';
-import DeleteMar from '@/components/Marcas/DeleteMar.vue';
-import EditMar from '@/components/Marcas/EditMar.vue';
+import { mapState, mapMutations } from "vuex";
+import AgregarMar from "@/components/Marcas/AgregarMar.vue";
+import DeleteMar from "@/components/Marcas/DeleteMar.vue";
+import EditMar from "@/components/Marcas/EditMar.vue";
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Marcas',
+  name: "Marcas",
   components: {
     AgregarMar,
     DeleteMar,
     EditMar,
   },
   data: () => ({
-    displayOption: '',
-    searchDisplay: '',
+    displayOption: "",
+    searchDisplay: "",
     show: {
       modalAgregarMar: false,
       modalEditarMar: false,
@@ -112,12 +112,12 @@ export default {
     },
   }),
   computed: {
-    ...mapState('marcas', ['marcas', 'marca']),
+    ...mapState("marcas", ["marcas", "marca"]),
   },
   methods: {
-    ...mapMutations('marcas', ['clearData', 'getMarcaSelected']),
+    ...mapMutations("marcas", ["clearData", "getMarcaSelected"]),
     filtro(index) {
-      if (this.searchDisplay === '') return true;
+      if (this.searchDisplay === "") return true;
       const marcaBusqueda = (
         this.marcas[index].doc.nombreMarca + this.marcas[index].doc.descripMarca
       ).toUpperCase();

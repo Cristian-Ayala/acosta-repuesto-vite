@@ -70,10 +70,10 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions } from "vuex";
 
 export default {
-  name: 'DetalleOrden',
+  name: "DetalleOrden",
   props: {
     show: {
       type: Object,
@@ -84,7 +84,7 @@ export default {
       required: true,
     },
   },
-  emits: ['updateOrders'],
+  emits: ["updateOrders"],
   data() {
     return {
     };
@@ -92,14 +92,14 @@ export default {
   watch: {
   },
   methods: {
-    ...mapActions('ordenes', ['changeDeliveryStatus']),
+    ...mapActions("ordenes", ["changeDeliveryStatus"]),
     formatDate(id) {
-        const date = new Date(id);
-        return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
+      const date = new Date(id);
+      return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", { hour12: true })}`;
     },
     async changeDeliveryStatusLocal (status){
       await this.changeDeliveryStatus({ id: this.ordSelected._id, status });
-      this.$emit('updateOrders');
+      this.$emit("updateOrders");
       // eslint-disable-next-line
       this.show.detOrd = false;
     }

@@ -97,7 +97,7 @@
 <script>
 function initialState() {
   return {
-    dateType: 'Por día',
+    dateType: "Por día",
     filters: {
       date: {
         start: new Date(),
@@ -107,23 +107,23 @@ function initialState() {
         priceLte: 0.0,
         priceGte: 0.0,
       },
-      orderType: 'Todas',
-      tipoDistribucion: 'Todas',
-      status: 'Todas',
+      orderType: "Todas",
+      tipoDistribucion: "Todas",
+      status: "Todas",
     },
   };
 }
 
 
 export default {
-  name: 'OrderFilters',
+  name: "OrderFilters",
   props: {
     show: {
       type: Object,
       required: true,
     },
   },
-  emits: ['filtersConfirmed'],
+  emits: ["filtersConfirmed"],
   data() {
     return initialState();
   },
@@ -131,7 +131,7 @@ export default {
     dateType() {
       this.filters.date.start = null;
     },
-    'filters.date.start': function resetEndDate() {
+    "filters.date.start": function resetEndDate() {
       this.filters.date.end = null;
     },
   },
@@ -146,9 +146,9 @@ export default {
     },
     confirmClick() {
       const options = { ...this.filters };
-      if (typeof(options.price.priceGte) !== 'number') options.price.priceGte = 0;
-      if (typeof(options.price.priceLte) !== 'number') options.price.priceLte = 0;
-      this.$emit('filtersConfirmed', options);
+      if (typeof(options.price.priceGte) !== "number") options.price.priceGte = 0;
+      if (typeof(options.price.priceLte) !== "number") options.price.priceLte = 0;
+      this.$emit("filtersConfirmed", options);
       // eslint-disable-next-line
       this.show.orderFilterDrawer = false;
     },

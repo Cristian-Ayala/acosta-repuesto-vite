@@ -30,20 +30,20 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
-  name: 'DeleteUser',
+  name: "DeleteUser",
   data() {
     return {};
   },
   computed: {
-    ...mapState('usuarios', ['usuario']),
+    ...mapState("usuarios", ["usuario"]),
   },
   mounted() {},
   methods: {
-    ...mapMutations('usuarios', ['setModalEditShow']),
-    ...mapActions('usuarios', ['removeRegistro']),
+    ...mapMutations("usuarios", ["setModalEditShow"]),
+    ...mapActions("usuarios", ["removeRegistro"]),
   },
 };
 </script>

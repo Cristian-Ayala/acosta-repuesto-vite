@@ -6,21 +6,21 @@
 </template>
 
 <script>
-import Default from '@/layouts/Default.vue'
-import Blank from '@/layouts/Blank.vue'
+import Default from "@/layouts/Default.vue"
+import Blank from "@/layouts/Blank.vue"
 
 const layouts = {
   Default,
   Blank
 }
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {}
   },
   computed: {
     layout() {
-      const defaultLayout = this.$route.meta.layout || 'Default'
+      const defaultLayout = this.$route.meta.layout || "Default"
       return layouts[defaultLayout]
     },
   },

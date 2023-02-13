@@ -25,7 +25,7 @@
 // import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
-  name: 'ActualizarView',
+  name: "ActualizarView",
 
   data: () => ({}),
   computed: {},

@@ -32,10 +32,10 @@ import {
   BrowserMultiFormatReader,
   Exception,
   NotFoundException,
-} from '@zxing/library';
+} from "@zxing/library";
 
 export default {
-  name: 'StreamBarcodeReader',
+  name: "StreamBarcodeReader",
   props: {
     showListCameras: {
       type: Boolean,
@@ -46,7 +46,7 @@ export default {
       default: false,
     },
   },
-  emits: ['loaded', 'decode'],
+  emits: ["loaded", "decode"],
   data() {
     return {
       isLoading: true,
@@ -54,7 +54,7 @@ export default {
       isMediaStreamAPISupported:
         navigator &&
         navigator.mediaDevices &&
-        'enumerateDevices' in navigator.mediaDevices,
+        "enumerateDevices" in navigator.mediaDevices,
       listOfCameras: [],
       selectedCamera: null,
       torch: false,
@@ -62,12 +62,12 @@ export default {
   },
   mounted() {
     if (!this.isMediaStreamAPISupported) {
-      throw new Exception('Media Stream API is not supported');
+      throw new Exception("Media Stream API is not supported");
     }
     this.listCameras();
     this.$refs.scanner.oncanplay = () => {
       this.isLoading = false;
-      this.$emit('loaded');
+      this.$emit("loaded");
     };
   },
   beforeUnmount() {
@@ -84,7 +84,7 @@ export default {
         (result, err) => {
           if (result) {
             this.isLoading = false;
-            this.$emit('decode', result.text);
+            this.$emit("decode", result.text);
           }
           if (err && !(err instanceof NotFoundException)) {
             throw new Exception(err);
@@ -101,7 +101,7 @@ export default {
             this.selectedCamera = this.listOfCameras[0].deviceId;
             this.start(this.selectedCamera);
           } else {
-            throw new Exception('No cameras found.');
+            throw new Exception("No cameras found.");
           }
         })
         .catch((err) => {
@@ -109,8 +109,8 @@ export default {
         });
     },
     torchChange(value) {
-      document.getElementsByTagName('video')[0]
-      .srcObject.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: value }] });
+      document.getElementsByTagName("video")[0]
+        .srcObject.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: value }] });
       this.torch = value;
     }
   },

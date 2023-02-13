@@ -6,10 +6,10 @@
 
 <script>
 // @ is an alias to /src
-import HomeBar from '@/components/HomeBar.vue';
+import HomeBar from "@/components/HomeBar.vue";
 
 export default {
-  name: 'HomeView',
+  name: "HomeView",
   components: {
     HomeBar,
   },

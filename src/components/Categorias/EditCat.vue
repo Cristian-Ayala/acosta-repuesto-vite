@@ -39,10 +39,10 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
 
 export default {
-  name: 'EditCat',
+  name: "EditCat",
   props: {
     show: {
       type: Object,
@@ -54,12 +54,12 @@ export default {
     };
   },
   computed: {
-    ...mapState('categorias',['catSelected']),
+    ...mapState("categorias",["catSelected"]),
   },
   mounted() {
   },
   methods: {
-    ...mapActions('categorias',['edithRegistro']),
+    ...mapActions("categorias",["edithRegistro"]),
   },
 };
 </script>

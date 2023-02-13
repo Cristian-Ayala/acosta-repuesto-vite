@@ -26,10 +26,10 @@
 </template>
 
 <script>
-import DetalleOrden from '@/components/Ordenes/DetalleOrden.vue';
+import DetalleOrden from "@/components/Ordenes/DetalleOrden.vue";
 
 export default {
-  name: 'OrderView',
+  name: "OrderView",
   components: {
     DetalleOrden,
   },
@@ -39,7 +39,7 @@ export default {
       required: true,
     },
   },
-  emits: ['updateOrders'],
+  emits: ["updateOrders"],
   data() {
     return {
       show: {
@@ -49,18 +49,18 @@ export default {
   },
   computed: {
     statusColor () {
-        if (!this.orden) return 'danger';
-        switch (this.orden.status) {
-            case 'Completado':
-                return 'success';
-            case 'En proceso':
-                return 'warning';
-            case 'En camino':
-                return 'primary';
-            default:
-                // In case of cancelado
-                return 'danger';
-        }
+      if (!this.orden) return "danger";
+      switch (this.orden.status) {
+      case "Completado":
+        return "success";
+      case "En proceso":
+        return "warning";
+      case "En camino":
+        return "primary";
+      default:
+        // In case of cancelado
+        return "danger";
+      }
     },
   },
   mounted() {
@@ -68,11 +68,11 @@ export default {
   },
   methods: {
     formatDate(id) {
-        const date = new Date(id);
-        return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
+      const date = new Date(id);
+      return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", { hour12: true })}`;
     },
     updateOrders() {
-      this.$emit('updateOrders');
+      this.$emit("updateOrders");
     },
   },
 };

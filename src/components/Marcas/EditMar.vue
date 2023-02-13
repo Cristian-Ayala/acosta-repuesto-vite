@@ -39,10 +39,10 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
 
 export default {
-  name: 'EditMar',
+  name: "EditMar",
   props: {
     show: {
       type: Object,
@@ -53,10 +53,10 @@ export default {
     return {};
   },
   computed: {
-    ...mapState('marcas', ['marSelected']),
+    ...mapState("marcas", ["marSelected"]),
   },
   methods: {
-    ...mapActions('marcas', ['edithRegistro']),
+    ...mapActions("marcas", ["edithRegistro"]),
   },
 };
 </script>

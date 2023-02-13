@@ -43,20 +43,20 @@
 //   });
 // };
 export default {
-  name: 'LoginIndex',
+  name: "LoginIndex",
   components: {},
   data() {
     return {
-      username: '',
-      password: '',
+      username: "",
+      password: "",
       error: false,
     };
   },
   mounted() {
     // Trigger para comenzar script para probar si las cookies de terceros estan habilitadas
     const url = `${import.meta.env.VITE_BACKEND_URL}step1.js.php`;
-    const step1El = document.createElement('script');
-    step1El.setAttribute('src', url);
+    const step1El = document.createElement("script");
+    step1El.setAttribute("src", url);
     document.body.appendChild(step1El);
     // Fin del trigger para comenzar script para probar si las cookies de terceros estan habilitadas
   },
@@ -66,16 +66,16 @@ export default {
     // eslint-disable-next-line
     window._3rd_party_test_step1_loaded = function () {
       // At this point, a third-party domain has now attempted to set a cookie (if all went to plan!)
-      const step2El = document.createElement('script');
+      const step2El = document.createElement("script");
       const url = `${import.meta.env.VITE_BACKEND_URL}/step2.js.php`;
-      step2El.setAttribute('src', url);
+      step2El.setAttribute("src", url);
       document.head.appendChild(step2El);
     };
     // eslint-disable-next-line
     window._3rd_party_test_step2_loaded = function (cookieSuccess) {
       // If true, the third-party domain cookies are enabled
       // If false, the third-party domain cookies are disable
-      if(!cookieSuccess) that.$router.push({ path: '/cookies' });
+      if(!cookieSuccess) that.$router.push({ path: "/cookies" });
     };
     // Fin de script para probar si las cookies de terceros estan habilitadas
     // remotedb(this.$url)
@@ -95,35 +95,35 @@ export default {
        * TODO: Some task
        */
       const settings = {
-          method: 'POST',
-          headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              name: this.username,
-              password: this.password,
-          }),
-          credentials: 'include',
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: this.username,
+          password: this.password,
+        }),
+        credentials: "include",
       };
       try {
         await fetch(`${import.meta.env.VITE_BACKEND_URL}_session`, settings);
         // const fetchResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}_session`, settings);
         // const data = await fetchResponse.json();
         // console.log(data);
-        this.$router.push({ path: '/' });
+        this.$router.push({ path: "/" });
         // const result = await remoteUsuarios.logIn(this.username, this.password)
         // if (result.ok) this.$router.push({ path: '/' });
       } catch (error) {
-          console.error(JSON.stringify(error));
-          this.error = true;
+        console.error(JSON.stringify(error));
+        this.error = true;
       }
     },
     areCookiesEnabled() {
       try {
-        document.cookie = 'cookietest=1';
-        const cookiesEnabled = document.cookie.indexOf('cookietest=') !== -1;
-        document.cookie = 'cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT';
+        document.cookie = "cookietest=1";
+        const cookiesEnabled = document.cookie.indexOf("cookietest=") !== -1;
+        document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
         return cookiesEnabled;
       } catch (e) {
         console.log(e);

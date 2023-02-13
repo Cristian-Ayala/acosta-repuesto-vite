@@ -39,10 +39,10 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
 
 export default {
-  name: 'AgregarMar',
+  name: "AgregarMar",
   props: {
     show: {
       type: Object,
@@ -53,10 +53,10 @@ export default {
     return {};
   },
   computed: {
-    ...mapState('marcas', ['marca']),
+    ...mapState("marcas", ["marca"]),
   },
   methods: {
-    ...mapActions('marcas', ['createRegistro']),
+    ...mapActions("marcas", ["createRegistro"]),
   },
 };
 </script>

@@ -1,24 +1,24 @@
-import { createApp } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
-import ElementPlus from 'element-plus';
-import * as ElementPlusIconsVue from '@element-plus/icons-vue';
-import { createStore } from './store';
-import App from './App.vue';
-import routes from './router';
-import isLoggedIn from './router/middleware/auth';
-import 'element-plus/dist/index.css';
+import { createApp } from "vue";
+import { createRouter, createWebHistory } from "vue-router";
+import ElementPlus from "element-plus";
+import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+import { createStore } from "./store";
+import App from "./App.vue";
+import routes from "./router";
+import isLoggedIn from "./router/middleware/auth";
+import "element-plus/dist/index.css";
 
 const router = createRouter({
   history: createWebHistory(),
   // base: process.env.BASE_URL,
   routes,
-  linkActiveClass: 'active-link',
-  linkExactActiveClass: 'exact-active-link',
+  linkActiveClass: "active-link",
+  linkExactActiveClass: "exact-active-link",
 });
 
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.allowAnonymous)) next()
-  else if (!(await isLoggedIn())) next({ name: 'Login' })
+  else if (!(await isLoggedIn())) next({ name: "Login" })
   else next()
   // to.name !== 'Login' &&
 })
@@ -41,4 +41,4 @@ app.use(ElementPlus);
 Object.entries(ElementPlusIconsVue).forEach(([key, component]) => {
   app.component(key, component);
 });
-app.mount('#app');
+app.mount("#app");

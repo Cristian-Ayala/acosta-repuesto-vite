@@ -108,22 +108,22 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
-  name: 'ProductosIndex',
+  name: "ProductosIndex",
   components: {
-    AddEditProdMovile: () => import('@/components/Productos/AddEditProdMovile.vue'),
+    AddEditProdMovile: () => import("@/components/Productos/AddEditProdMovile.vue"),
     // ConfirmarTransacciones: () => import('@/components/Productos/ConfirmarTransacciones.vue'),
-    EliminarProdMovil: () => import('@/components/Productos/EliminarProdMovil.vue'),
-    FiltrosProductos: () => import('@/components/Productos/FiltrosProductos.vue'),
+    EliminarProdMovil: () => import("@/components/Productos/EliminarProdMovil.vue"),
+    FiltrosProductos: () => import("@/components/Productos/FiltrosProductos.vue"),
   },
   data() {
     return {
-      displayOption: '',
-      searchDisplay: '',
-      tab: '',
-      title: 'Editar',
+      displayOption: "",
+      searchDisplay: "",
+      tab: "",
+      title: "Editar",
       currentPageLocal: 1,
       show: {
         addEditProdMovile: false,
@@ -133,25 +133,25 @@ export default {
     };
   },
   computed: {
-    ...mapState('productos', [
-      'productos',
-      'producto',
-      'cacheEditProd',
-      'editedProd',
-      'newProd',
-      'deleteTransaction',
-      'editTransaction',
-      'numeroDeEditados',
-      'newProductMobile',
-      'currentPage',
-      'perPage',
-      'totalRows',
-      'filtroCategorias',
-      'filtroMarcas',
-      'filtroNombre',
-      'filtroUPC',
+    ...mapState("productos", [
+      "productos",
+      "producto",
+      "cacheEditProd",
+      "editedProd",
+      "newProd",
+      "deleteTransaction",
+      "editTransaction",
+      "numeroDeEditados",
+      "newProductMobile",
+      "currentPage",
+      "perPage",
+      "totalRows",
+      "filtroCategorias",
+      "filtroMarcas",
+      "filtroNombre",
+      "filtroUPC",
     ]),
-    ...mapState('categorias', ['categorias']),
+    ...mapState("categorias", ["categorias"]),
     allFilters() {
       const filters = [];
       const categories = this.filtroCategorias.map((cat) => cat);
@@ -185,23 +185,23 @@ export default {
     // },
   },
   methods: {
-    ...mapMutations('productos', [
-      'clearData',
-      'removeRegistro',
-      'editProd',
-      'saveEditProd',
-      'undoEditProd',
-      'transactionRemove',
-      'addProd',
-      'removeNewRegistro',
-      'saveNewProduct',
-      'editNewRegistro',
-      'prodSelected',
+    ...mapMutations("productos", [
+      "clearData",
+      "removeRegistro",
+      "editProd",
+      "saveEditProd",
+      "undoEditProd",
+      "transactionRemove",
+      "addProd",
+      "removeNewRegistro",
+      "saveNewProduct",
+      "editNewRegistro",
+      "prodSelected",
     ]),
-    ...mapActions('productos', ['setPage']),
+    ...mapActions("productos", ["setPage"]),
 
     filtro(valor) {
-      if (this.searchDisplay.trim() === '') return true;
+      if (this.searchDisplay.trim() === "") return true;
       const array = (
         this.productos[valor].nombreProd +
         this.productos[valor].descripcion +
@@ -213,7 +213,7 @@ export default {
     },
     createProduct() {
       this.prodSelected({});
-      this.title = 'Agregar producto';
+      this.title = "Agregar producto";
       this.show.addEditProdMovile = true;
     },
   },

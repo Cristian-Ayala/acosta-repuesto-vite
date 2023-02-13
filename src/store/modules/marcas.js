@@ -1,14 +1,14 @@
-import { ElMessage } from 'element-plus';
-import PouchDB from 'pouchdb-browser';
-import router from '../../router/index';
+import { ElMessage } from "element-plus";
+import PouchDB from "pouchdb-browser";
+import router from "../../router/index";
 
 export default (app) => ({
   namespaced: true,
   state: {
     marcas: [],
     marca: {
-      nombreMarca: '',
-      descripMarca: '',
+      nombreMarca: "",
+      descripMarca: "",
     },
     marSelected: {},
     localMarca: null,
@@ -17,8 +17,8 @@ export default (app) => ({
   mutations: {
     clearData(state) {
       state.marca = {
-        nombreMarca: '',
-        descripMarca: '',
+        nombreMarca: "",
+        descripMarca: "",
       };
     },
     getMarcaSelected(state, mar) {
@@ -29,33 +29,33 @@ export default (app) => ({
       ElMessage({
         showClose: true,
         message,
-        type: 'error',
+        type: "error",
       });
     },
     successNotification(state, message) {
       ElMessage({
         showClose: true,
         message,
-        type: 'success',
+        type: "success",
       });
     },
   },
   actions: {
     createRegistro({ state, dispatch, commit }) {
-      if (state.marca.nombreMarca.trim() !== '') {
+      if (state.marca.nombreMarca.trim() !== "") {
         // For puchDB we need to add an _id field
         state.marca._id = new Date().toISOString();
         state.marca.nombreMarca = state.marca.nombreMarca.trim().toLocaleUpperCase();
         state.localMarca
           .put(state.marca)
           .then(() => {
-            dispatch('getAll').then(() => commit('successNotification', 'Marca agregada con éxito'));
+            dispatch("getAll").then(() => commit("successNotification", "Marca agregada con éxito"));
           })
           .catch((err) => {
-            commit('errorNotification', `Error al guardar la marca. ${err}`);
+            commit("errorNotification", `Error al guardar la marca. ${err}`);
           });
       } else {
-        commit('errorNotification', 'Por favor, introduce un nombre para la marca');
+        commit("errorNotification", "Por favor, introduce un nombre para la marca");
       }
     },
     getAll({ state, commit }) {
@@ -71,19 +71,19 @@ export default (app) => ({
             return 0;
           });
         })
-        .catch((err) => commit('errorNotification', `Error al listar la marca. ${err}`));
+        .catch((err) => commit("errorNotification", `Error al listar la marca. ${err}`));
     },
     edithRegistro({ state, commit, dispatch }) {
       const marcaDoc = state.marSelected.doc;
       marcaDoc.nombreMarca = marcaDoc.nombreMarca.trim().toLocaleUpperCase();
-      if (marcaDoc.nombreMarca === '') return;
+      if (marcaDoc.nombreMarca === "") return;
       state.localMarca
         .put(marcaDoc)
         .then(() => {
-          dispatch('getAll').then(() => commit('successNotification', 'Marca editada con éxito'));
+          dispatch("getAll").then(() => commit("successNotification", "Marca editada con éxito"));
         })
         .catch((err) => {
-          commit('errorNotification', `Error al editar la marca. ${err}`);
+          commit("errorNotification", `Error al editar la marca. ${err}`);
         });
     },
     removeRegistro({ state, commit, dispatch }) {
@@ -91,11 +91,11 @@ export default (app) => ({
       state.localMarca
         .put(state.marca.doc)
         .then(() => {
-          dispatch('getAll');
-          commit('successNotification', 'Marca eliminada con éxito');
+          dispatch("getAll");
+          commit("successNotification", "Marca eliminada con éxito");
         })
         .catch((err) => {
-          commit('errorNotification', `Error al eliminar la marca. ${err}`);
+          commit("errorNotification", `Error al eliminar la marca. ${err}`);
         });
     },
     initDB({ state, dispatch }) {
@@ -104,7 +104,7 @@ export default (app) => ({
         {
           fetch(url, opts) {
             return state.PouchDB.fetch(url, opts, {
-              credentials: 'include',
+              credentials: "include",
             });
           },
         },
@@ -113,25 +113,25 @@ export default (app) => ({
         if (err.status === 401) {
           router
             .push({
-              path: '/login',
+              path: "/login",
             })
             .catch(() => {});
         }
       });
 
-      state.localMarca = new state.PouchDB('marcas');
+      state.localMarca = new state.PouchDB("marcas");
       // do one way, one-off sync from the server until completion
-      state.localMarca.replicate.from(remoteMarca).on('complete', () => {
+      state.localMarca.replicate.from(remoteMarca).on("complete", () => {
         // console.log("Se terminó la replicación");
-        dispatch('getAll');
+        dispatch("getAll");
         // then two-way, continuous, retriable sync
         state.localMarca
           .sync(remoteMarca, {
             live: true,
             retry: true,
           })
-          .on('change', () => {
-            dispatch('getAll');
+          .on("change", () => {
+            dispatch("getAll");
           });
       });
     },

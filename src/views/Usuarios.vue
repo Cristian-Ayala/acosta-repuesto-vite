@@ -65,15 +65,15 @@
 
 <script>
 // import { mapState, mapMutations, mapActions } from "vuex";
-import { mapMutations, mapState } from 'vuex';
-import NewUsuario from '@/components/Usuarios/NewUsuario.vue';
-import EditUser from '@/components/Usuarios/EditUser.vue';
-import EditUserName from '@/components/Usuarios/EditUserName.vue';
-import EditUserPassword from '@/components/Usuarios/EditUserPassword.vue';
-import DeleteUser from '@/components/Usuarios/DeleteUser.vue';
+import { mapMutations, mapState } from "vuex";
+import NewUsuario from "@/components/Usuarios/NewUsuario.vue";
+import EditUser from "@/components/Usuarios/EditUser.vue";
+import EditUserName from "@/components/Usuarios/EditUserName.vue";
+import EditUserPassword from "@/components/Usuarios/EditUserPassword.vue";
+import DeleteUser from "@/components/Usuarios/DeleteUser.vue";
 
 export default {
-  name: 'UsuariosIndex',
+  name: "UsuariosIndex",
   components: {
     NewUsuario,
     EditUser,
@@ -83,10 +83,10 @@ export default {
   },
   data: () => ({}),
   computed: {
-    ...mapState('usuarios', ['usuarios']),
+    ...mapState("usuarios", ["usuarios"]),
   },
   methods: {
-    ...mapMutations('usuarios', ['clearData', 'setUser','setModalEditShow']),
+    ...mapMutations("usuarios", ["clearData", "setUser","setModalEditShow"]),
   },
 };
 </script>

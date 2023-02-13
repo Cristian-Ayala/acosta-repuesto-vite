@@ -32,7 +32,7 @@
 
 <script>
 export default {
-  name: 'InstallPrompt',
+  name: "InstallPrompt",
   data() {
     return {
       deferredPrompt: null,
@@ -40,14 +40,14 @@ export default {
     };
   },
   created() {
-    window.addEventListener('beforeinstallprompt', (e) => {
+    window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
-      if(!window.localStorage.getItem('instalar')){
+      if(!window.localStorage.getItem("instalar")){
         // Stash the event so it can be triggered later.
         this.deferredPrompt = e;
       }
     });
-    window.addEventListener('appinstalled', () => {
+    window.addEventListener("appinstalled", () => {
       this.deferredPrompt = null;
     });
 
@@ -57,7 +57,7 @@ export default {
   },
   methods: {
     async dismiss() {
-      window.localStorage.setItem('instalar','false');
+      window.localStorage.setItem("instalar","false");
       this.deferredPrompt = null;
     },
     async install() {

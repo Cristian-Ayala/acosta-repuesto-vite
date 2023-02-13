@@ -1,15 +1,15 @@
-import { ElMessage } from 'element-plus';
-import PouchDB from 'pouchdb-browser';
-import PouchDBFind from 'pouchdb-find';
-import router from '../../router/index';
+import { ElMessage } from "element-plus";
+import PouchDB from "pouchdb-browser";
+import PouchDBFind from "pouchdb-find";
+import router from "../../router/index";
 // import PouchDBQuickSearch from 'pouchdb-quick-search';
 PouchDB.plugin(PouchDBFind);
 // PouchDB.plugin(PouchDBQuickSearch);
 
 function regexSearch(keyword) {
-  if (!keyword || keyword.trim() === '') return 'nonexistent';
-  const arrayOfWords = keyword.split(' ');
-  const joinedRegex = arrayOfWords.map((word) => word !== ' ' ? `(?=.*${word})`: '').join('');
+  if (!keyword || keyword.trim() === "") return "nonexistent";
+  const arrayOfWords = keyword.split(" ");
+  const joinedRegex = arrayOfWords.map((word) => word !== " " ? `(?=.*${word})`: "").join("");
   return `^${joinedRegex}.+`;
 }
 
@@ -18,13 +18,13 @@ export default (app) => ({
   state: {
     productos: [],
     producto: {
-      nombreProd: '',
+      nombreProd: "",
       activoProd: true,
       stockProd: null,
       upc: null,
-      nombreMarca: '',
-      nombreCategoria: '',
-      foto: '',
+      nombreMarca: "",
+      nombreCategoria: "",
+      foto: "",
       precioTaller: 0,
       precioMayoreo: 0,
       precioPublico: 0,
@@ -51,10 +51,10 @@ export default (app) => ({
     },
     filtroCategorias: [],
     filtroMarcas: [],
-    filtroNombre: '',
-    filtroUPC: '',
-    tempFiltroUPC: '',
-    calledFrom: '',
+    filtroNombre: "",
+    filtroUPC: "",
+    tempFiltroUPC: "",
+    calledFrom: "",
     prodSearchInOrdtotRows: 0,
   },
   mutations: {
@@ -64,13 +64,13 @@ export default (app) => ({
       if (!Object.keys(productoSelectedLocal).length) {
         productoSelectedLocal = {
           doc: {
-            nombreProd: '',
+            nombreProd: "",
             activoProd: true,
             stockProd: 0,
-            upc: '',
-            nombreMarca: '',
-            nombreCategoria: '',
-            foto: '',
+            upc: "",
+            nombreMarca: "",
+            nombreCategoria: "",
+            foto: "",
             precioTaller: 0,
             precioMayoreo: 0,
             precioPublico: 0,
@@ -83,14 +83,14 @@ export default (app) => ({
       ElMessage({
         showClose: true,
         message,
-        type: 'success',
+        type: "success",
       });
     },
     errorNotification(state, message) {
       ElMessage({
         showClose: true,
         message,
-        type: 'error',
+        type: "error",
       });
     },
     marcaSelected(state, marca) {
@@ -113,7 +113,7 @@ export default (app) => ({
     async validarDatos({ state }, productoDoc) {
       try {
         if (!productoDoc.upc) {
-          throw new Error('Agregue un UPC');
+          throw new Error("Agregue un UPC");
         }
         const numbersOfUPCs = await state.localProductos
           .find({
@@ -128,25 +128,25 @@ export default (app) => ({
             return null;
           });
         if (!productoDoc.nombreProd) {
-          throw new Error('El nombre no puede estar vacío');
+          throw new Error("El nombre no puede estar vacío");
         }
         if (!productoDoc.foto) {
-          throw new Error('Tiene que agregar una foto');
+          throw new Error("Tiene que agregar una foto");
         }
         if (!productoDoc.nombreMarca) {
-          throw new Error('Tiene que agregar una Marca');
+          throw new Error("Tiene que agregar una Marca");
         }
         if (!productoDoc.nombreCategoria) {
-          throw new Error('Tiene que agregar una Categoria');
+          throw new Error("Tiene que agregar una Categoria");
         }
         if (!(productoDoc.precioMayoreo > 0)) {
-          throw new Error('El precio de mayoreo no puede ser menor a 0');
+          throw new Error("El precio de mayoreo no puede ser menor a 0");
         }
         if (!(productoDoc.precioPublico > 0)) {
-          throw new Error('El precio de publico no puede ser menor a 0');
+          throw new Error("El precio de publico no puede ser menor a 0");
         }
         if (!(productoDoc.precioTaller > 0)) {
-          throw new Error('El precio de taller no puede ser menor a 0');
+          throw new Error("El precio de taller no puede ser menor a 0");
         }
         return numbersOfUPCs;
       } catch (error) {
@@ -159,30 +159,30 @@ export default (app) => ({
         productoDoc.precioMayoreo = Math.round(productoDoc.precioMayoreo * 100) / 100;
         productoDoc.precioPublico = Math.round(productoDoc.precioPublico * 100) / 100;
         productoDoc.precioTaller = Math.round(productoDoc.precioTaller * 100) / 100;
-        const totalNumberOfUPCs = await dispatch('validarDatos', productoDoc);
-        if (!(typeof totalNumberOfUPCs.length === 'number')) {
+        const totalNumberOfUPCs = await dispatch("validarDatos", productoDoc);
+        if (!(typeof totalNumberOfUPCs.length === "number")) {
           throw new Error(totalNumberOfUPCs);
         }
         if (totalNumberOfUPCs.length > 0) {
-          throw new Error('Ya existe un producto con ese UPC');
+          throw new Error("Ya existe un producto con ese UPC");
         }
         productoDoc._id = new Date().toISOString(); // For puchDB we need to add an _id field
         state.localProductos
           .put(productoDoc)
           .then(() => {
-            dispatch('readProducto').then(() => commit('successNotification', 'Producto agregado con éxito'));
+            dispatch("readProducto").then(() => commit("successNotification", "Producto agregado con éxito"));
           })
           .catch((err) => {
-            commit('errorNotification', `Error al guardar el producto ${err}`);
+            commit("errorNotification", `Error al guardar el producto ${err}`);
           });
       } catch (err) {
-        commit('errorNotification', `Error al guardar el producto ${err}`);
+        commit("errorNotification", `Error al guardar el producto ${err}`);
       }
     },
     readProducto({ state, dispatch }) {
-      if (state.filtroUPC.trim() !== '') dispatch('readProductsUPC');
-      else if (state.filtroCategorias.length > 0 || state.filtroMarcas.length > 0) dispatch('readProductoCategoriaMarcaNombre');
-      else dispatch('readAllProducts');
+      if (state.filtroUPC.trim() !== "") dispatch("readProductsUPC");
+      else if (state.filtroCategorias.length > 0 || state.filtroMarcas.length > 0) dispatch("readProductoCategoriaMarcaNombre");
+      else dispatch("readAllProducts");
     },
     async updateProducto({ state, commit, dispatch }, producto) {
       try {
@@ -190,23 +190,23 @@ export default (app) => ({
         productoDoc.precioMayoreo = Math.round(productoDoc.precioMayoreo * 100) / 100;
         productoDoc.precioPublico = Math.round(productoDoc.precioPublico * 100) / 100;
         productoDoc.precioTaller = Math.round(productoDoc.precioTaller * 100) / 100;
-        const totalNumberOfUPCs = await dispatch('validarDatos', productoDoc);
-        if (typeof totalNumberOfUPCs.length !== 'number') throw new Error(totalNumberOfUPCs);
+        const totalNumberOfUPCs = await dispatch("validarDatos", productoDoc);
+        if (typeof totalNumberOfUPCs.length !== "number") throw new Error(totalNumberOfUPCs);
         if (totalNumberOfUPCs.length > 0) {
           if (productoDoc._id !== totalNumberOfUPCs[0]._id) {
             window.console.error(
-              'No es el mismo doc así que no se modifica, se arroja error que el upc ya existe',
+              "No es el mismo doc así que no se modifica, se arroja error que el upc ya existe",
             );
-            throw new Error('El UPC ya existente. Sólo puede haber 1.');
+            throw new Error("El UPC ya existente. Sólo puede haber 1.");
           }
         }
         state.localProductos
           .put(productoDoc)
           .then(() => {
-            dispatch('readProducto').then(() => commit('successNotification', 'Producto modificado con éxito'));
+            dispatch("readProducto").then(() => commit("successNotification", "Producto modificado con éxito"));
           });
       } catch (err) {
-        commit('errorNotification', `Error al modificar el producto. ${err}`);
+        commit("errorNotification", `Error al modificar el producto. ${err}`);
       }
     },
     deleteProducto({ state, commit, dispatch }, productoDel) {
@@ -216,17 +216,17 @@ export default (app) => ({
       state.localProductos
         .put(producto.doc)
         .then(() => {
-          dispatch('readProducto').then(() => commit('successNotification', 'Producto eliminado con éxito'));
+          dispatch("readProducto").then(() => commit("successNotification", "Producto eliminado con éxito"));
         })
         .catch((err) => {
-          commit('errorNotification', `Error al eliminar el producto ${err}`);
+          commit("errorNotification", `Error al eliminar el producto ${err}`);
         });
     },
     initDbProductos({ state, dispatch }) {
       const remoteProductos = new state.PouchDB(`${app.config.globalProperties.$url}productos`, {
         fetch(url, opts) {
           return state.PouchDB.fetch(url, opts, {
-            credentials: 'include',
+            credentials: "include",
           });
         },
       });
@@ -234,26 +234,26 @@ export default (app) => ({
         if (err.status === 401) {
           router
             .push({
-              path: '/login',
+              path: "/login",
             });
         }
       });
 
-      state.localProductos = new state.PouchDB('productos');
+      state.localProductos = new state.PouchDB("productos");
       // do one way, one-off sync from the server until completion
       state.localProductos.replicate
         .from(remoteProductos)
-        .on('complete', () => {
+        .on("complete", () => {
           // console.log("Se terminó la replicación");
-          dispatch('readProducto');
+          dispatch("readProducto");
           // then two-way, continuous, retriable sync
           state.localProductos
             .sync(remoteProductos, {
               live: true,
               retry: true,
             })
-            .on('change', () => {
-              dispatch('readProducto');
+            .on("change", () => {
+              dispatch("readProducto");
             });
         });
     },
@@ -261,12 +261,12 @@ export default (app) => ({
       state.localProductos
         .createIndex({
           index: {
-            fields: ['nombreMarca', 'nombreCategoria'],
-            ddoc: 'marcas_categorias',
+            fields: ["nombreMarca", "nombreCategoria"],
+            ddoc: "marcas_categorias",
           },
         })
         .then(() => {
-          window.console.log('Index creado');
+          window.console.log("Index creado");
         })
         .catch((err) => {
           window.console.log(err);
@@ -274,12 +274,12 @@ export default (app) => ({
       state.localProductos
         .createIndex({
           index: {
-            fields: ['nombreMarca'],
-            ddoc: 'marcas',
+            fields: ["nombreMarca"],
+            ddoc: "marcas",
           },
         })
         .then(() => {
-          window.console.log('Index marcas creado');
+          window.console.log("Index marcas creado");
         })
         .catch((err) => {
           window.console.log(err);
@@ -287,12 +287,12 @@ export default (app) => ({
       state.localProductos
         .createIndex({
           index: {
-            fields: ['nombreCategoria'],
-            ddoc: 'categorias',
+            fields: ["nombreCategoria"],
+            ddoc: "categorias",
           },
         })
         .then(() => {
-          window.console.log('Index categorias creado');
+          window.console.log("Index categorias creado");
         })
         .catch((err) => {
           window.console.log(err);
@@ -300,12 +300,12 @@ export default (app) => ({
     },
     readAllProducts({ state }) {
       if (state.currentPage === 1) {
-        const settings = { method: 'GET', credentials: 'include' };
+        const settings = { method: "GET", credentials: "include" };
         fetch(`${app.config.globalProperties.$url}productos/_design/totalProd/_view/totalProd`, settings)
-        .then(resp => resp.json()).then((response) => {
-          state.totalRows = response.rows[0].value;
+          .then(resp => resp.json()).then((response) => {
+            state.totalRows = response.rows[0].value;
           })
-        .catch(window.console.error);
+          .catch(window.console.error);
       }
       const totalLimit = state.optionsPagination.skip + state.optionsPagination.limit;
       state.localProductos
@@ -318,7 +318,7 @@ export default (app) => ({
           limit: totalLimit,
           sort: [
             {
-              _id: state.optionsPagination.descending ? 'desc' : 'asc',
+              _id: state.optionsPagination.descending ? "desc" : "asc",
             },
           ],
         })
@@ -361,7 +361,7 @@ export default (app) => ({
       };
       if (state.filtroNombre) {
         selector.nombreProd = {
-          $regex: RegExp(state.filtroNombre, 'i'),
+          $regex: RegExp(state.filtroNombre, "i"),
         };
       }
       if (state.filtroMarcas.length > 0) {
@@ -379,9 +379,9 @@ export default (app) => ({
       // Pagination purposes
       if (state.currentPage === 1) {
         state.localProductos
-          .find({ selector, fields: ['_id'] })
+          .find({ selector, fields: ["_id"] })
           .then((response) => {
-            window.console.log('response productos', response);
+            window.console.log("response productos", response);
             state.totalRows = response.docs.length;
           })
           .catch(window.console.error);
@@ -393,7 +393,7 @@ export default (app) => ({
           limit: state.optionsPagination.limit,
           sort: [
             {
-              _id: state.optionsPagination.descending ? 'desc' : 'asc',
+              _id: state.optionsPagination.descending ? "desc" : "asc",
             },
           ],
         })
@@ -430,7 +430,7 @@ export default (app) => ({
       // New limit must be calculates because the last page is not full of products,
       // so it will be less than the perPage
       state.optionsPagination.limit = newLimit;
-      dispatch('readProducto');
+      dispatch("readProducto");
     },
     firstPage({ state, dispatch }) {
       // startkey
@@ -441,7 +441,7 @@ export default (app) => ({
       state.optionsPagination.skip = 0;
       state.currentPage = 1;
       state.optionsPagination.descending = false;
-      dispatch('readProducto');
+      dispatch("readProducto");
     },
     nextPage({ state, dispatch }, page) {
       // startkey
@@ -453,9 +453,9 @@ export default (app) => ({
       if (state.currentPage < lastPage) {
         state.optionsPagination.skip = 1;
         state.optionsPagination.descending = false;
-        dispatch('readProducto');
+        dispatch("readProducto");
       } else if (lastPage === state.currentPage) {
-        dispatch('lastPage');
+        dispatch("lastPage");
       }
     },
     prevPage({ state, dispatch }, page) {
@@ -467,9 +467,9 @@ export default (app) => ({
       if (state.currentPage > 1) {
         state.optionsPagination.descending = true;
         state.optionsPagination.skip = 1;
-        dispatch('readProducto');
+        dispatch("readProducto");
       } else if (state.currentPage === 1) {
-        dispatch('firstPage');
+        dispatch("firstPage");
       }
     },
     setPage({ state, dispatch }, page) {
@@ -478,11 +478,11 @@ export default (app) => ({
       }
       state.optionsPagination.limit = state.perPage;
       if (page === 1) {
-        dispatch('firstPage');
+        dispatch("firstPage");
       } else if (page < state.currentPage) {
-        dispatch('prevPage', page);
+        dispatch("prevPage", page);
       } else if (page > state.currentPage) {
-        dispatch('nextPage', page);
+        dispatch("nextPage", page);
       }
     },
     // ----------------------- End of pagination -----------------------
@@ -496,9 +496,9 @@ export default (app) => ({
     confirmation({ dispatch }, producto) {
       // Verify in confirmation is for update o create new
       if (producto.doc._rev) {
-        dispatch('updateProducto', { ...producto.doc });
+        dispatch("updateProducto", { ...producto.doc });
       } else {
-        dispatch('createProducto', [producto]);
+        dispatch("createProducto", [producto]);
       }
     },
     aplicarFiltros({ state, dispatch }, prod) {
@@ -506,18 +506,18 @@ export default (app) => ({
       state.filtroMarcas = prod.mar;
       state.filtroUPC = prod.upc;
       state.filtroNombre = prod.nom;
-      dispatch('firstPage');
+      dispatch("firstPage");
     },
     borrarFiltros({ state, dispatch }) {
       state.filtroCategorias = [];
       state.filtroMarcas = [];
-      state.filtroUPC = '';
-      state.filtroNombre = '';
-      dispatch('firstPage');
+      state.filtroUPC = "";
+      state.filtroNombre = "";
+      dispatch("firstPage");
     },
     getTotalProductosSearchOrdenes({ state }, selector) {
       state.localProductos
-        .find({ selector, fields: ['_id'] })
+        .find({ selector, fields: ["_id"] })
         .then((response) => {
           state.prodSearchInOrdtotRows = response.docs.length;
         })
@@ -533,13 +533,13 @@ export default (app) => ({
         selector: {
           $or: [
             { upc: variables.keyword },
-            { nombreProd: { $regex: RegExp(regexSearch(variables.keyword), 'i') } }
+            { nombreProd: { $regex: RegExp(regexSearch(variables.keyword), "i") } }
           ]
         },
         limit: variables.limit,
         skip: variables.skip,
       };
-      if (variables.pagination?.page === 1) dispatch('getTotalProductosSearchOrdenes', searchParameters.selector);
+      if (variables.pagination?.page === 1) dispatch("getTotalProductosSearchOrdenes", searchParameters.selector);
       await state.localProductos
         .find(searchParameters)
         .then((res) => {
@@ -548,18 +548,18 @@ export default (app) => ({
         .catch((err) => {
           console.error(err);
         });
-        return resultado;
+      return resultado;
     },
     reduceQuantity(store, detalleOrden) {
       Promise.all(detalleOrden.map((producto) => {
         const settings = {
-            method: 'PUT',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ cantidad: producto.cantidad }),
-            credentials: 'include',
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ cantidad: producto.cantidad }),
+          credentials: "include",
         };
         return fetch(`${app.config.globalProperties.$url}productos/_design/productHandler/_update/reduceQuantity/${producto._id}`, settings);
       }));

@@ -40,20 +40,20 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
-  name: 'EditUserPassword',
+  name: "EditUserPassword",
   data() {
     return {};
   },
   computed: {
-    ...mapState('usuarios', ['usuario']),
+    ...mapState("usuarios", ["usuario"]),
   },
   mounted() {},
   methods: {
-    ...mapMutations('usuarios', ['setModalEditShow']),
-    ...mapActions('usuarios', ['editRegistro']),
+    ...mapMutations("usuarios", ["setModalEditShow"]),
+    ...mapActions("usuarios", ["editRegistro"]),
   },
 };
 </script>

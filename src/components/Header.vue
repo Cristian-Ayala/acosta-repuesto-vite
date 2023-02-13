@@ -23,12 +23,12 @@
 
 <script>
 export default {
-  name: 'HeaderComp',
-  emits: ['toggleSideBar'],
+  name: "HeaderComp",
+  emits: ["toggleSideBar"],
   methods: {
     sidebarClass() {
-      const elementDOM = document.getElementsByClassName('sidebar')[0].classList;
-      elementDOM.toggle('d-none');
+      const elementDOM = document.getElementsByClassName("sidebar")[0].classList;
+      elementDOM.toggle("d-none");
     },
   },
 };

@@ -34,19 +34,19 @@
 </template>
 
 <script>
-import { mapMutations,mapState } from 'vuex';
+import { mapMutations,mapState } from "vuex";
 
 export default {
-  name: 'EditUser',
+  name: "EditUser",
   data() {
     return {};
   },
   computed: {
-      ...mapState('usuarios', ['showModalEdit']),
+    ...mapState("usuarios", ["showModalEdit"]),
   },
   mounted() {},
   methods: {
-    ...mapMutations('usuarios', ['setModalEditShow']),
+    ...mapMutations("usuarios", ["setModalEditShow"]),
   },
 };
 </script>

@@ -102,19 +102,19 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
 
 export default {
-  name: 'LeftSideBar',
+  name: "LeftSideBar",
   computed: {
-    ...mapState('usuarios', ['actualUser']),
+    ...mapState("usuarios", ["actualUser"]),
     userName() {
-      const username = window.localStorage.getItem('user_name');
+      const username = window.localStorage.getItem("user_name");
       return username || null;
     },
   },
   methods: {
-    ...mapActions('usuarios', ['logout']),
+    ...mapActions("usuarios", ["logout"]),
   },
 };
 </script>

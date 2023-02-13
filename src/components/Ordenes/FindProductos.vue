@@ -52,7 +52,7 @@
 // import { mapState, mapMutations } from "vuex";
 
 export default {
-  name: 'FindProductos',
+  name: "FindProductos",
   props: {
     prod: {
       type: Object,
@@ -71,30 +71,30 @@ export default {
       required: true,
     },
   },
-  emits: ['addTmpProducts', 'reCalculateSubTotal'],
+  emits: ["addTmpProducts", "reCalculateSubTotal"],
   data() {
     return {};
   },
   computed: {
     showQuantity () {
       return (
-        typeof this.ordenDetalleProductos !== 'undefined' &&
+        typeof this.ordenDetalleProductos !== "undefined" &&
         Object.hasOwnProperty.call(
           this.ordenDetalleProductos,
           this.prod.upc
         ) &&
         Object.hasOwnProperty.call(
           this.ordenDetalleProductos[this.prod.upc],
-          'cantidad'
+          "cantidad"
         ) &&
         this.ordenDetalleProductos[this.prod.upc].cantidad >= 1
       );
     },
   },
   watch: {
-    'prod.price': {
+    "prod.price": {
       handler () {
-        this.$emit('reCalculateSubTotal', this.index, this.prod);
+        this.$emit("reCalculateSubTotal", this.index, this.prod);
       },
     },
   },
@@ -118,15 +118,15 @@ export default {
         return;
       }
       switch (this.tipoDist) {
-      case 'Público':
+      case "Público":
         // eslint-disable-next-line
         this.prod.price = prod.precioPublico;
         break;
-      case 'Mayoreo':
+      case "Mayoreo":
         // eslint-disable-next-line
         this.prod.price = prod.precioMayoreo;
         break;
-      case 'Taller':
+      case "Taller":
         // eslint-disable-next-line
         this.prod.price = prod.precioTaller;
         break;
@@ -137,7 +137,7 @@ export default {
       }
     },
     changeQuantity(addOrSubstract = false) {
-      this.$emit('addTmpProducts', this.prod, this.index, addOrSubstract);
+      this.$emit("addTmpProducts", this.prod, this.index, addOrSubstract);
     }
   },
 };
