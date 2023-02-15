@@ -21,12 +21,14 @@
     "image-resize-compress": "^1.1.0",
     "pouchdb-browser": "^8.0.0",
     "pouchdb-find": "^8.0.0",
+    "register-service-worker": "^1.7.2",
     "unplugin-auto-import": "^0.12.1",
     "unplugin-vue-components": "^0.22.12",
     "vite": "^4.0.4",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "workbox-precaching": "^6.5.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
@@ -40,6 +42,6 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.9.0",
-    "vite-plugin-pwa": "^0.14.1"
+    "vite-plugin-pwa": "^0.14.4"
   }
 }

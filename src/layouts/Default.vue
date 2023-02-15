@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <!-- <InstallPrompt /> -->
+    <reload-p-w-a />
     <!-- eslint-disable vue/v-on-event-hyphenation -->
     <header-comp @toggleSideBar="isLeftSideBar = !isLeftSideBar" ></header-comp>
     <div class="d-flex align-items-stretch">
@@ -23,6 +24,7 @@
 import { mapActions } from "vuex";
 import HeaderComp from "@/components/Header.vue";
 import LeftSideBar from "@/components/Left-SideBar.vue";
+import ReloadPWA from "@/components/ReloadPWA.vue";
 // import InstallPrompt from "@/components/InstallPrompt.vue";
 
 export default {
@@ -30,6 +32,7 @@ export default {
   components: {
     HeaderComp,
     LeftSideBar,
+    ReloadPWA,
     // InstallPrompt,
   },
   data() {

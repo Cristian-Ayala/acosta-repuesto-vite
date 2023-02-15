@@ -40,7 +40,7 @@ export default defineConfig({
         theme_color: "#e94c63",
         start_url: "/",
         display: "fullscreen",
-        background_color: "#000000",
+        background_color: "#e94c63",
         icons: [
           {
             src: "img/192x192.png",
@@ -49,7 +49,7 @@ export default defineConfig({
             purpose: "any",
           },
           {
-            src: "img/maskable_192x192.png",
+            src: "img/192x192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "maskable",
@@ -61,7 +61,7 @@ export default defineConfig({
             purpose: "any",
           },
           {
-            src: "img/maskable_512x512.png",
+            src: "img/512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
