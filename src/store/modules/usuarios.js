@@ -1,26 +1,18 @@
-import axios from "axios";
+import isLoggedIn from "../../router/middleware/auth";
 
-import PouchDB from "pouchdb-browser";
-import router from "../../router/index";
-// PouchDB.plugin(require('pouchdb-authentication').default);
-const axios1 = axios.create({
-  withCredentials: true,
+const rejectPromise = (message) => new Promise((resolve, reject) => {
+  reject(new Error(message));
 });
-let remoteUsuarios;
-const remotedb = async (url) => {
-  remoteUsuarios = await new PouchDB(`${url}marcas`, {
-    skip_setup: true,
-  });
-};
-export default () => ({
+
+export default (app) => ({
   namespaced: true,
   state: {
     localUsuarios: null,
-    PouchDB,
     usuario: {},
     usuarios: [],
     showModalEdit: false,
     actualUser: {},
+    users: null,
   },
   mutations: {
     clearData(state) {
@@ -52,171 +44,45 @@ export default () => ({
     },
   },
   actions: {
-    createRegistro({ state, dispatch, commit }) {
-      remoteUsuarios
-        .signUp(state.usuario.nickname, state.usuario.password)
-        .then(() => {
-          dispatch("getAll").then(() =>
-            commit("successNotification", {
-              message: "Usuario creado con éxito",
-              tittle: "EXITO",
-              duration: 4000,
-            }),
-          );
-        })
-        .catch((err) => {
-          console.log(JSON.stringify(err));
-          let mensaje = "";
-          if (err.error === "conflict") {
-            mensaje = "El usuario ya existe.";
-          } else if (err.error === "forbidden") {
-            mensaje = "Existen caracteres que no son válidos en el usuario.";
-          }
-
-          commit("alertNotification", {
-            message: `Error al crear usuario<br>${  mensaje}`,
-            duration: 4000,
-          });
-        });
+    createRegistro() {
     },
-    getAll({ state }) {
-      axios1({
-        method: "GET",
-        url: `${this.$url  }_users/_all_docs`,
-      })
-        .then((res) => {
-          if (res.status === 200) {
-            const rows = res.data.rows || [];
-            state.usuarios = rows.filter((usr) => usr.id.includes("org"));
-          }
-        })
-        .catch((error) => {
-          console.error(JSON.stringify(error));
-        });
-    },
-    editRegistro({ state, commit, dispatch }) {
-      if (state.usuario.password) {
-        remoteUsuarios
-          .changePassword(
-            state.usuario.id.substring(17),
-            state.usuario.password,
-          )
-          .then((res) => {
-            console.log(JSON.stringify(res));
-            commit("clearData");
-            dispatch("getAll").then(() =>
-              commit("successNotification", {
-                message: "Contraseña modificada con éxito",
-                tittle: "EXITO",
-                duration: 4000,
-              }),
-            );
-          })
-          .catch((err) => {
-            console.log(JSON.stringify(err));
-            let mensajeError = "";
-            if (err.name === "not_found") {
-              // typo, or you don't have the privileges to see this user
-              mensajeError =
-                  "Contraseña no valida o no tiene permisos de edición.";
-            } else {
-              // some other error
-              mensajeError = JSON.stringify(err);
-            }
-            commit("alertNotification", {
-              message: `Error al editar la contraseña<br>${  mensajeError}`,
-              duration: 4000,
-            });
-          });
-      } else {
-        remoteUsuarios
-          .changeUsername(
-            state.usuario.id.substring(17),
-            state.usuario.nombre,
-          )
-          .then((res) => {
-            console.log(JSON.stringify(res));
-            commit("clearData");
-            dispatch("getAll").then(() =>
-              commit("successNotification", {
-                message: "Nombre de usuario editado con éxito",
-                tittle: "EXITO",
-                duration: 4000,
-              }),
-            );
-          })
-          .catch((err) => {
-            console.log(JSON.stringify(err));
-            let mensajeError = "";
-            if (err.name === "not_found") {
-              // typo, or you don't have the privileges to see this user
-              mensajeError =
-                  "Nombre de usuario no valido o no tiene permisos de edición.";
-            } else if (err.taken) {
-              // auth error, make sure that 'batman' isn't already in DB
-              mensajeError = "Asegurese que el usuario sea único.";
-            } else {
-              // some other error
-              mensajeError = JSON.stringify(err);
-            }
-            commit("alertNotification", {
-              message:
-                  `Error al editar el nombre de usuario<br>${  mensajeError}`,
-              duration: 4000,
-            });
-          });
+    async getAllUsuarios() {
+      if (!isLoggedIn()) {
+        rejectPromise("No está logueado");
+        return null;
       }
+      const role = localStorage.getItem("role");
+      if (role !== "general_manager" && role !== "manager") {
+        rejectPromise("No tiene permitido ver las estadísticas de todos los usuarios, solo podrá ver las suyas");
+        return null;
+      }
+      const settings = {
+        method: "GET",
+        credentials: "include",
+      };
+      let findOrAllDocs = "_all_docs";
+      if (role === "manager") {
+        settings.method = "POST";
+        findOrAllDocs = "_find";
+        settings.headers = {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        };
+        settings.body = JSON.stringify({ selector: { organization_unit: localStorage.getItem("org_division"), "roles": { "$in": ["member"]} } });
+      }
+      const response = await fetch(`${app.config.globalProperties.$url}users/${findOrAllDocs}?include_docs=true`, settings);
+      const res = await response.json();
+      if (res.rows != null) this.users = res.rows.map(user => user.doc);
+      else if (res.docs != null) this.users = res.docs;
+      else this.users = null;
+      return this.users;
     },
-    removeRegistro({ state, commit, dispatch }) {
-      remoteUsuarios
-        .deleteUser(state.usuario.id.substring(17))
-        .then((res) => {
-          console.log(JSON.stringify(res));
-          commit("clearData");
-          dispatch("getAll").then(() =>
-            commit("successNotification", {
-              message: "Nombre de usuario eliminado con éxito",
-              tittle: "EXITO",
-              duration: 4000,
-            }),
-          );
-        })
-        .catch((err) => {
-          commit("alertNotification", {
-            message: `Error al eliminar el usuario<br>${  JSON.stringify(err)}`,
-            duration: 4000,
-          });
-        });
+    editRegistro() {
     },
-    initDBUsuarios({ state, dispatch }) {
-      // Se agrega el nombre de la DB ("marca") en la función del inicio por eso no se pasa acá
-      remotedb(this.$url)
-        .then(() => {
-          remoteUsuarios
-            .getSession()
-            .then((response) => {
-              if (response.userCtx.name) {
-                state.actualUser.user = response.userCtx.name;
-                state.actualUser.roles = response.userCtx.roles;
-                if (state.actualUser.roles && state.actualUser.roles.length) {
-                  dispatch("getAll");
-                }
-              } else {
-                throw new Error(JSON.stringify("No hay usuario"));
-              }
-            })
-            .catch(() => {
-              // console.log("No hay sesión");
-              router
-                .push({
-                  path: "/login",
-                })
-                .catch(() => {});
-            });
-        })
-        .catch(console.log);
+    removeRegistro() {
     },
     logout() {
+      localStorage.removeItem("org_division");
       return fetch(`${import.meta.env.VITE_BACKEND_URL}_session`, { method: "DELETE", credentials: "include" });
     },
   },
