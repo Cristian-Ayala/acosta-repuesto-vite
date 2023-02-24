@@ -4,6 +4,7 @@ import productos from "./modules/productos";
 import marcas from "./modules/marcas";
 import ordenes from "./modules/ordenes";
 import usuarios from "./modules/usuarios";
+import estadisticas from "./modules/estadisticas";
 
 // eslint-disable-next-line import/prefer-default-export
 export const createStore = (app) => createVuexStore({
@@ -13,5 +14,6 @@ export const createStore = (app) => createVuexStore({
     marcas: marcas(app),
     ordenes: ordenes(app),
     usuarios: usuarios(app),
+    estadisticas: estadisticas(app),
   },
 });

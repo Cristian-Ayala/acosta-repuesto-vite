@@ -66,14 +66,14 @@
       </router-link>
       <router-link
         v-slot="{ href, navigate, isExactActive }"
-        to="/actualizar"
+        to="/estadisticas"
         custom
       >
         <a
           :href="href" class="sidebar-link text-muted sidebar-list-item" :class="{ 'active': isExactActive }"
           @click="navigate()">
-          <i class="fa fa-upload mr-3 text-gray my-2" aria-hidden="true"></i>
-          <span>Actualizar</span>
+          <i class="fas fa-chart-bar text-gray my-2" aria-hidden="true"></i>
+          <span>Estadísticas</span>
         </a>
       </router-link>
       <router-link
