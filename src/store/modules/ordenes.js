@@ -72,7 +72,6 @@ export default (app) => ({
           upc: obj.upc,
           cantidadProd: obj.cantidad,
           descuento: obj.descuento,
-          stockProd: obj.stockProd,
         };
         return objet;
       });
@@ -155,6 +154,8 @@ export default (app) => ({
       if (!isLoggedIn()) return;
       // eslint-disable-next-line no-param-reassign
       orden.creation_user = localStorage.getItem("user_name");
+      // eslint-disable-next-line no-param-reassign
+      orden.organization_division = localStorage.getItem("org_division");
       await state.localOrdenes
         .put(orden)
         .then(() => {

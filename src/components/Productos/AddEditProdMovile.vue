@@ -109,10 +109,10 @@
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Categoria</label>
           <div v-if="newProductMobile.doc" class="col-md-9">
-            <el-select 
-              v-model="newProductMobile.doc.nombreCategoria" 
-              class="m-2" 
-              placeholder="Seleccione una categoria" 
+            <el-select
+              v-model="newProductMobile.doc.nombreCategoria"
+              class="m-2"
+              placeholder="Seleccione una categoria"
               size="large"
             >
               <el-option
@@ -172,12 +172,23 @@
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
-        <div class="form-group row">
+        <div v-if="organizationDivision === 'Santa-Ana'" class="form-group row">
           <label class="col-md-3 form-control-label">Stock:</label>
           <div v-if="newProductMobile.doc" class="col-md-9">
             <el-input-number
               id="decrementIncrement"
-              v-model="newProductMobile.doc.stockProd"
+              v-model="newProductMobile.doc.stockProdStaAna"
+              :min="0"
+              :max="1000000"/>
+          </div>
+        </div>
+        <!-- ------------------------------------------ -->
+        <div v-if="organizationDivision === 'Metapan'" class="form-group row">
+          <label class="col-md-3 form-control-label">Stock:</label>
+          <div v-if="newProductMobile.doc" class="col-md-9">
+            <el-input-number
+              id="decrementIncrement"
+              v-model="newProductMobile.doc.stockProdMetapan"
               :min="0"
               :max="1000000"/>
           </div>
@@ -243,6 +254,7 @@ export default {
         modalAgregarCat: false,
         modalUPCBarcode: false,
       },
+      organizationDivision: "",
     };
   },
   computed: {
@@ -279,6 +291,7 @@ export default {
     // },
   },
   mounted() {
+    this.organizationDivision = localStorage.getItem("org_division");
     this.modalIsActive();
   },
   methods: {

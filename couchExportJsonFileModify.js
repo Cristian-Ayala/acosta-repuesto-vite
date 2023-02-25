@@ -11,9 +11,7 @@ console.log("\n *START transformation* \n");
 
 const newDocs = docs.map((doc) => {
   const innerdoc = doc.doc;
-  if (innerdoc.stockProd) innerdoc.stockProd = parseInt(innerdoc.stockProd, 10);
   delete innerdoc._rev;
-  delete innerdoc.activoProd;
   return innerdoc;
 });
 
