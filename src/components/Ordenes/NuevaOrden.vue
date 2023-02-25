@@ -105,6 +105,7 @@
                 :index="index"
                 :orden-detalle-productos="ordenDetalleProductos"
                 :tipo-dist="tipoDistribucion.selected"
+                :user-organization="userOrganization"
                 @addTmpProducts="addTmpProducts"
                 @reCalculateSubTotal="reCalculateSubTotal"
               ></find-productos>
@@ -269,6 +270,7 @@ function initialState() {
     },
     findProductos: null,
     searchTimeout: null,
+    userOrganization: null,
   };
 }
 
@@ -313,6 +315,7 @@ export default {
     },
   },
   mounted() {
+    this.userOrganization = localStorage.getItem("org_division");
     this.date = todayDate();
     this.modalIsActive();
   },
@@ -372,7 +375,16 @@ export default {
         prod = this.ordenDetalleProductos[product.upc];
         if (add) {
           // check if quantity is in stock range
-          if (prod.cantidad <= prod.stockProd) prod.cantidad += 1;
+          switch (localStorage.getItem("org_division")) {
+          case "Santa-Ana":
+            if (prod.cantidad <= prod.stockProdStaAna) prod.cantidad += 1;
+            break;
+          case "Metapan":
+            if (prod.cantidad <= prod.stockProdMetapan) prod.cantidad += 1;
+            break;
+          default:
+            break;
+          }
         } else if (prod.cantidad >= 1) prod.cantidad -= 1;
         prod.subtotal = twoDecimalsOnly(prod.cantidad * prod.price);
       } else {

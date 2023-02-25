@@ -20,7 +20,8 @@ export default (app) => ({
     producto: {
       nombreProd: "",
       activoProd: true,
-      stockProd: null,
+      stockProdStaAna: null,
+      stockProdMetapan: null,
       upc: null,
       nombreMarca: "",
       nombreCategoria: "",
@@ -66,7 +67,8 @@ export default (app) => ({
           doc: {
             nombreProd: "",
             activoProd: true,
-            stockProd: 0,
+            stockProdStaAna: 0,
+            stockProdMetapan: 0,
             upc: "",
             nombreMarca: "",
             nombreCategoria: "",
@@ -181,7 +183,7 @@ export default (app) => ({
     },
     readProducto({ state, dispatch }) {
       if (state.filtroUPC.trim() !== "") dispatch("readProductsUPC");
-      else if (state.filtroCategorias.length > 0 || state.filtroMarcas.length > 0) dispatch("readProductoCategoriaMarcaNombre");
+      else if (state.filtroCategorias.length > 0 || state.filtroMarcas.length > 0 || (typeof(state.filtroNombre) === "string" && state.filtroNombre.trim() !== "")) dispatch("readProductoCategoriaMarcaNombre");
       else dispatch("readAllProducts");
     },
     async updateProducto({ state, commit, dispatch }, producto) {
@@ -361,7 +363,7 @@ export default (app) => ({
       };
       if (state.filtroNombre) {
         selector.nombreProd = {
-          $regex: RegExp(state.filtroNombre, "i"),
+          $regex: RegExp(regexSearch(state.filtroNombre), "i"),
         };
       }
       if (state.filtroMarcas.length > 0) {
@@ -551,6 +553,7 @@ export default (app) => ({
       return resultado;
     },
     reduceQuantity(store, detalleOrden) {
+      const organizationDivision = localStorage.getItem("org_division");
       Promise.all(detalleOrden.map((producto) => {
         const settings = {
           method: "PUT",
@@ -558,7 +561,7 @@ export default (app) => ({
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ cantidad: producto.cantidad }),
+          body: JSON.stringify({ cantidad: producto.cantidad, organization_division: organizationDivision }),
           credentials: "include",
         };
         return fetch(`${app.config.globalProperties.$url}productos/_design/productHandler/_update/reduceQuantity/${producto._id}`, settings);
