@@ -39,7 +39,7 @@
             </el-row>
           </el-radio-group>
         </div>
-        Stock: {{ prod.stockProd }}
+        Stock: {{ getStock }}
         <div v-if="showQuantity">
           <p>Subtotal: ${{ ordenDetalleProductos[prod.upc].subtotal }}</p>
         </div>
@@ -70,6 +70,10 @@ export default {
       type: Number,
       required: true,
     },
+    userOrganization: {
+      type: String,
+      default: ""
+    },
   },
   emits: ["addTmpProducts", "reCalculateSubTotal"],
   data() {
@@ -89,6 +93,17 @@ export default {
         ) &&
         this.ordenDetalleProductos[this.prod.upc].cantidad >= 1
       );
+    },
+    getStock() {
+      switch (this.userOrganization) {
+      case "Santa-Ana":
+        return this.prod.stockProdStaAna;
+      case "Metapan":
+        return this.prod.stockProdMetapan;
+      default:
+        window.console.warning("No se encontró la división");
+        return 0;
+      }
     },
   },
   watch: {

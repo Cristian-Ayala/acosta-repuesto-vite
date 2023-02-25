@@ -57,7 +57,7 @@
                     >P.T.: <br>${{ prod.doc.precioTaller }}</span
                     >
                   </div>
-                  Stock: {{ prod.doc.stockProd }}<br>
+                  Stock: {{ getStock(prod.doc) }}<br>
                   Marca: {{ prod.doc.nombreMarca }}<br>
                   Categoria: {{ prod.doc.nombreCategoria }}<br>
                 </div>
@@ -130,6 +130,7 @@ export default {
         modalFiltros: false,
         deleteProduc: false,
       },
+      userOrganization: null,
     };
   },
   computed: {
@@ -184,6 +185,9 @@ export default {
     //   immediate: true,
     // },
   },
+  created() {
+    this.userOrganization = localStorage.getItem("org_division");
+  },
   methods: {
     ...mapMutations("productos", [
       "clearData",
@@ -215,6 +219,17 @@ export default {
       this.prodSelected({});
       this.title = "Agregar producto";
       this.show.addEditProdMovile = true;
+    },
+    getStock(prod) {
+      switch (this.userOrganization) {
+      case "Santa-Ana":
+        return prod.stockProdStaAna;
+      case "Metapan":
+        return prod.stockProdMetapan;
+      default:
+        window.console.warning("No se encontró la división");
+        return 0;
+      }
     },
   },
 };
