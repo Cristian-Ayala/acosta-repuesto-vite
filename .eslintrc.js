@@ -490,4 +490,13 @@ module.exports = {
     //   https://eslint.org/docs/rules/template-curly-spacing
     "vue/template-curly-spacing": "error",
   },
+  overrides: [
+    {
+      files: ["*.html"],
+      rules: {
+        "vue/comment-directive": "off",
+        "max-len": "off",
+      }
+    }
+  ]
 };
