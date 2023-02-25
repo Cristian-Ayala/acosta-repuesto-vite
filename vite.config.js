@@ -30,7 +30,7 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
       },
       manifest: {
-        id: "1.0.0",
+        id: "2.0.0",
         version: "1.0.0",
         manifest_version: 1,
         name: "Acosta Repuestos",
@@ -39,7 +39,7 @@ export default defineConfig({
         description: "Manage inventory and catalogs",
         theme_color: "#e94c63",
         start_url: "/",
-        display: "fullscreen",
+        display: "standalone",
         background_color: "#e94c63",
         icons: [
           {
@@ -49,7 +49,7 @@ export default defineConfig({
             purpose: "any",
           },
           {
-            src: "img/192x192.png",
+            src: "img/maskable_icon_x192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "maskable",
@@ -61,7 +61,7 @@ export default defineConfig({
             purpose: "any",
           },
           {
-            src: "img/512x512.png",
+            src: "img/maskable_icon_x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
