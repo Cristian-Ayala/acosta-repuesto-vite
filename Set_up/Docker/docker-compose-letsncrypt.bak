@@ -1,0 +1,86 @@
+version: '3'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs:ro
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+    networks:
+      nginx_network:
+        aliases:
+         - nginxProxy
+
+  letsencrypt:
+    image: nginxproxy/acme-companion
+    restart: always
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      nginx_network:
+        aliases:
+         - letsencrypt
+
+  nginxCouchdb:
+    image: nginx
+    restart: always
+    expose:
+      - "80"
+    volumes:
+      - /docker/nginx/conf/:/etc/nginx/conf.d/:rw
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST_MAIN}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST_MAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_MAIN}
+    depends_on:
+      - nginx-proxy
+      - letsencrypt
+      - couchdb
+    networks:
+      nginx_network:
+        aliases:
+         - nginx
+
+  couchdb:
+    image: couchdb
+    restart: always
+    expose:
+      - "5984"
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+    volumes:
+      - /docker/couchdb/etc:/opt/couchdb/etc/local.d
+      - /docker/couchdb/databases/mainCouchdb/docker:/opt/couchdb/data/:rw
+    networks:
+      nginx_network:
+        aliases:
+         - couchdb
+
+volumes:
+  certs:
+  html:
+  vhostd:
+  couchdbVol:
+  acme:
+
+networks:
+  nginx_network:
+    name: nginx_net
+    driver: bridge
+    ipam:
+      driver: default

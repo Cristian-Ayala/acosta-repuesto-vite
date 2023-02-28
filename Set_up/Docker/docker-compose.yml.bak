@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  webserver:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /docker/nginx/conf/:/etc/nginx/conf.d/:rw
+      - /docker/certbot/certificates:/usr/share/nginx/certificates:ro
+    networks:
+      nginx_network:
+        aliases:
+         - nginx
+    depends_on:
+        - couchdb
+
+  couchdb:
+      image: couchdb
+      restart: always
+      expose:
+        - "5984"
+      environment:
+        - COUCHDB_USER=${COUCHDB_USER}
+        - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+      volumes:
+        - /docker/couchdb/etc:/opt/couchdb/etc/local.d
+        - /docker/couchdb/databases/mainCouchdb/docker:/opt/couchdb/data/:rw
+      networks:
+        nginx_network:
+          aliases:
+          - couchdb
+
+
+volumes:
+  couchdbVol:
+
+networks:
+  nginx_network:
+    name: nginx_net
+    driver: bridge
+    ipam:
+      driver: default
