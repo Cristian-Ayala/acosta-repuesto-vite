@@ -155,27 +155,8 @@ export default (app) => ({
               live: true,
               retry: true,
             })
-            .on("change", (change) => {
-              console.log("yo, something changed!", change);
+            .on("change", () => {
               dispatch("getAllCategorias");
-            })
-            .on("paused", (info) => {
-              console.log(
-                "replication was paused, usually because of a lost connection",
-                info,
-              );
-            })
-            .on("active", (info) => {
-              console.log("replication was resumed", info);
-            })
-            .on("denied", (err) => {
-              console.log(
-                "a document failed to replicate (e.g. due to permissions)",
-                err,
-              );
-            })
-            .on("complete", (info) => {
-              console.log("Completado", info);
             })
             .on("error", (err) => {
               console.log("totally unhandled error (shouldn't happen)", err);

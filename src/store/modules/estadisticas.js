@@ -18,7 +18,9 @@ export default (app) => ({
         method: "GET",
         credentials: "include",
       };
-      if (searchParameters.userSelected === "Todos" && localStorage.getItem("role") !== "manager") return dispatch("getStatisticsByOrgDiv", { searchParameters, settings });
+      const role = localStorage.getItem("role");
+      if (searchParameters.userSelected === "Todos" && role === "manager") return dispatch("getStatisticsByOrgDiv", { searchParameters, settings });
+      if (searchParameters.typeOfFilter === "Por cede") return dispatch("getStatisticsByOrgDiv", { searchParameters, settings });
       return dispatch("getStatisticsByUser", { searchParameters, settings });
     },
     getStatisticsByUser(store, {searchParameters, settings}) {

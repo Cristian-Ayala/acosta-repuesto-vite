@@ -96,7 +96,7 @@
       @click="logout()"
     >
       <i class="fas fa-door-open mr-3 text-black my-2" aria-hidden="true"></i>
-      <span v-if="actualUser">Salir {{ userName }}</span>
+      <span v-if="actualUser">Salir <br>{{ userName }}</span>
     </a>
   </div>
 </template>
