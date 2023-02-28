@@ -16,7 +16,7 @@
     <div class="cuadros-home">
       <div class="cuadro1-home">
         <router-link to="/productos">
-          <img src="../assets/img/motul.webp" alt="..." style="max-width: 100%" >
+          <img src="../assets/img/1.webp" alt="..." style="max-width: 100%" >
           <div
             class="font-weight-bold d-block"
             style="margin: 1rem; font-size: 2.5rem"
@@ -68,6 +68,18 @@
             Ordenes
           </div>
           <div class="cuadros-text-home">Eliminar, agregar o listar</div>
+        </router-link>
+      </div>
+      <div class="cuadro5-home">
+        <router-link to="/estadisticas">
+          <img src="../assets/img/5.webp" alt="..." style="max-width: 100%" >
+          <div
+            class="font-weight-bold d-block"
+            style="margin: 1rem; font-size: 2.5rem"
+          >
+            Estadisticas
+          </div>
+          <div class="cuadros-text-home">Ver estadísticas de venta</div>
         </router-link>
       </div>
     </div>

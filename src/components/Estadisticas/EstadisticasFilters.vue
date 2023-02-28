@@ -62,6 +62,21 @@
             value="Todos"
           />
           <el-option
+            v-if="user.role === 'manager'"
+            :label="user.name"
+            :value="user.name"
+          >
+            <span style="float: left">{{ user.name }}</span>
+            <span
+              style="
+                float: right;
+                color: var(--el-text-color-secondary);
+                font-size: 13px;
+              "
+            >{{ user.orgDiv }}</span
+            >
+          </el-option>
+          <el-option
             v-for="item in users"
             :key="item._id"
             :label="item.name"
@@ -122,6 +137,11 @@ function initialState() {
       orgDivSelected: null,
     },
     users: null,
+    user: {
+      name: null,
+      role: null,
+      orgDiv: null,
+    },
   };
 }
 
@@ -161,6 +181,9 @@ export default {
     this.users = await this.getAllUsuarios();
     if (this.users == null) this.filters.userSelected = localStorage.getItem("user_name");
     this.filters.orgDivSelected = localStorage.getItem("org_division");
+    this.user.name = localStorage.getItem("user_name");
+    this.user.role = localStorage.getItem("role");
+    this.user.orgDiv = localStorage.getItem("org_division");
   },
   methods: {
     ...mapActions("usuarios", ["getAllUsuarios"]),
