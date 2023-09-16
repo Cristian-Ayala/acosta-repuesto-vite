@@ -1,7 +1,8 @@
 import { ElMessage } from "element-plus";
 import PouchDB from "pouchdb-browser";
-import router from "../../router/index";
-import isLoggedIn from "../../router/middleware/auth";
+import router from "../../router/routes/index";
+
+const isLoggedIn = () => false;
 
 function dateFilterSelector(dates = {}) {
   const selector = {};

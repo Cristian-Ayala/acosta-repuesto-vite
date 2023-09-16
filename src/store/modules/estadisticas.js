@@ -1,6 +1,6 @@
 // import { ElMessage } from "element-plus";
 // import router from "../../router/index";
-import isLoggedIn from "../../router/middleware/auth";
+const isLoggedIn = () => false;
 
 const rejectPromise = (message) => new Promise((resolve, reject) => {
   reject(new Error(message));

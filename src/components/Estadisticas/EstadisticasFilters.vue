@@ -118,8 +118,6 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
-
 function initialState() {
   return {
     dateType: "Por día",
@@ -178,7 +176,6 @@ export default {
     },
   },
   async created() {
-    this.users = await this.getAllUsuarios();
     if (this.users == null) this.filters.userSelected = localStorage.getItem("user_name");
     this.filters.orgDivSelected = localStorage.getItem("org_division");
     this.user.name = localStorage.getItem("user_name");
@@ -186,7 +183,6 @@ export default {
     this.user.orgDiv = localStorage.getItem("org_division");
   },
   methods: {
-    ...mapActions("usuarios", ["getAllUsuarios"]),
     disabledStartDate(time) {
       return time.getTime() > Date.now();
     },

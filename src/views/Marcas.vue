@@ -32,7 +32,7 @@
                 type="search"
                 placeholder="Buscar marca..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
-              >
+              />
             </div>
             <table class="table card-text table-hover">
               <thead>
@@ -44,34 +44,29 @@
                 </tr>
               </thead>
               <tbody v-if="marcas">
-                <tr
-                  v-for="(mar, index) in marcas"
-                  v-show="filtro(index)"
-                  :key="mar.doc.nombreMarca"
-                >
-                  <th scope="row" class="onlyOnWeb">{{ index + 1 }}</th>
-                  <td>{{ mar.doc.nombreMarca }}</td>
-                  <td class="onlyOnWeb">{{ mar.doc.descripMarca }}</td>
+                <tr v-for="(mar, index) in marcas" :key="index">
+                  <td>{{ mar.nombre_marca }}</td>
+                  <td class="onlyOnWeb">{{ mar.descripcion_marca }}</td>
                   <td>
                     <el-button
                       type="danger"
                       circle
                       @click="
-                        getMarcaSelected(mar);
+                        setMarcaSelected(mar);
                         show.modalEliminarMar = true;
                       "
                     >
-                      <i class="fas fa-times" aria-hidden="true" ></i>
+                      <i class="fas fa-times" aria-hidden="true"></i>
                     </el-button>
                     <el-button
                       type="warning"
                       circle
                       @click="
-                        getMarcaSelected(mar);
-                        show.modalEditarMar = true;
+                        setMarcaSelected(mar);
+                        show.modalAgregarMar = true;
                       "
                     >
-                      <i class="fas fa-pencil-alt" aria-hidden="true" ></i>
+                      <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                     </el-button>
                   </td>
                 </tr>
@@ -81,48 +76,61 @@
           </div>
         </div>
       </div>
-      <agregar-mar :show="show"></agregar-mar>
-      <delete-mar :show="show"></delete-mar>
-      <edit-mar :show="show"></edit-mar>
+      <agregar-mar
+        :show="show"
+        :marca-prop="marcaSelected"
+        @clear-marca-selected="() => (marcaSelected = {})"
+      ></agregar-mar>
+      <delete-mar
+        :show="show"
+        :marca-prop="marcaSelected"
+        @clear-marca-selected="() => (marcaSelected = {})"
+      ></delete-mar>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex";
-import AgregarMar from "@/components/Marcas/AgregarMar.vue";
-import DeleteMar from "@/components/Marcas/DeleteMar.vue";
-import EditMar from "@/components/Marcas/EditMar.vue";
 
+// TODO: Filtrar las marcas
+// TODO: Paginacion
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Marcas",
   components: {
-    AgregarMar,
-    DeleteMar,
-    EditMar,
+    AgregarMar: () => import("@/components/Marcas/AgregarMar.vue"),
+    // DeleteMar: () => import("@/components/Marcas/DeleteMar.vue"),
   },
   data: () => ({
     displayOption: "",
     searchDisplay: "",
     show: {
       modalAgregarMar: false,
-      modalEditarMar: false,
       modalEliminarMar: false,
     },
+    marcaSelected: {},
   }),
   computed: {
     ...mapState("marcas", ["marcas", "marca"]),
   },
+  mounted() {
+    this.$store.dispatch("marcas/getAll");
+  },
   methods: {
-    ...mapMutations("marcas", ["clearData", "getMarcaSelected"]),
-    filtro(index) {
-      if (this.searchDisplay === "") return true;
-      const marcaBusqueda = (
-        this.marcas[index].doc.nombreMarca + this.marcas[index].doc.descripMarca
-      ).toUpperCase();
-      return marcaBusqueda.indexOf(this.searchDisplay.toUpperCase()) >= 0;
+    ...mapMutations("marcas", ["clearData"]),
+    setMarcaSelected(marca) {
+      const tmpMarca = JSON.parse(JSON.stringify(marca));
+      delete tmpMarca.__typename;
+      this.marcaSelected = tmpMarca;
     },
+    // filtro(index) {
+    //   if (this.searchDisplay === "") return true;
+    //   const marcaBusqueda = (
+    //     this.marcas[index].doc.nombreMarca + this.marcas[index].doc.descripMarca
+    //   ).toUpperCase();
+    //   return marcaBusqueda.indexOf(this.searchDisplay.toUpperCase()) >= 0;
+    // },
   },
 };
 </script>

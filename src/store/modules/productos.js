@@ -1,7 +1,7 @@
 import { ElMessage } from "element-plus";
 import PouchDB from "pouchdb-browser";
 import PouchDBFind from "pouchdb-find";
-import router from "../../router/index";
+import router from "../../router/routes/index";
 // import PouchDBQuickSearch from 'pouchdb-quick-search';
 PouchDB.plugin(PouchDBFind);
 // PouchDB.plugin(PouchDBQuickSearch);

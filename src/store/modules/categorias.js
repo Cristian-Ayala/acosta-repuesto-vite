@@ -1,6 +1,6 @@
 import { ElMessage } from "element-plus";
 import PouchDB from "pouchdb-browser";
-import router from "../../router/index";
+import router from "../../router/routes/index";
 
 export default (app) => ({
   namespaced: true,
