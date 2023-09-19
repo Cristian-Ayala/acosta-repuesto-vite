@@ -2,7 +2,7 @@ import { apolloClient } from "@/plugins/vue-apollo";
 import { GET_CATEGORIAS } from "@/store/graphql/queries/categorias";
 import {
   CREATE_UPDATE_CATEGORIA,
-  // DELETE_CATEGORIA,
+  DELETE_CATEGORIA,
 } from "@/store/graphql/mutations/categorias";
 
 export default () => ({
@@ -10,98 +10,108 @@ export default () => ({
   state: {
     categorias: [],
     categoriasCount: 0,
-    categoria: {
-      nombreCategoria: "",
-      descripcion: "",
-    },
-    catSelected: {},
-    localCategorias: null,
+    loadingTableCategoria: false,
+    variables: {},
   },
   mutations: {},
   actions: {
-    async createUpdateRegistro({ commit, dispatch }, variables) {
+    async createCategory({ commit, dispatch }, variables) {
       try {
-        if (variables.marca.nombre_marca === "")
-          throw new Error(
-            "Por favor, introduce un nombre para la marca. (DO NOT REPORT THIS ERROR)",
-          );
         const insertMutation = {
           mutation: CREATE_UPDATE_CATEGORIA,
           variables,
         };
         const res = await apolloClient.mutate(insertMutation);
-        if (!res || res.error)
-          throw new Error("al crear la marca.\n", res.error);
-        dispatch("getAll");
-        if (variables.marca.id) {
-          commit("common/successNotification", "Categoria editada con éxito", { root: true });
-        } else {
-          commit("common/successNotification", "Categoria agregada con éxito", { root: true });
-        }
-        return res.data?.create_marca?.returning[0]?.id;
+        if (!res || res.errors)
+          throw new Error("al crear la categoria.\n", res.errors);
+        dispatch("getCategorias");
+        commit("common/successNotification", "Categoria agregada con éxito", {
+          root: true,
+        });
+        return res.data?.insert_acostarep_categorias?.affected_rows;
       } catch (error) {
-        if (variables.marca.id) {
-          commit("common/errorNotification", `Error al editar la marca. ${error}`, { root: true });
-        } else if (error.message.includes("introduce un nombre")) {
-          commit(
-            "common/errorNotification",
-            "Por favor, introduce un nombre para la marca"
-            , { root: true }
-          );
-        } else {
-          commit("common/errorNotification", `Error al crear la marca. ${error}`, { root: true });
-        }
-        window.console.log("Error in createRegistro (Marcas):", error);
+        commit(
+          "common/errorNotification",
+          `Error al crear la marca. ${error}`,
+          { root: true },
+        );
+        window.console.error("Error in createRegistro (Categorias):", error);
         return null;
       }
     },
     async getCategorias({ state, commit }, variables) {
       try {
+        if (variables != null && Object.keys(variables).length > 0) state.variables = variables;
+        state.loadingTableCategoria = true;
         const searchInfo = {
           query: GET_CATEGORIAS,
           fetchPolicy: "network-only",
-          variables,
+          variables: state.variables,
         };
         const result = await apolloClient.query(searchInfo);
         if (result && result.data) {
           state.categorias = result.data.categorias;
           state.categoriasCount = result.data.totalRows.aggregate.count;
         }
+        state.loadingTableCategoria = false;
       } catch (err) {
         window.console.error(err);
-        commit("common/errorNotification", `Error al listar categorias. ${err}`, { root: true });
+        commit(
+          "common/errorNotification",
+          `Error al listar categorias. ${err}`,
+          { root: true },
+        );
+        state.loadingTableCategoria = false;
       }
     },
-    edithRegistro({ state, commit, dispatch }) {
-      const catDoc = state.catSelected.doc;
-      catDoc.nombreCategoria = catDoc.nombreCategoria.trim().toLocaleUpperCase();
-      if (catDoc.nombreCategoria === "") return;
-      state.localCategorias
-        .put(catDoc)
-        .then(() => {
-          dispatch("getAllCategorias").then(() =>
-            commit("common/successNotification", "Categoria editada con éxito", { root: true }),
-          );
-        })
-        .catch((err) => {
-          commit("common/errorNotification", `Error al editar la categoria. ${  err}`, { root: true });
+    async editCategory({ commit, dispatch }, variables) {
+      try {
+        const insertMutation = {
+          mutation: CREATE_UPDATE_CATEGORIA,
+          variables,
+        };
+        const res = await apolloClient.mutate(insertMutation);
+        if (!res || res.errors)
+          throw new Error("al editar la categoria.\n", res.errors);
+        dispatch("getCategorias");
+        commit("common/successNotification", "Categoria editada con éxito", {
+          root: true,
         });
+        return res.data?.insert_acostarep_categorias?.affected_rows;
+      } catch (error) {
+        commit(
+          "common/errorNotification",
+          `Error al editar la categoria. ${error}`,
+          { root: true },
+        );
+        window.console.error("Error in editRegistro (Categorias):", error);
+        return null;
+      }
     },
-    /**
-       * Elimina un registro
-       * @returns nada we :v,¿esperabas algo?
-       */
-    removeRegistro({ state, commit, dispatch }) {
-      // state.categoria.doc._deleted = true;
-      state.localCategorias
-        .put(state.categoria.doc)
-        .then(() => {
-          dispatch("getAllCategorias");
-          commit("common/successNotification", "Categoria eliminada con éxito", { root: true });
-        })
-        .catch((err) => {
-          commit("common/errorNotification", `Error al eliminar la categoria. ${  err}`, { root: true });
+    async removeCategoria({ commit, dispatch }, variables) {
+      try {
+        const insertMutation = {
+          mutation: DELETE_CATEGORIA,
+          variables,
+        };
+        const res = await apolloClient.mutate(insertMutation);
+        if (!res || res.errors)
+          throw new Error("al eliminar la categoria.\n", res.errors);
+        dispatch("getCategorias");
+        commit("common/successNotification", "Categoria eliminada con éxito", {
+          root: true,
         });
+        return res;
+        // return res.data?.deleteCategoria?.id;
+      } catch (error) {
+        commit(
+          "common/errorNotification",
+          `Error al eliminar la categoria. ${error}`,
+          { root: true },
+        );
+        window.console.error("Error in removeCategoria (Categorias):", error);
+        return null;
+      }
     },
   },
 });

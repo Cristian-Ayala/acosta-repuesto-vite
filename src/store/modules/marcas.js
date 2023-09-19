@@ -23,8 +23,8 @@ export default () => ({
           variables,
         };
         const res = await apolloClient.mutate(insertMutation);
-        if (!res || res.error)
-          throw new Error("al crear la marca.\n", res.error);
+        if (!res || res.errors)
+          throw new Error("al crear la marca.\n", res.errors);
         dispatch("getAll");
         if (variables.marca.id) {
           commit("common/successNotification", "Marca editada con éxito", {
@@ -55,7 +55,7 @@ export default () => ({
             { root: true },
           );
         }
-        window.console.log("Error in createRegistro (Marcas):", error);
+        window.console.error("Error in createRegistro (Marcas):", error);
         return null;
       }
     },
@@ -82,8 +82,8 @@ export default () => ({
           variables,
         };
         const res = await apolloClient.mutate(deleteMutation);
-        if (!res || res.error)
-          throw new Error("al eliminar la marca.\n", res.error);
+        if (!res || res.errors)
+          throw new Error("al eliminar la marca.\n", res.errors);
         dispatch("getAll");
         commit("common/successNotification", "Marca eliminada con éxito", {
           root: true,

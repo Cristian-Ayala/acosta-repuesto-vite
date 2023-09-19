@@ -2,19 +2,29 @@
 import { gql } from "@apollo/client/core";
 
 export const GET_CATEGORIAS = gql`
-  query GET_CATEGORIAS {
+  query GET_CATEGORIAS(
+    $nombreCat: String = "%%"
+    $limit: Int = 10
+    $offset: Int = 0
+  ) {
     categorias: acostarep_categorias(
-      where: { is_active_categoria: { _eq: true } }
+      where: {
+        is_active_categoria: { _eq: true }
+        nombre_categoria: { _ilike: $nombreCat }
+      }
       order_by: { nombre_categoria: asc }
-      offset: 0
-      limit: 10
+      offset: $offset
+      limit: $limit
     ) {
       id
       nombre_categoria
       descripcion_categoria
     }
     totalRows: acostarep_categorias_aggregate(
-      where: { is_active_categoria: { _eq: true } }
+      where: {
+        is_active_categoria: { _eq: true }
+        nombre_categoria: { _ilike: $nombreCat }
+      }
     ) {
       aggregate {
         count

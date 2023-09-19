@@ -13,7 +13,7 @@
             v-model.trim="categoria.nombre_categoria"
             type="text"
             class="form-control"
-          >
+          />
         </div>
       </div>
       <div class="line"></div>
@@ -31,13 +31,13 @@
     </div>
     <template #footer>
       <el-button @click="show.modalAgregarCat = false"> Cancelar </el-button>
-      <el-button type="primary" @click="createRegistro();show.modalAgregarCat = false;"> Guardar </el-button>
+      <el-button type="primary" @click="performAction()"> Guardar </el-button>
     </template>
   </el-dialog>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 
 export default {
   name: "AgregarCat",
@@ -45,6 +45,10 @@ export default {
     show: {
       type: Object,
       required: true,
+    },
+    categoryProp: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
@@ -55,15 +59,41 @@ export default {
       },
     };
   },
-  computed: {
+  computed: {},
+  watch: {
+    categoryProp: {
+      deep: true,
+      handler(newValue) {
+        if (Object.keys(newValue).length === 0) return;
+        if (newValue.clear) {
+          this.categoria = {
+            nombre_categoria: "",
+            descripcion_categoria: "",
+          };
+        } else {
+          this.categoria = newValue;
+        }
+      },
+    },
   },
   methods: {
-    ...mapActions("categorias",["createRegistro"]),
-    createRegistro() {
-      // commit("errorNotification", "Por favor, introduce un nombre para la categoria.");
-      // "Por favor, introduce un nombre para la marca. (DO NOT REPORT THIS ERROR)",
-      this.createRegistro(this.categoria);
-    }
+    ...mapMutations("common", ["errorNotification"]),
+    ...mapActions("categorias", ["createCategory", "editCategory"]),
+    performAction() {
+      if (!this.categoria.nombre_categoria) {
+        this.errorNotification(
+          "Por favor, introduce un nombre para la categoria.",
+        );
+        return;
+      }
+      if (this.categoria.id) {
+        this.editCategory({ categoria: this.categoria });
+      } else {
+        this.createCategory({ categoria: this.categoria });
+      }
+      /* eslint-disable vue/no-mutating-props */
+      this.show.modalAgregarCat = false;
+    },
   },
 };
 </script>
