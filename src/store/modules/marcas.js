@@ -1,5 +1,3 @@
-import { ElMessage } from "element-plus";
-import PouchDB from "pouchdb-browser";
 import { apolloClient } from "@/plugins/vue-apollo";
 import { GET_MARCAS } from "@/store/graphql/queries/marcas";
 import {
@@ -11,41 +9,8 @@ export default () => ({
   namespaced: true,
   state: {
     marcas: [],
-    marcasCount: 0,
-    marca: {
-      nombreMarca: "",
-      descripMarca: "",
-    },
-    marSelected: {},
-    localMarca: null,
-    PouchDB,
   },
-  mutations: {
-    clearData(state) {
-      state.marca = {
-        nombreMarca: "",
-        descripMarca: "",
-      };
-    },
-    getMarcaSelected(state, mar) {
-      state.marca = mar;
-      state.marSelected = JSON.parse(JSON.stringify(mar));
-    },
-    errorNotification(state, message) {
-      ElMessage({
-        showClose: true,
-        message,
-        type: "error",
-      });
-    },
-    successNotification(state, message) {
-      ElMessage({
-        showClose: true,
-        message,
-        type: "success",
-      });
-    },
-  },
+  mutations: {},
   actions: {
     async createUpdateRegistro({ commit, dispatch }, variables) {
       try {
@@ -62,21 +27,33 @@ export default () => ({
           throw new Error("al crear la marca.\n", res.error);
         dispatch("getAll");
         if (variables.marca.id) {
-          commit("successNotification", "Marca editada con éxito");
+          commit("common/successNotification", "Marca editada con éxito", {
+            root: true,
+          });
         } else {
-          commit("successNotification", "Marca agregada con éxito");
+          commit("common/successNotification", "Marca agregada con éxito", {
+            root: true,
+          });
         }
         return res.data?.create_marca?.returning[0]?.id;
       } catch (error) {
         if (variables.marca.id) {
-          commit("errorNotification", `Error al editar la marca. ${error}`);
+          commit(
+            "common/errorNotification",
+            `Error al editar la marca. ${error}`,
+          );
         } else if (error.message.includes("introduce un nombre")) {
           commit(
-            "errorNotification",
+            "common/errorNotification",
             "Por favor, introduce un nombre para la marca",
+            { root: true },
           );
         } else {
-          commit("errorNotification", `Error al crear la marca. ${error}`);
+          commit(
+            "common/errorNotification",
+            `Error al crear la marca. ${error}`,
+            { root: true },
+          );
         }
         window.console.log("Error in createRegistro (Marcas):", error);
         return null;
@@ -92,7 +69,6 @@ export default () => ({
         const result = await apolloClient.query(searchInfo);
         if (result && result.data) {
           state.marcas = result.data.marcas;
-          state.marcasCount = result.data.totalRows.aggregate.count;
         }
       } catch (err) {
         window.console.error(err);
@@ -109,10 +85,16 @@ export default () => ({
         if (!res || res.error)
           throw new Error("al eliminar la marca.\n", res.error);
         dispatch("getAll");
-        commit("successNotification", "Marca eliminada con éxito");
+        commit("common/successNotification", "Marca eliminada con éxito", {
+          root: true,
+        });
         return res.data?.create_marca?.returning[0]?.id;
       } catch (error) {
-        commit("errorNotification", `Error al eliminar la marca. ${error}`);
+        commit(
+          "common/errorNotification",
+          `Error al eliminar la marca. ${error}`,
+          { root: true },
+        );
         return null;
       }
     },

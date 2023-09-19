@@ -30,26 +30,22 @@
             <table class="table card-text table-hover">
               <thead>
                 <tr>
-                  <th class="onlyOnWeb">#</th>
                   <th>Nombre</th>
-                  <th class="onlyOnWeb">Descripción</th>
                   <th>Operaciones</th>
                 </tr>
               </thead>
               <tbody v-if="categorias">
                 <tr
                   v-for="(cat, index) in categorias"
-                  v-show="filtro(index)"
                   :key="index"
                 >
-                  <th scope="row" class="onlyOnWeb">{{ index + 1 }}</th>
-                  <td>{{ cat.doc.nombreCategoria }}</td>
-                  <td class="onlyOnWeb">{{ cat.doc.descripcion }}</td>
+                  <td>{{ cat.nombre_categoria }}</td>
+                  <td class="onlyOnWeb">{{ cat.descripcion_categoria }}</td>
                   <td>
-                    <el-button type="danger" circle @click="getCategoriaSelected(cat);show.modalEliminarCat = true">
+                    <el-button type="danger" circle @click="show.modalEliminarCat = true">
                       <i class="fas fa-times" aria-hidden="true"></i>
                     </el-button>
-                    <el-button type="warning" circle @click="getCategoriaSelected(cat);show.modalEditCat = true">
+                    <el-button type="warning" circle @click="show.modalEditCat = true">
                       <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                     </el-button>
                   </td>
@@ -68,7 +64,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState } from "vuex";
 import AgregarCat from "@/components/Categorias/AgregarCat.vue";
 import DeleteCat from "@/components/Categorias/DeleteCat.vue";
 import EditCat from "@/components/Categorias/EditCat.vue";
@@ -90,18 +86,12 @@ export default {
     }
   }),
   computed: {
-    ...mapState("categorias", ["categorias", "categoria"]),
+    ...mapState("categorias", ["categorias"]),
+  },
+  mounted() {
+    this.$store.dispatch("categorias/getCategorias");
   },
   methods: {
-    ...mapMutations("categorias", ["clearDataCat", "getCategoriaSelected"]),
-    filtro(index) {
-      if (this.searchDisplay === "") return true;
-      const array = (
-        this.categorias[index].doc.nombreCategoria +
-        this.categorias[index].doc.descripcion
-      ).toUpperCase();
-      return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
-    },
   },
 };
 </script>

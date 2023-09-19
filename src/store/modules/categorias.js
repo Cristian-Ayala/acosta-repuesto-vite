@@ -1,94 +1,76 @@
-import { ElMessage } from "element-plus";
-import PouchDB from "pouchdb-browser";
-import router from "../../router/routes/index";
+import { apolloClient } from "@/plugins/vue-apollo";
+import { GET_CATEGORIAS } from "@/store/graphql/queries/categorias";
+import {
+  CREATE_UPDATE_CATEGORIA,
+  // DELETE_CATEGORIA,
+} from "@/store/graphql/mutations/categorias";
 
-export default (app) => ({
+export default () => ({
   namespaced: true,
   state: {
     categorias: [],
+    categoriasCount: 0,
     categoria: {
       nombreCategoria: "",
       descripcion: "",
     },
     catSelected: {},
-    PouchDB,
     localCategorias: null,
   },
-  mutations: {
-    /**
-       * limpiando valores de la categoria previamente seleccionada
-       * @param {*} state
-       */
-    clearDataCat(state) {
-      state.categoria = {
-        nombreCategoria: "",
-        descripcion: "",
-      };
-    },
-    /**
-       *
-       * @param {*} cat
-       */
-    getCategoriaSelected(state, cat) {
-      state.categoria = cat;
-      state.catSelected = JSON.parse(JSON.stringify(cat));
-    },
-    successNotification(state, message) {
-      ElMessage({
-        showClose: true,
-        message,
-        type: "success",
-      });
-    },
-    errorNotification(state, message) {
-      ElMessage({
-        showClose: true,
-        message,
-        type: "error",
-      });
-    },
-  },
+  mutations: {},
   actions: {
-    /**
-       * Crea registro con categoria
-       * El nombre no tiene que ir vacío
-       * @param {*} state
-       */
-    createRegistro({ state, dispatch, commit }) {
-      if (state.categoria.nombreCategoria.trim() !== "") {
-        // For puchDB we need to add an _id field
-        state.categoria._id = new Date().toISOString();
-        state.categoria.nombreCategoria = state.categoria.nombreCategoria.trim().toLocaleUpperCase();
-        state.localCategorias
-          .put(state.categoria)
-          .then(() => {
-            dispatch("getAllCategorias").then(() =>
-              commit("successNotification", "Categoria agregada con éxito"),
-            );
-          })
-          .catch((err) => {
-            commit("errorNotification", `Error al guardar la categoria. ${  err}`);
-          });
-      } else {
-        commit("errorNotification", "Por favor, introduce un nombre para la categoria.");
+    async createUpdateRegistro({ commit, dispatch }, variables) {
+      try {
+        if (variables.marca.nombre_marca === "")
+          throw new Error(
+            "Por favor, introduce un nombre para la marca. (DO NOT REPORT THIS ERROR)",
+          );
+        const insertMutation = {
+          mutation: CREATE_UPDATE_CATEGORIA,
+          variables,
+        };
+        const res = await apolloClient.mutate(insertMutation);
+        if (!res || res.error)
+          throw new Error("al crear la marca.\n", res.error);
+        dispatch("getAll");
+        if (variables.marca.id) {
+          commit("common/successNotification", "Categoria editada con éxito", { root: true });
+        } else {
+          commit("common/successNotification", "Categoria agregada con éxito", { root: true });
+        }
+        return res.data?.create_marca?.returning[0]?.id;
+      } catch (error) {
+        if (variables.marca.id) {
+          commit("common/errorNotification", `Error al editar la marca. ${error}`, { root: true });
+        } else if (error.message.includes("introduce un nombre")) {
+          commit(
+            "common/errorNotification",
+            "Por favor, introduce un nombre para la marca"
+            , { root: true }
+          );
+        } else {
+          commit("common/errorNotification", `Error al crear la marca. ${error}`, { root: true });
+        }
+        window.console.log("Error in createRegistro (Marcas):", error);
+        return null;
       }
     },
-    getAllCategorias({ state, commit }) {
-      state.localCategorias
-        .allDocs({
-          include_docs: true,
-          descending: false,
-        })
-        .then((doc) => {
-          state.categorias = doc.rows.sort((a, b) => {
-            if (a.doc.nombreCategoria > b.doc.nombreCategoria) return 1
-            if (b.doc.nombreCategoria > a.doc.nombreCategoria) return -1;
-            return 0;
-          });
-        })
-        .catch((err) =>
-          commit("errorNotification", `Error al listar categorias. ${  err}`),
-        );
+    async getCategorias({ state, commit }, variables) {
+      try {
+        const searchInfo = {
+          query: GET_CATEGORIAS,
+          fetchPolicy: "network-only",
+          variables,
+        };
+        const result = await apolloClient.query(searchInfo);
+        if (result && result.data) {
+          state.categorias = result.data.categorias;
+          state.categoriasCount = result.data.totalRows.aggregate.count;
+        }
+      } catch (err) {
+        window.console.error(err);
+        commit("common/errorNotification", `Error al listar categorias. ${err}`, { root: true });
+      }
     },
     edithRegistro({ state, commit, dispatch }) {
       const catDoc = state.catSelected.doc;
@@ -98,11 +80,11 @@ export default (app) => ({
         .put(catDoc)
         .then(() => {
           dispatch("getAllCategorias").then(() =>
-            commit("successNotification", "Categoria editada con éxito"),
+            commit("common/successNotification", "Categoria editada con éxito", { root: true }),
           );
         })
         .catch((err) => {
-          commit("errorNotification", `Error al editar la categoria. ${  err}`);
+          commit("common/errorNotification", `Error al editar la categoria. ${  err}`, { root: true });
         });
     },
     /**
@@ -110,57 +92,15 @@ export default (app) => ({
        * @returns nada we :v,¿esperabas algo?
        */
     removeRegistro({ state, commit, dispatch }) {
-      state.categoria.doc._deleted = true;
+      // state.categoria.doc._deleted = true;
       state.localCategorias
         .put(state.categoria.doc)
         .then(() => {
           dispatch("getAllCategorias");
-          commit("successNotification", "Categoria eliminada con éxito");
+          commit("common/successNotification", "Categoria eliminada con éxito", { root: true });
         })
         .catch((err) => {
-          commit("errorNotification", `Error al eliminar la categoria. ${  err}`);
-        });
-    },
-    initDbCategorias({ state, dispatch }) {
-      const remoteCategorias = new state.PouchDB(
-        `${app.config.globalProperties.$url  }categorias`,
-        {
-          fetch (url, opts) {
-            return state.PouchDB.fetch(url, opts, {
-              credentials: "include",
-            });
-          },
-        },
-      );
-      remoteCategorias.info().catch((err) => {
-        if (err.status === 401) {
-          router
-            .push({
-              path: "/login",
-            })
-            .catch(() => {});
-        }
-      });
-
-      state.localCategorias = new state.PouchDB("categorias");
-      // do one way, one-off sync from the server until completion
-      state.localCategorias.replicate
-        .from(remoteCategorias)
-        .on("complete", () => {
-          // console.log("Se terminó la replicación");
-          dispatch("getAllCategorias");
-          // then two-way, continuous, retriable sync
-          state.localCategorias
-            .sync(remoteCategorias, {
-              live: true,
-              retry: true,
-            })
-            .on("change", () => {
-              dispatch("getAllCategorias");
-            })
-            .on("error", (err) => {
-              console.log("totally unhandled error (shouldn't happen)", err);
-            });
+          commit("common/errorNotification", `Error al eliminar la categoria. ${  err}`, { root: true });
         });
     },
   },

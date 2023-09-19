@@ -10,7 +10,7 @@
         <label class="col-md-3 form-control-label">Nombre</label>
         <div class="col-md-9">
           <input
-            v-model="categoria.nombreCategoria"
+            v-model.trim="categoria.nombre_categoria"
             type="text"
             class="form-control"
           >
@@ -22,7 +22,7 @@
         <div class="col-md-9">
           <textarea
             id="exampleFormControlTextarea1"
-            v-model="categoria.descripcion"
+            v-model.trim="categoria.descripcion_categoria"
             class="form-control"
             rows="3"
           ></textarea>
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   name: "AgregarCat",
@@ -49,13 +49,21 @@ export default {
   },
   data() {
     return {
+      categoria: {
+        nombre_categoria: "",
+        descripcion_categoria: "",
+      },
     };
   },
   computed: {
-    ...mapState("categorias",["categoria"]),
   },
   methods: {
     ...mapActions("categorias",["createRegistro"]),
+    createRegistro() {
+      // commit("errorNotification", "Por favor, introduce un nombre para la categoria.");
+      // "Por favor, introduce un nombre para la marca. (DO NOT REPORT THIS ERROR)",
+      this.createRegistro(this.categoria);
+    }
   },
 };
 </script>

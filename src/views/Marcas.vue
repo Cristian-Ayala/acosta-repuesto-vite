@@ -10,25 +10,16 @@
             <el-button
               color="#28a745"
               circle
-              @click="
-                clearData();
-                show.modalAgregarMar = true;
-              "
+              @click="createNewMarca()"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </el-button>
           </div>
           <div class="card-body">
-            <div class="form-group position-relative mb-0">
-              <button
-                type="submit"
-                style="top: -3px; left: 0"
-                class="position-absolute bg-white border-0 p-0"
-              >
-                <i class="o-search-magnify-1 text-gray text-lg"></i>
-              </button>
+            <div class="form-group position-relative mb-0 flex-middle">
+              <i class="fas fa-search text-gray"></i>
               <input
-                v-model="searchDisplay"
+                v-model.trim="searchDisplay"
                 type="search"
                 placeholder="Buscar marca..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
@@ -44,7 +35,11 @@
                 </tr>
               </thead>
               <tbody v-if="marcas">
-                <tr v-for="(mar, index) in marcas" :key="index">
+                <tr
+                  v-for="(mar, index) in marcas"
+                  v-show="filtro(index)"
+                  :key="index"
+                >
                   <td>{{ mar.nombre_marca }}</td>
                   <td class="onlyOnWeb">{{ mar.descripcion_marca }}</td>
                   <td>
@@ -91,16 +86,14 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState } from "vuex";
 
-// TODO: Filtrar las marcas
-// TODO: Paginacion
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Marcas",
   components: {
     AgregarMar: () => import("@/components/Marcas/AgregarMar.vue"),
-    // DeleteMar: () => import("@/components/Marcas/DeleteMar.vue"),
+    DeleteMar: () => import("@/components/Marcas/DeleteMar.vue"),
   },
   data: () => ({
     displayOption: "",
@@ -112,25 +105,28 @@ export default {
     marcaSelected: {},
   }),
   computed: {
-    ...mapState("marcas", ["marcas", "marca"]),
+    ...mapState("marcas", ["marcas"]),
   },
   mounted() {
     this.$store.dispatch("marcas/getAll");
   },
   methods: {
-    ...mapMutations("marcas", ["clearData"]),
     setMarcaSelected(marca) {
       const tmpMarca = JSON.parse(JSON.stringify(marca));
       delete tmpMarca.__typename;
       this.marcaSelected = tmpMarca;
     },
-    // filtro(index) {
-    //   if (this.searchDisplay === "") return true;
-    //   const marcaBusqueda = (
-    //     this.marcas[index].doc.nombreMarca + this.marcas[index].doc.descripMarca
-    //   ).toUpperCase();
-    //   return marcaBusqueda.indexOf(this.searchDisplay.toUpperCase()) >= 0;
-    // },
+    filtro(index) {
+      if (this.searchDisplay === "") return true;
+      const marcaBusqueda = (
+        this.marcas[index].nombre_marca + this.marcas[index].descripcion_marca
+      ).toUpperCase();
+      return marcaBusqueda.indexOf(this.searchDisplay.toUpperCase()) >= 0;
+    },
+    createNewMarca() {
+      this.marcaSelected.clearProp = true;
+      this.show.modalAgregarMar = true;
+    }
   },
 };
 </script>

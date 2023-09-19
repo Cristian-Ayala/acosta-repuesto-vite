@@ -2,7 +2,7 @@
   <!-- eslint-disable vue/no-mutating-props -->
   <el-dialog
     v-model="show.modalAgregarMar"
-    title="Agregar marca"
+    :title="`${marca?.id ? 'Editar' : 'Agregar'} Marca`"
     width="90%"
   >
     <div class="card-body">
@@ -67,7 +67,11 @@ export default {
       deep: true,
       handler(newValue) {
         if (Object.keys(newValue).length === 0) return;
-        this.marca = newValue;
+        if (newValue?.clearProp) {
+          this.marca = {};
+        } else {
+          this.marca = newValue;
+        }
       }
     }
   },

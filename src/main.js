@@ -10,7 +10,7 @@ function installPlugins({ app }) {
     try {
       plugin({ app, router });
     } catch (error) {
-      window.console.error("Error occurred while loading plugin:", error);
+      window.console.error("Error occurred while loading plugin:", error, plugin);
     }
   });
 }
