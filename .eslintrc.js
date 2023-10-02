@@ -2,7 +2,7 @@ module.exports = {
   root: true,
   extends: ["airbnb-base", "plugin:vue/vue3-recommended", "prettier"],
   rules: {
-    indent: ["error", 2],
+    indent: ["error", 2, { "SwitchCase": 1, "ignoredNodes": ["ConditionalExpression"] }],
     // Disallow the use of console.
     // @see https://eslint.org/docs/rules/no-console
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
@@ -460,7 +460,7 @@ module.exports = {
     //   https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/es6.js,
     //   https://eslint.org/docs/rules/template-curly-spacing
     "vue/template-curly-spacing": "error",
-    "import/extensions": [0, { js: "always"  }]
+    "import/extensions": [0, { js: "always"  }],
   },
   overrides: [
     {

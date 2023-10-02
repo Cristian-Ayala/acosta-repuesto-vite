@@ -167,6 +167,9 @@ export default {
 div:deep(.el-pagination.is-background.el-pagination--small) {
   justify-content: center;
 }
+div:deep(.el-pagination.el-pagination--small) {
+  place-content: center;
+}
 :global(footer.el-dialog__footer) {
   padding: var(--el-dialog-padding-primary);
 }

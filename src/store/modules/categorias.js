@@ -1,5 +1,5 @@
 import { apolloClient } from "@/plugins/vue-apollo";
-import { GET_CATEGORIAS } from "@/store/graphql/queries/categorias";
+import { GET_CATEGORIAS, GET_MARCAS_BY_KEYWORD } from "@/store/graphql/queries/categorias";
 import {
   CREATE_UPDATE_CATEGORIA,
   DELETE_CATEGORIA,
@@ -111,6 +111,28 @@ export default () => ({
         );
         window.console.error("Error in removeCategoria (Categorias):", error);
         return null;
+      }
+    },
+    async getCategoriasByKeyword({ commit }, variables) {
+      try {
+        const searchInfo = {
+          query: GET_MARCAS_BY_KEYWORD,
+          fetchPolicy: "network-only",
+          variables,
+        };
+        const result = await apolloClient.query(searchInfo);
+        if (result && result.data) {
+          return result.data.categorias;
+        }
+        return [];
+      } catch (err) {
+        window.console.error(err);
+        commit(
+          "common/errorNotification",
+          `Error al buscar categorias por nombre. ${err}`,
+          { root: true },
+        );
+        return [];
       }
     },
   },

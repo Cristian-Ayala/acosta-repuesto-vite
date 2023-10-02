@@ -32,3 +32,20 @@ export const GET_CATEGORIAS = gql`
     }
   }
 `;
+
+export const GET_MARCAS_BY_KEYWORD = gql`
+  query GET_MARCAS_BY_KEYWORD($nombreCat: String = "%%", $limit: Int = 10) {
+    categorias: acostarep_categorias(
+      where: {
+        is_active_categoria: { _eq: true }
+        nombre_categoria: { _ilike: $nombreCat }
+      }
+      order_by: { nombre_categoria: asc }
+      limit: $limit
+    ) {
+      id
+      nombre_categoria
+      descripcion_categoria
+    }
+  }
+`;

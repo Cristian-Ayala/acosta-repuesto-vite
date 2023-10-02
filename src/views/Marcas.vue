@@ -7,11 +7,7 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Marcas
             </h6>
-            <el-button
-              color="#28a745"
-              circle
-              @click="createNewMarca()"
-            >
+            <el-button color="#28a745" circle @click="createNewMarca()">
               <i class="fa fa-plus" aria-hidden="true"></i>
             </el-button>
           </div>
@@ -86,8 +82,6 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Marcas",
@@ -102,13 +96,12 @@ export default {
       modalAgregarMar: false,
       modalEliminarMar: false,
     },
+    marcas: [],
     marcaSelected: {},
   }),
-  computed: {
-    ...mapState("marcas", ["marcas"]),
-  },
-  mounted() {
-    this.$store.dispatch("marcas/getAll");
+  computed: {},
+  async mounted() {
+    this.marcas = await this.$store.dispatch("marcas/getAll");
   },
   methods: {
     setMarcaSelected(marca) {
@@ -126,7 +119,7 @@ export default {
     createNewMarca() {
       this.marcaSelected.clearProp = true;
       this.show.modalAgregarMar = true;
-    }
+    },
   },
 };
 </script>

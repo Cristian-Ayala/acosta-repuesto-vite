@@ -7,9 +7,7 @@ import {
 
 export default () => ({
   namespaced: true,
-  state: {
-    marcas: [],
-  },
+  state: {},
   mutations: {},
   actions: {
     async createUpdateRegistro({ commit, dispatch }, variables) {
@@ -59,7 +57,7 @@ export default () => ({
         return null;
       }
     },
-    async getAll({ state }, variables) {
+    async getAll(store, variables) {
       try {
         const searchInfo = {
           query: GET_MARCAS,
@@ -67,11 +65,11 @@ export default () => ({
           variables,
         };
         const result = await apolloClient.query(searchInfo);
-        if (result && result.data) {
-          state.marcas = result.data.marcas;
-        }
+        if (result && result.data) return result.data.marcas;
+        return [];
       } catch (err) {
         window.console.error(err);
+        return [];
       }
     },
     async removeRegistro({ commit, dispatch }, variables) {

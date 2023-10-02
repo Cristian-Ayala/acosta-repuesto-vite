@@ -9,68 +9,85 @@
     <h5>UPC</h5>
     <div class="input-group">
       <!-- v-b-modal.barCode -->
-      <input v-model="tmpFiltroUPC" type="text" class="form-control" ><span
+      <input v-model.trim="tmpFiltroUPC" type="text" class="form-control" />
+      <span
         class="input-group-text"
         @click="
           show.modalUPCBarcode = true;
           setCalledFrom('FiltrosProductos.vue');
         "
-      ><i class="fas fa-barcode"
-      ></i></span>
+      >
+        <i class="fas fa-barcode"></i>
+      </span>
     </div>
-    <hr >
+    <hr />
     <div class="nombreProducto">
       <h5>Nombre</h5>
-      <input v-model="tmpFiltroNombre" type="search" placeholder="Buscar" >
+      <input v-model.trim="tmpFiltroNombre" type="search" placeholder="Buscar" />
     </div>
-    <hr >
-    <div v-if="marcas.length > 0" class="marcas">
+    <hr />
+    <div class="marcas">
       <h5>Marcas:</h5>
       <el-select
         v-model="tmpFiltroMarcasActivas"
         multiple
-        collapse-tags
-        collapse-tags-tooltip
         placeholder="Filtro por marcas"
+        filterable
+        remote
+        value-key="id"
+        :remote-method="remoteMethodMarcas"
+        :loading="loading.marcas"
       >
         <el-option
           v-for="mar in marcas"
-          :key="mar.doc.nombreMarca"
-          :label="mar.doc.nombreMarca"
-          :value="mar.doc.nombreMarca"
+          :key="mar.id"
+          :label="mar.nombre_marca"
+          :value="mar"
         />
       </el-select>
     </div>
-    <hr >
-    <div v-if="categorias.length > 0" class="categorias">
+    <hr />
+    <div class="categorias">
       <h5>Categorias:</h5>
       <el-select
         v-model="tmpFiltroCategoriasActivas"
         multiple
-        collapse-tags
-        collapse-tags-tooltip
         placeholder="Filtro por categorias"
+        filterable
+        remote
+        value-key="id"
+        :remote-method="remoteMethodCategorias"
+        :loading="loading.categorias"
       >
         <el-option
           v-for="categoria in categorias"
-          :key="categoria.doc.nombreCategoria"
-          :label="categoria.doc.nombreCategoria"
-          :value="categoria.doc.nombreCategoria"
+          :key="categoria.id"
+          :label="categoria.nombre_categoria"
+          :value="categoria"
         />
       </el-select>
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="borrarFiltros();mostrar.modalFiltros = false;">Borrar Filtros</el-button>
+        <el-button
+          @click="
+            borrarFiltros();
+            mostrar.modalFiltros = false;
+          "
+        >
+          Borrar Filtros
+        </el-button>
         <el-button
           type="primary"
-          @click="aplicarFiltros({
-                    cat: tmpFiltroCategoriasActivas,
-                    mar: tmpFiltroMarcasActivas,
-                    upc: tmpFiltroUPC,
-                    nom: tmpFiltroNombre,
-                  });
-                  mostrar.modalFiltros = false;"
+          @click="
+            aplicarFiltros({
+              cat: tmpFiltroCategoriasActivas,
+              mar: tmpFiltroMarcasActivas,
+              upc: tmpFiltroUPC,
+              nom: tmpFiltroNombre,
+            });
+            mostrar.modalFiltros = false;
+          "
         >
           Aplicar Filtros
         </el-button>
@@ -87,18 +104,6 @@ import UPCReader from "@/components/Productos/UPCReader.vue";
 // Variables for upc barcode scanner
 let code = "";
 let reading = false;
-
-// const LoggerServiceInstance1 = (function () {
-//     function LoggerService() {
-//         this.log = console.log.bind(window.console);
-//         this.error = console.error.bind(window.console);
-//         this.warning = console.warn.bind(window.console);
-//     }
-//     return LoggerService;
-// }());
-
-// const logger1 = new LoggerServiceInstance1();
-// logger1.log('What line was this on?');
 
 export default {
   name: "FiltrosProductos",
@@ -119,43 +124,47 @@ export default {
     show: {
       modalUPCBarcode: false,
     },
+    loading: {
+      marcas: false,
+      categorias: false,
+    },
+    marcas: [],
+    categorias: [],
   }),
   computed: {
-    ...mapState("categorias", ["categorias"]),
-    ...mapState("marcas", ["marcas"]),
     ...mapState("productos", [
       "filtroCategorias",
       "filtroMarcas",
       "filtroNombre",
       "filtroUPC",
-      "tempFiltroUPC"
+      "tempFiltroUPC",
     ]),
   },
   watch: {
-    filtroMarcas (filtroMarcas) {
+    filtroMarcas(filtroMarcas) {
       this.tmpFiltroMarcasActivas = [...filtroMarcas];
     },
-    filtroCategorias (filtroCategorias) {
+    filtroCategorias(filtroCategorias) {
       this.tmpFiltroCategoriasActivas = [...filtroCategorias];
     },
-    filtroNombre (filtroNombre) {
+    filtroNombre(filtroNombre) {
       this.tmpFiltroNombre = filtroNombre.toString();
     },
-    filtroUPC (filtroUPC) {
+    filtroUPC(filtroUPC) {
       // this.setFiltroUPC(filtroUPC.toString());
       this.tmpFiltroUPC = filtroUPC;
     },
-    tempFiltroUPC (tempFiltroUPC) {
+    tempFiltroUPC(tempFiltroUPC) {
       this.tmpFiltroUPC = tempFiltroUPC;
     },
   },
-  mounted () {
+  mounted() {
     this.getFilters();
     this.addScannerListener();
   },
   methods: {
     ...mapActions("productos", ["aplicarFiltros", "borrarFiltros"]),
-    ...mapMutations("productos", ["setCalledFrom","setFiltroUPC"]),
+    ...mapMutations("productos", ["setCalledFrom", "setFiltroUPC"]),
     getFilters() {
       this.tmpFiltroMarcasActivas = [...this.filtroMarcas];
       this.tmpFiltroCategoriasActivas = [...this.filtroCategorias];
@@ -196,6 +205,22 @@ export default {
           reading = false;
         }, 200); // 200 works fine for me but you can adjust it
       }
+    },
+    async remoteMethodMarcas(marcaKeyWord) {
+      if (!marcaKeyWord || marcaKeyWord.trim() === "") return;
+      this.loading.marcas = true;
+      this.marcas = await this.$store.dispatch("marcas/getAll", {
+        nombreMarca: `%${marcaKeyWord}%`,
+      });
+      this.loading.marcas = false;
+    },
+    async remoteMethodCategorias(categoriaKeyWord) {
+      if (!categoriaKeyWord || categoriaKeyWord.trim() === "") return;
+      this.loading.categorias = true;
+      this.categorias = await this.$store.dispatch("categorias/getCategoriasByKeyword", {
+        nombreCat: `%${categoriaKeyWord}%`,
+      });
+      this.loading.categorias = false;
     },
   },
 };

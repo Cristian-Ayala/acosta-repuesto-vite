@@ -42,6 +42,9 @@ const cache = new InMemoryCache({
         },
         acostarep_categorias: {
           merge: mergeFuction,
+        },
+        acostarep_productos: {
+          merge: mergeFuction,
         }
       },
     },
