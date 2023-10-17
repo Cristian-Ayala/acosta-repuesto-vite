@@ -33,6 +33,14 @@ export default defineConfig(({ mode }) => {
     define: {
       "process.env.NODE_ENV": mode === "development" || `"${mode}"`,
     },
+    css: {
+      devSourcemap: true,
+      preprocessorOptions: {
+        scss: {
+          additionalData: "@use '@/assets/scss/customTheme.scss' as *;",
+        },
+      },
+    },
     plugins: [
       vue(),
       AutoImport({

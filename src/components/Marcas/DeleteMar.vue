@@ -28,7 +28,7 @@ export default {
       default: () => ({}),
     },
   },
-  emits: ["clearMarcaSelected"],
+  emits: ["clearMarcaSelected", "getAllMarcas"],
   data() {
     return {};
   },
@@ -46,9 +46,10 @@ export default {
   },
   methods: {
     ...mapActions("marcas", ["removeRegistro"]),
-    removeMarca() {
+    async removeMarca() {
       const marcaID = this.marcaProp.id;
-      this.removeRegistro({ id: marcaID });
+      await this.removeRegistro({ id: marcaID });
+      this.$emit("getAllMarcas");
       /* eslint-disable vue/no-mutating-props */
       this.show.modalEliminarMar = false;
     },

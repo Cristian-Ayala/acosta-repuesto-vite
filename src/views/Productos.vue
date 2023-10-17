@@ -49,7 +49,9 @@
               :key="prod.upc"
               :body-style="{ padding: '0px' }"
             >
-              <img-with-back-up :source="`${$FILE_MANAGER}${prod.foto}`" />
+              <img-with-back-up
+                :source="`${$FILE_MANAGER}photo/${prod.foto}`"
+              />
               <div style="padding: 14px; text-align: center">
                 <span>{{ prod.nombre_producto }}</span>
                 <div class="bottom">
@@ -73,7 +75,7 @@
                   type="warning"
                   circle
                   @click="
-                    prodSelected(prod);
+                    prodSelected = JSON.parse(JSON.stringify(prod));
                     title = 'Editar producto';
                     show.addEditProdMovile = true;
                   "
@@ -84,7 +86,7 @@
                   type="danger"
                   circle
                   @click="
-                    prodSelected(prod);
+                    prodSelected = JSON.parse(JSON.stringify(prod));
                     show.deleteProduc = true;
                   "
                 >
@@ -112,8 +114,12 @@
         v-if="show.addEditProdMovile"
         :title="title"
         :mostrar="show"
+        :prod-selected="prodSelected"
       ></AddEditProdMovile>
-      <EliminarProdMovil :mostrar="show"></EliminarProdMovil>
+      <EliminarProdMovil
+        :mostrar="show"
+        :new-product-mobile="prodSelected"
+      ></EliminarProdMovil>
       <FiltrosProductos ref="filtrosRef" :mostrar="show"></FiltrosProductos>
       <!-- <ConfirmarTransacciones :show=show></ConfirmarTransacciones> -->
     </div>
@@ -149,9 +155,11 @@ export default {
         deleteProduc: false,
       },
       userOrganization: null,
+      prodSelected: null,
     };
   },
   computed: {
+    // TODO: depurar este computed
     ...mapState("productos", [
       "currentPage",
       "loadingTableProductos",
@@ -171,7 +179,6 @@ export default {
       "filtroNombre",
       "filtroUPC",
     ]),
-    ...mapState("categorias", ["categorias"]),
     allFilters() {
       const filters = [];
       const categories = this.filtroCategorias.map(
@@ -218,7 +225,6 @@ export default {
       "removeNewRegistro",
       "saveNewProduct",
       "editNewRegistro",
-      "prodSelected",
     ]),
     fetchProducts() {
       this.$store.dispatch("productos/readAllProducts");
@@ -236,7 +242,7 @@ export default {
       return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
     },
     createProduct() {
-      this.prodSelected({});
+      this.prodSelected = { CLEAR: true };
       this.title = "Agregar producto";
       this.show.addEditProdMovile = true;
     },

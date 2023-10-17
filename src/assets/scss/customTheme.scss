@@ -1,0 +1,14 @@
+// https://github.com/element-plus/element-plus/blob/dev/packages/theme-chalk/src/common/var.scss
+@forward "element-plus/theme-chalk/src/common/var.scss" with (
+  $colors: (
+    "primary": (
+      "base": #5C95EB,
+    ),
+    "success": (
+      "base": #0c9463,
+    ),
+  ),
+  $input: (
+    'border-radius': 1rem,
+  )
+);

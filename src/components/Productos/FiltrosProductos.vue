@@ -23,7 +23,11 @@
     <hr />
     <div class="nombreProducto">
       <h5>Nombre</h5>
-      <input v-model.trim="tmpFiltroNombre" type="search" placeholder="Buscar" />
+      <input
+        v-model.trim="tmpFiltroNombre"
+        type="search"
+        placeholder="Buscar"
+      />
     </div>
     <hr />
     <div class="marcas">
@@ -217,9 +221,12 @@ export default {
     async remoteMethodCategorias(categoriaKeyWord) {
       if (!categoriaKeyWord || categoriaKeyWord.trim() === "") return;
       this.loading.categorias = true;
-      this.categorias = await this.$store.dispatch("categorias/getCategoriasByKeyword", {
-        nombreCat: `%${categoriaKeyWord}%`,
-      });
+      this.categorias = await this.$store.dispatch(
+        "categorias/getCategoriasByKeyword",
+        {
+          nombreCat: `%${categoriaKeyWord}%`,
+        },
+      );
       this.loading.categorias = false;
     },
   },
@@ -297,5 +304,11 @@ input::-webkit-input-placeholder {
 }
 :deep(.input-group-text) {
   border-radius: 0 2rem 2rem 0;
+}
+:deep(div.el-input__wrapper) {
+  border-radius: 1rem;
+}
+:deep(.el-tag) {
+  border-radius: 1rem;
 }
 </style>

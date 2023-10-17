@@ -6,16 +6,19 @@
     width="90%"
     top="5vh"
   >
-    <p v-if="newProductMobile.doc" class="my-4" style="word-break: break-word;">
+    <p class="my-4" style="word-break: break-word">
       ¿Seguro quiere eliminar el producto:
-      {{ newProductMobile.doc.nombreProd }}?
+      {{ newProductMobile.nombre_producto }}?
     </p>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="mostrar.deleteProduc = false">Cancelar</el-button>
         <el-button
           type="danger"
-          @click="deleteProducto(newProductMobile);mostrar.deleteProduc = false;"
+          @click="
+            deleteProducto({ id: newProductMobile.id });
+            mostrar.deleteProduc = false;
+          "
         >
           Confirmar
         </el-button>
@@ -25,7 +28,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   name: "EliminarProdMovil",
@@ -34,16 +37,13 @@ export default {
       type: Object,
       default: () => ({}),
     },
-  },
-  computed: {
-    ...mapState("productos", [
-      "newProductMobile",
-    ]),
+    newProductMobile: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   methods: {
-    ...mapActions("productos", [
-      "deleteProducto",
-    ]),
+    ...mapActions("productos", ["deleteProducto"]),
   },
 };
 </script>

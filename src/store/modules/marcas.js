@@ -1,5 +1,5 @@
 import { apolloClient } from "@/plugins/vue-apollo";
-import { GET_MARCAS } from "@/store/graphql/queries/marcas";
+import { GET_MARCAS, GET_MARCAS_BY_ID } from "@/store/graphql/queries/marcas";
 import {
   CREATE_UPDATE_MARCA,
   DELETE_MARCA,
@@ -10,7 +10,7 @@ export default () => ({
   state: {},
   mutations: {},
   actions: {
-    async createUpdateRegistro({ commit, dispatch }, variables) {
+    async createUpdateRegistro({ commit }, variables) {
       try {
         if (variables.marca.nombre_marca === "")
           throw new Error(
@@ -23,7 +23,6 @@ export default () => ({
         const res = await apolloClient.mutate(insertMutation);
         if (!res || res.errors)
           throw new Error("al crear la marca.\n", res.errors);
-        dispatch("getAll");
         if (variables.marca.id) {
           commit("common/successNotification", "Marca editada con éxito", {
             root: true,
@@ -72,7 +71,7 @@ export default () => ({
         return [];
       }
     },
-    async removeRegistro({ commit, dispatch }, variables) {
+    async removeRegistro({ commit }, variables) {
       try {
         if (!variables.id) throw new Error("No existe ID de la marca.");
         const deleteMutation = {
@@ -82,7 +81,6 @@ export default () => ({
         const res = await apolloClient.mutate(deleteMutation);
         if (!res || res.errors)
           throw new Error("al eliminar la marca.\n", res.errors);
-        dispatch("getAll");
         commit("common/successNotification", "Marca eliminada con éxito", {
           root: true,
         });
@@ -94,6 +92,21 @@ export default () => ({
           { root: true },
         );
         return null;
+      }
+    },
+    async GET_MARCA_BY_ID(store, variables) {
+      try {
+        const searchInfo = {
+          query: GET_MARCAS_BY_ID,
+          fetchPolicy: "network-only",
+          variables,
+        };
+        const result = await apolloClient.query(searchInfo);
+        if (result && result.data) return result.data.marcas;
+        return [];
+      } catch (err) {
+        window.console.error(err);
+        return [];
       }
     },
   },

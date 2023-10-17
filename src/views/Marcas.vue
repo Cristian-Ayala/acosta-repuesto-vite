@@ -71,11 +71,13 @@
         :show="show"
         :marca-prop="marcaSelected"
         @clear-marca-selected="() => (marcaSelected = {})"
+        @get-all-marcas="getAllMarcas()"
       ></agregar-mar>
       <delete-mar
         :show="show"
         :marca-prop="marcaSelected"
         @clear-marca-selected="() => (marcaSelected = {})"
+        @get-all-marcas="getAllMarcas()"
       ></delete-mar>
     </div>
   </div>
@@ -120,6 +122,9 @@ export default {
       this.marcaSelected.clearProp = true;
       this.show.modalAgregarMar = true;
     },
+    async getAllMarcas() {
+      this.marcas = await this.$store.dispatch("marcas/getAll");
+    }
   },
 };
 </script>

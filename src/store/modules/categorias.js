@@ -1,5 +1,9 @@
 import { apolloClient } from "@/plugins/vue-apollo";
-import { GET_CATEGORIAS, GET_MARCAS_BY_KEYWORD } from "@/store/graphql/queries/categorias";
+import {
+  GET_CATEGORIAS,
+  GET_CATEGORIAS_BY_KEYWORD,
+  GET_CATEGORIAS_BY_ID,
+} from "@/store/graphql/queries/categorias";
 import {
   CREATE_UPDATE_CATEGORIA,
   DELETE_CATEGORIA,
@@ -41,7 +45,8 @@ export default () => ({
     },
     async getCategorias({ state, commit }, variables) {
       try {
-        if (variables != null && Object.keys(variables).length > 0) state.variables = variables;
+        if (variables != null && Object.keys(variables).length > 0)
+          state.variables = variables;
         state.loadingTableCategoria = true;
         const searchInfo = {
           query: GET_CATEGORIAS,
@@ -116,7 +121,29 @@ export default () => ({
     async getCategoriasByKeyword({ commit }, variables) {
       try {
         const searchInfo = {
-          query: GET_MARCAS_BY_KEYWORD,
+          query: GET_CATEGORIAS_BY_KEYWORD,
+          fetchPolicy: "network-only",
+          variables,
+        };
+        const result = await apolloClient.query(searchInfo);
+        if (result && result.data) {
+          return result.data.categorias;
+        }
+        return [];
+      } catch (err) {
+        window.console.error(err);
+        commit(
+          "common/errorNotification",
+          `Error al buscar categorias por nombre. ${err}`,
+          { root: true },
+        );
+        return [];
+      }
+    },
+    async getCategoriasByID({ commit }, variables) {
+      try {
+        const searchInfo = {
+          query: GET_CATEGORIAS_BY_ID,
           fetchPolicy: "network-only",
           variables,
         };

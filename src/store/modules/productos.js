@@ -1,5 +1,12 @@
 import { apolloClient } from "@/plugins/vue-apollo";
-import { GET_PRODUCTOS } from "@/store/graphql/queries/productos";
+import {
+  GET_PRODUCTOS,
+  GET_PRODUCT_BY_UPC,
+} from "@/store/graphql/queries/productos";
+import {
+  CREATE_UPDATE_PRODUCTO,
+  DELETE_PRODUCTO,
+} from "@/store/graphql/mutations/productos";
 
 function regexSearch(keyword) {
   if (!keyword || keyword.trim() === "") return "nonexistent";
@@ -56,36 +63,12 @@ export default (app) => ({
     variables: {},
   },
   mutations: {
-    prodSelected(state, productoSelected) {
-      let productoSelectedLocal = { ...productoSelected };
-      // check if empty, if it is -> set array with format
-      if (!Object.keys(productoSelectedLocal).length) {
-        productoSelectedLocal = {
-          doc: {
-            nombreProd: "",
-            activoProd: true,
-            stockProdStaAna: 0,
-            stockProdMetapan: 0,
-            upc: "",
-            nombreMarca: "",
-            nombreCategoria: "",
-            foto: "",
-            precioTaller: 0,
-            precioMayoreo: 0,
-            precioPublico: 0,
-          },
-        };
-      }
-      state.newProductMobile = productoSelectedLocal;
-    },
+    // TODO: Delete all mutations if not used
     marcaSelected(state, marca) {
       state.newProductMobile.doc.nombreMarca = marca;
     },
     categoriaSelected(state, categoria) {
       state.newProductMobile.doc.nombreCategoria = categoria;
-    },
-    fotoSelected(state, foto) {
-      state.newProductMobile.doc.foto = foto;
     },
     setFiltroUPC(state, upc) {
       state.tempFiltroUPC = upc;
@@ -95,78 +78,62 @@ export default (app) => ({
     },
   },
   actions: {
-    async validarDatos({ state }, productoDoc) {
+    async createProducto({ commit, dispatch }, producto) {
       try {
-        if (!productoDoc.upc) {
-          throw new Error("Agregue un UPC");
+        const uniqueUPC = await dispatch("uniqueUPC", { upc: producto.upc });
+        if (uniqueUPC != null) {
+          dispatch("upcMessages", uniqueUPC);
+          return null;
         }
-        const numbersOfUPCs = await state.localProductos
-          .find({
-            selector: {
-              upc: productoDoc.upc,
-            },
-          })
-          .then((response) => response.docs)
-          .catch((err) => {
-            // an error occured
-            window.console.error(err);
-            return null;
+        if (producto.foto && producto.foto instanceof File) {
+          const fotoUploaded = await dispatch(
+            "uploadAttachments",
+            producto.foto,
+          );
+          /* eslint-disable */
+          delete producto.UPLOAD_NEW_PICTURE;
+          producto.foto = fotoUploaded != null ? fotoUploaded[0] : "";
+          /* eslint-enable */
+        }
+        const searchInfo = {
+          mutation: CREATE_UPDATE_PRODUCTO,
+          variables: {
+            producto,
+            update_columns: [
+              "nombre_producto",
+              "upc",
+              "id_marca",
+              "id_categoria",
+              "foto",
+              "precio_taller",
+              "precio_mayoreo",
+              "precio_publico",
+              "stock_prod_sta_ana",
+              "stock_prod_metapan",
+            ],
+          },
+        };
+        const result = await apolloClient.mutate(searchInfo);
+        let productoInserted = null;
+        if (
+          result &&
+          result.data &&
+          result.data.insert_acostarep_productos_one
+        ) {
+          productoInserted = result.data.insert_acostarep_productos_one;
+          commit("common/successNotification", "Producto creado con éxito", {
+            root: true,
           });
-        if (!productoDoc.nombreProd) {
-          throw new Error("El nombre no puede estar vacío");
+          dispatch("readAllProducts");
         }
-        if (!productoDoc.foto) {
-          throw new Error("Tiene que agregar una foto");
-        }
-        if (!productoDoc.nombreMarca) {
-          throw new Error("Tiene que agregar una Marca");
-        }
-        if (!productoDoc.nombreCategoria) {
-          throw new Error("Tiene que agregar una Categoria");
-        }
-        if (!(productoDoc.precioMayoreo > 0)) {
-          throw new Error("El precio de mayoreo no puede ser menor a 0");
-        }
-        if (!(productoDoc.precioPublico > 0)) {
-          throw new Error("El precio de publico no puede ser menor a 0");
-        }
-        if (!(productoDoc.precioTaller > 0)) {
-          throw new Error("El precio de taller no puede ser menor a 0");
-        }
-        return numbersOfUPCs;
-      } catch (error) {
-        return error;
-      }
-    },
-    async createProducto({ state, commit, dispatch }, producto) {
-      try {
-        const productoDoc = producto[0].doc;
-        productoDoc.precioMayoreo =
-          Math.round(productoDoc.precioMayoreo * 100) / 100;
-        productoDoc.precioPublico =
-          Math.round(productoDoc.precioPublico * 100) / 100;
-        productoDoc.precioTaller =
-          Math.round(productoDoc.precioTaller * 100) / 100;
-        const totalNumberOfUPCs = await dispatch("validarDatos", productoDoc);
-        if (!(typeof totalNumberOfUPCs.length === "number")) {
-          throw new Error(totalNumberOfUPCs);
-        }
-        if (totalNumberOfUPCs.length > 0) {
-          throw new Error("Ya existe un producto con ese UPC");
-        }
-        productoDoc._id = new Date().toISOString(); // For puchDB we need to add an _id field
-        state.localProductos
-          .put(productoDoc)
-          .then(() => {
-            dispatch("readProducto").then(() =>
-              commit("successNotification", "Producto agregado con éxito"),
-            );
-          })
-          .catch((err) => {
-            commit("errorNotification", `Error al guardar el producto ${err}`);
-          });
+        return productoInserted;
       } catch (err) {
-        commit("errorNotification", `Error al guardar el producto ${err}`);
+        commit(
+          "common/errorNotification",
+          `Error al guardar el producto ${err}`,
+          { root: true },
+        );
+        return null;
       }
     },
     async readAllProducts({ state, commit, dispatch }, variables) {
@@ -196,48 +163,121 @@ export default (app) => ({
         state.loadingTableProductos = false;
       }
     },
-    async updateProducto({ state, commit, dispatch }, producto) {
+    async updateProducto({ commit, dispatch }, prod) {
       try {
-        const productoDoc = { ...producto };
-        productoDoc.precioMayoreo =
-          Math.round(productoDoc.precioMayoreo * 100) / 100;
-        productoDoc.precioPublico =
-          Math.round(productoDoc.precioPublico * 100) / 100;
-        productoDoc.precioTaller =
-          Math.round(productoDoc.precioTaller * 100) / 100;
-        const totalNumberOfUPCs = await dispatch("validarDatos", productoDoc);
-        if (typeof totalNumberOfUPCs.length !== "number")
-          throw new Error(totalNumberOfUPCs);
-        if (totalNumberOfUPCs.length > 0) {
-          if (productoDoc._id !== totalNumberOfUPCs[0]._id) {
-            window.console.error(
-              "No es el mismo doc así que no se modifica, se arroja error que el upc ya existe",
-            );
-            throw new Error("El UPC ya existente. Sólo puede haber 1.");
-          }
-        }
-        state.localProductos.put(productoDoc).then(() => {
-          dispatch("readProducto").then(() =>
-            commit("successNotification", "Producto modificado con éxito"),
-          );
+        const updateColumns = [
+          "nombre_producto",
+          "upc",
+          "id_marca",
+          "id_categoria",
+          "precio_taller",
+          "precio_mayoreo",
+          "precio_publico",
+          "stock_prod_sta_ana",
+          "stock_prod_metapan",
+          "foto",
+        ];
+        const producto = JSON.parse(JSON.stringify(prod));
+        const uniqueUPC = await dispatch("uniqueUPC", {
+          upc: producto.upc,
+          id: producto.id,
         });
+        if (uniqueUPC != null) {
+          dispatch("upcMessages", uniqueUPC);
+          return null;
+        }
+        if (producto.UPLOAD_NEW_PICTURE) {
+          const fotoUploaded = await dispatch("uploadAttachments", prod.foto);
+          delete producto.UPLOAD_NEW_PICTURE;
+          producto.foto = fotoUploaded != null ? fotoUploaded[0] : "";
+        } else if (typeof producto.foto === "string") {
+          [, producto.foto] = prod.foto.split("/photo/");
+        }
+        const searchInfo = {
+          mutation: CREATE_UPDATE_PRODUCTO,
+          variables: {
+            producto,
+            update_columns: updateColumns,
+          },
+        };
+        const result = await apolloClient.mutate(searchInfo);
+        let productoInserted = null;
+        if (
+          result &&
+          result.data &&
+          result.data.insert_acostarep_productos_one
+        ) {
+          productoInserted = result.data.insert_acostarep_productos_one;
+          commit("common/successNotification", "Producto editado con éxito", {
+            root: true,
+          });
+          dispatch("readAllProducts");
+        }
+        return productoInserted;
       } catch (err) {
-        commit("errorNotification", `Error al modificar el producto. ${err}`);
+        window.console.error(err);
+        commit(
+          "common/errorNotification",
+          `Error al modificar el producto. ${err}`,
+          { root: true },
+        );
+        return null;
       }
     },
-    deleteProducto({ state, commit, dispatch }, productoDel) {
-      const producto = productoDel;
-      producto.doc.activoProd = false;
-      state.localProductos
-        .put(producto.doc)
-        .then(() => {
-          dispatch("readProducto").then(() =>
-            commit("successNotification", "Producto eliminado con éxito"),
-          );
-        })
-        .catch((err) => {
-          commit("errorNotification", `Error al eliminar el producto ${err}`);
+    async deleteProducto({ commit, dispatch }, variables) {
+      try {
+        const result = await apolloClient.mutate({
+          mutation: DELETE_PRODUCTO,
+          variables,
         });
+        if (!result || result.errors)
+          throw new Error("al eliminar el producto.\n", result.errors);
+        commit("common/successNotification", "Producto eliminado con éxito", {
+          root: true,
+        });
+        dispatch("readAllProducts");
+      } catch (error) {
+        commit(
+          "common/errorNotification",
+          `Error al eliminar el producto ${error}`,
+          { root: true },
+        );
+        window.console.error("ERROR:", error);
+      }
+    },
+    async uniqueUPC(store, variables) {
+      try {
+        const searchInfo = {
+          query: GET_PRODUCT_BY_UPC,
+          fetchPolicy: "network-only",
+          variables,
+        };
+        const result = await apolloClient.query(searchInfo);
+        let numbersOfUPCs = null;
+        if (result && result.data && result.data.listUPC.length > 0) {
+          [numbersOfUPCs] = result.data.listUPC;
+        }
+        return numbersOfUPCs;
+      } catch (error) {
+        window.console.error("error", error);
+        return { ERROR: true, error };
+      }
+    },
+    upcMessages({ commit }, uniqueUPC) {
+      if (uniqueUPC.ERROR) {
+        commit(
+          "common/errorNotification",
+          `Error al buscar UPC duplicador.
+          ${uniqueUPC.error}`,
+          { root: true },
+        );
+      }
+      commit(
+        "common/errorNotification",
+        `UPC duplicado: ${uniqueUPC.upc}
+        Nombre del producto: ${uniqueUPC.nombre_producto}`,
+        { root: true },
+      );
     },
     setPage({ state, dispatch }, page) {
       if (page === state.currentPage) return;
@@ -251,14 +291,11 @@ export default (app) => ({
      * @param {vuex} param0
      * @param {product} producto
      */
-    confirmation({ dispatch }, producto) {
-      // Verify in confirmation is for update o create new
-      /* eslint-disable-next-line */
-      if (producto.doc._rev) {
-        dispatch("updateProducto", { ...producto.doc });
-      } else {
-        dispatch("createProducto", [producto]);
+    async confirmation({ dispatch }, producto) {
+      if (producto.id) {
+        return dispatch("updateProducto", producto);
       }
+      return dispatch("createProducto", producto);
     },
     getQueryFilters({ state }) {
       const where = {
@@ -375,6 +412,34 @@ export default (app) => ({
         }),
       );
       // .then(resp => resp.json()).then(console.log);
+    },
+    async uploadAttachments({ commit }, file) {
+      try {
+        if (!(file instanceof File)) return null;
+        const url = `${app.config.globalProperties.$FILE_MANAGER}upload-photo`;
+        const bodyFormData = new FormData();
+        bodyFormData.append("file", file);
+        bodyFormData.append("userEmail", localStorage.getItem("email"));
+        return fetch(url, {
+          method: "POST",
+          body: bodyFormData,
+          redirect: "follow",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.errors) throw new Error(data.errors);
+            return data.savedFileNames;
+          })
+          .catch((error) => {
+            throw new Error(error);
+          });
+      } catch (error) {
+        commit("common/errorNotification", `Error al cargar imagen. ${error}`, {
+          root: true,
+        });
+        window.console.error("error in uploadAttachments", error);
+        return null;
+      }
     },
   },
 });
