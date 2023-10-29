@@ -92,6 +92,24 @@
                 >
                   <i class="fas fa-times" aria-hidden="true"></i>
                 </el-button>
+                <el-button
+                  :type="ordenDetalleProductos[prod.id]?.cantidad ? 'warning' : 'success'"
+                  plain
+                  style="width: 100%; margin: 0.5rem 0 0 0"
+                  @click="
+                    prodSelected = JSON.parse(JSON.stringify(prod));
+                    show.addToCartModal = true;
+                  "
+                >
+                  <i class="fas fa-cart-plus" aria-hidden="true"></i>
+                  <span style="padding-left: 0.5em">
+                    {{
+                      ordenDetalleProductos[prod.id]?.cantidad
+                        ? "Agregar/Quitar"
+                        : "Agregar"
+                    }}
+                  </span>
+                </el-button>
               </div>
             </el-card>
           </div>
@@ -110,6 +128,24 @@
         </div>
       </div>
       <!-- eslint-disable  vue/component-name-in-template-casing -->
+      <DraggableButton
+        v-if="showCartButton && Object.keys(ordenDetalleProductos).length"
+      >
+        <el-button
+          class="cartButton"
+          type="success"
+          size="large"
+          circle
+          @click="show.newOrder = true"
+        >
+          <i
+            class="fas fa-cart-plus"
+            aria-hidden="true"
+            style="font-size: large"
+          ></i>
+        </el-button>
+      </DraggableButton>
+      <NuevaOrden v-if="show.newOrder" :show="show"></NuevaOrden>
       <AddEditProdMovile
         v-if="show.addEditProdMovile"
         :title="title"
@@ -117,11 +153,16 @@
         :prod-selected="prodSelected"
       ></AddEditProdMovile>
       <EliminarProdMovil
+        v-if="show.deleteProduc"
         :mostrar="show"
         :new-product-mobile="prodSelected"
       ></EliminarProdMovil>
+      <AddToCartModal
+        v-if="show.addToCartModal"
+        :prod-selected="prodSelected"
+        :mostrar="show"
+      ></AddToCartModal>
       <FiltrosProductos ref="filtrosRef" :mostrar="show"></FiltrosProductos>
-      <!-- <ConfirmarTransacciones :show=show></ConfirmarTransacciones> -->
     </div>
   </div>
 </template>
@@ -134,14 +175,16 @@ export default {
   components: {
     AddEditProdMovile: () =>
       import("@/components/Productos/AddEditProdMovile.vue"),
-    // ConfirmarTransacciones: () => import('@/components/Productos/ConfirmarTransacciones.vue'),
     EliminarProdMovil: () =>
       import("@/components/Productos/EliminarProdMovil.vue"),
+    AddToCartModal: () => import("@/components/Productos/AddToCartModal.vue"),
     FiltrosProductos: () =>
       import("@/components/Productos/FiltrosProductos.vue"),
     ImgWithBackUp: () => import("@/components/ImgWithBackUp.vue"),
     LoadingProductos: () =>
       import("@/components/Productos/LoadingProductos.vue"),
+    DraggableButton: () => import("@/components/Productos/DraggableButton.vue"),
+    NuevaOrden: () => import("@/components/Ordenes/NuevaOrden.vue"),
   },
   data() {
     return {
@@ -153,8 +196,9 @@ export default {
         addEditProdMovile: false,
         modalFiltros: false,
         deleteProduc: false,
+        addToCartModal: false,
+        newOrder: false,
       },
-      userOrganization: null,
       prodSelected: null,
     };
   },
@@ -178,6 +222,7 @@ export default {
       "filtroMarcas",
       "filtroNombre",
       "filtroUPC",
+      "ordenDetalleProductos",
     ]),
     allFilters() {
       const filters = [];
@@ -193,6 +238,11 @@ export default {
       }
       return filters.concat(categories).concat(brands);
     },
+    showCartButton() {
+      if (Object.values(this.show).some((value) => value === true))
+        return false;
+      return true;
+    },
   },
   watch: {
     // 'show.addEditProdMovile': {
@@ -206,9 +256,6 @@ export default {
     //   },
     //   immediate: true,
     // },
-  },
-  created() {
-    this.userOrganization = localStorage.getItem("org_division");
   },
   mounted() {
     this.fetchProducts();
@@ -253,12 +300,15 @@ export default {
         case "Metapan":
           return prod.stock_prod_metapan;
         default:
-          window.console.warning("No se encontró la división");
+          window.console.warn("No se encontró la división");
           return 0;
       }
     },
     handleChangePage(currentPage) {
       this.$store.dispatch("productos/setPage", currentPage);
+    },
+    addToCart(prod) {
+      window.console.log("prod", prod);
     },
   },
 };
@@ -424,5 +474,11 @@ div:deep(.el-pagination.is-background.el-pagination--small) {
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   justify-items: center;
+}
+.cartButton {
+  border: 1px solid #656565;
+  box-shadow: -1px 0rem 2rem rgb(0 0 0 / 64%);
+  width: 2.5rem !important;
+  height: 2.5rem !important;
 }
 </style>

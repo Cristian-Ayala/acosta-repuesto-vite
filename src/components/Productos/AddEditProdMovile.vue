@@ -427,8 +427,6 @@ export default {
     ...mapMutations("productos", [
       "removeRegistro",
       "applyAllChanges",
-      "marcaSelected",
-      "categoriaSelected",
       "setCalledFrom",
     ]),
     ...mapActions("productos", ["confirmation"]),

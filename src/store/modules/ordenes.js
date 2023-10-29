@@ -151,12 +151,12 @@ export default (app) => ({
           });
       });
     },
-    async createRegistroOrdenes({ state, commit, dispatch }, orden) {
+    async createRegistroOrdenes({ state, commit }, orden) {
       if (!isLoggedIn()) return;
       // eslint-disable-next-line no-param-reassign
       orden.creation_user = localStorage.getItem("user_name");
       // eslint-disable-next-line no-param-reassign
-      orden.organization_division = localStorage.getItem("org_division");
+      orden.organization_division = localStorage.getItem("locationSelected");
       await state.localOrdenes
         .put(orden)
         .then(() => {
@@ -166,7 +166,7 @@ export default (app) => ({
           commit("errorNotification", "Error al guardar la orden.");
           console.error("error trying insert order", err);
         });
-      dispatch("productos/reduceQuantity", orden.productos, {root:true})
+      // dispatch("productos/reduceQuantity", orden.productos, {root:true})
     },
     getTotalRows({ state }, selector) {
       state.localOrdenes

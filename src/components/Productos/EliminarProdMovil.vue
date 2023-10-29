@@ -5,6 +5,7 @@
     title="Eliminar Producto"
     width="90%"
     top="5vh"
+    align-center
   >
     <p class="my-4" style="word-break: break-word">
       ¿Seguro quiere eliminar el producto:

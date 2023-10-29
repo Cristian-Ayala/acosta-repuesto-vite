@@ -12,14 +12,16 @@
   .cuadro2-home,
   .cuadro3-home,
   .cuadro4-home,
-  .cuadro5-home {
+  .cuadro5-home,
+  .cuadro6-home {
     max-width: 85% !important;
     justify-self: center;
     text-align: center;
   }
   .cuadro1-home,
   .cuadro3-home,
-  .cuadro4-home {
+  .cuadro4-home,
+  .cuadro5-home {
     margin-bottom: 2rem;
   }
   .cuadros-text-home {
@@ -30,7 +32,8 @@
 .cuadro2-home,
 .cuadro3-home,
 .cuadro4-home,
-.cuadro5-home {
+.cuadro5-home,
+.cuadro6-home {
   box-shadow: 0 0.125rem 0.8rem rgba(0, 0, 0, 0.18);
   border-radius: 25px;
   overflow: hidden;
@@ -79,10 +82,18 @@
 }
 .cuadro5-home:hover {
   color: #fff;
-  background: linear-gradient(to left, #84b6ff, #0073b7) !important;
+  background: linear-gradient(to left, #72a0b1ad, #1272c5) !important;
   cursor: pointer;
 }
 .cuadro5-home:hover .cuadros-text-home {
+  color: #fff;
+}
+.cuadro6-home:hover {
+  color: #fff;
+  background: linear-gradient(to left, #0073b7b3, #051E38) !important;
+  cursor: pointer;
+}
+.cuadro6-home:hover .cuadros-text-home {
   color: #fff;
 }
 .footer-margin {

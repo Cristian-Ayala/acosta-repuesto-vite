@@ -55,24 +55,6 @@ module.exports = {
     quotes: ["error", "double"],
 
     // /////////////////////////////////////////////////////////////////////////
-    // `vue/vue3-recommended`: Overwrites
-    // @see https://eslint.vuejs.org/rules/
-    // /////////////////////////////////////////////////////////////////////////
-
-    // Enforce consistent indentation in `<template>`.
-    // @see https://eslint.vuejs.org/rules/html-indent
-    "vue/html-indent": [
-      "error",
-      2,
-      {
-        attribute: 1,
-        baseIndent: 1,
-        closeBracket: 0,
-        alignAttributesVertically: true,
-        ignores: [],
-      },
-    ],
-    // /////////////////////////////////////////////////////////////////////////
     // `vue/vue3-recommended`: Optional (Uncategorized) Rules
     // @see https://eslint.vuejs.org/rules/#uncategorized
     // /////////////////////////////////////////////////////////////////////////
@@ -409,21 +391,6 @@ module.exports = {
         allowAllPropertiesOnSameLine: true,
       },
     ],
-
-    // Enforce consistent linebreak style for operators.
-    // @see https://eslint.vuejs.org/rules/operator-linebreak,
-    //   https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/style.js,
-    //   https://eslint.org/docs/rules/operator-linebreak
-    "vue/operator-linebreak": [
-      "error",
-      "before",
-      {
-        overrides: {
-          "=": "none",
-        },
-      },
-    ],
-
     // Suggest using template literals instead of string concatenation.
     // @see https://eslint.vuejs.org/rules/prefer-template,
     //   https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/es6.js,

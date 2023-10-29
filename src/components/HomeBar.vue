@@ -82,6 +82,18 @@
           <div class="cuadros-text-home">Ver estadísticas de venta</div>
         </router-link>
       </div>
+      <div class="cuadro6-home">
+        <router-link to="/clientes">
+          <img src="../assets/img/6.webp" alt="..." style="max-width: 100%" >
+          <div
+            class="font-weight-bold d-block"
+            style="margin: 1rem; font-size: 2.5rem"
+          >
+            Clientes
+          </div>
+          <div class="cuadros-text-home">Editar, eliminar, agregar o listar</div>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>

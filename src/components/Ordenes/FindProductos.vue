@@ -2,14 +2,24 @@
   <!-- eslint-disable vue/no-mutating-props -->
   <tr class="d-flex w-100 justify-content-between">
     <td class="imgCenter">
-      <img :src="prod.foto" class="image">
+      <img :src="prod.foto" class="image" />
       <div class="carousel-inner">
-        <el-button plain class="plus-btn" size="small" @click="changeQuantity(false)">
+        <el-button
+          plain
+          class="plus-btn"
+          size="small"
+          @click="changeQuantity(false)"
+        >
           <i class="fas fa-minus"></i>
         </el-button>
-        <input v-model.number="prod.cantidad" class="no-border">
+        <input v-model.number="prod.cantidad" class="no-border" />
         <!-- <p>Cantidad: {{ ordenDetalleProductos[prod.upc].cantidad }}</p> -->
-        <el-button plain class="plus-btn" size="small" @click="changeQuantity(true)">
+        <el-button
+          plain
+          class="plus-btn"
+          size="small"
+          @click="changeQuantity(true)"
+        >
           <i class="fas fa-plus"></i>
         </el-button>
       </div>
@@ -21,19 +31,25 @@
           <el-radio-group v-model="prod.price">
             <el-row :gutter="20">
               <el-col :span="8">
-                <el-radio :label="prod.precioPublico" size="small" border>${{prod.precioPublico}}</el-radio>
+                <el-radio :label="prod.precio_publico" size="small" border>
+                  ${{ prod.precio_publico }}
+                </el-radio>
               </el-col>
               <el-col :span="8">
-                <el-radio :label="prod.precioMayoreo" size="small" border>${{prod.precioMayoreo}}</el-radio>
+                <el-radio :label="prod.precio_mayoreo" size="small" border>
+                  ${{ prod.precio_mayoreo }}
+                </el-radio>
               </el-col>
               <el-col :span="8">
-                <el-radio :label="prod.precioTaller" size="small" border>${{prod.precioTaller}}</el-radio>
+                <el-radio :label="prod.precio_taller" size="small" border>
+                  ${{ prod.precio_taller }}
+                </el-radio>
               </el-col>
             </el-row>
             <el-row :gutter="20">
               <el-col :span="24">
                 <el-radio :label="prod.price" size="small" border>
-                  <input v-model.number="prod.price" class="no-border">
+                  <input v-model.number="prod.price" class="no-border" />
                 </el-radio>
               </el-col>
             </el-row>
@@ -72,7 +88,7 @@ export default {
     },
     userOrganization: {
       type: String,
-      default: ""
+      default: "",
     },
   },
   emits: ["addTmpProducts", "reCalculateSubTotal"],
@@ -80,42 +96,40 @@ export default {
     return {};
   },
   computed: {
-    showQuantity () {
+    showQuantity() {
       return (
         typeof this.ordenDetalleProductos !== "undefined" &&
-        Object.hasOwnProperty.call(
-          this.ordenDetalleProductos,
-          this.prod.upc
-        ) &&
+        Object.hasOwnProperty.call(this.ordenDetalleProductos, this.prod.upc) &&
         Object.hasOwnProperty.call(
           this.ordenDetalleProductos[this.prod.upc],
-          "cantidad"
+          "cantidad",
         ) &&
         this.ordenDetalleProductos[this.prod.upc].cantidad >= 1
       );
     },
     getStock() {
       switch (this.userOrganization) {
-      case "Santa-Ana":
-        return this.prod.stockProdStaAna;
-      case "Metapan":
-        return this.prod.stockProdMetapan;
-      default:
-        window.console.warning("No se encontró la división");
-        return 0;
+        case "Santa Ana":
+          return this.prod.stock_prod_sta_ana;
+        case "Metapan":
+          return this.prod.stock_prod_metapan;
+        default:
+          window.console.warn("No se encontró la división");
+          return 0;
       }
     },
   },
   watch: {
     "prod.price": {
-      handler () {
+      handler() {
         this.$emit("reCalculateSubTotal", this.index, this.prod);
       },
     },
   },
   mounted() {
     // eslint-disable-next-line
-    this.prod.cantidad = this.ordenDetalleProductos[this.prod?.upc]?.cantidad || 0;
+    this.prod.cantidad =
+      this.ordenDetalleProductos[this.prod?.upc]?.cantidad || 0;
     this.showPrice(this.prod);
   },
   methods: {
@@ -133,27 +147,27 @@ export default {
         return;
       }
       switch (this.tipoDist) {
-      case "Público":
-        // eslint-disable-next-line
-        this.prod.price = prod.precioPublico;
-        break;
-      case "Mayoreo":
-        // eslint-disable-next-line
-        this.prod.price = prod.precioMayoreo;
-        break;
-      case "Taller":
-        // eslint-disable-next-line
-        this.prod.price = prod.precioTaller;
-        break;
-      default:
-        // eslint-disable-next-line
-        this.prod.price = 0.0;
-        break;
+        case "Público":
+          // eslint-disable-next-line
+          this.prod.price = prod.precioPublico;
+          break;
+        case "Mayoreo":
+          // eslint-disable-next-line
+          this.prod.price = prod.precioMayoreo;
+          break;
+        case "Taller":
+          // eslint-disable-next-line
+          this.prod.price = prod.precioTaller;
+          break;
+        default:
+          // eslint-disable-next-line
+          this.prod.price = 0.0;
+          break;
       }
     },
     changeQuantity(addOrSubstract = false) {
       this.$emit("addTmpProducts", this.prod, this.index, addOrSubstract);
-    }
+    },
   },
 };
 </script>
@@ -179,7 +193,7 @@ div.carousel-inner input.no-border {
   background-color: transparent;
   color: white;
 }
-:deep(.el-radio-group){
+:deep(.el-radio-group) {
   place-content: center;
 }
 .plus_minus {

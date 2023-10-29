@@ -1,6 +1,9 @@
 <template>
   <div class="order">
-    <div id="leftSide" :style="`background-color: var(--el-color-${statusColor});`">
+    <div
+      id="leftSide"
+      :style="`background-color: var(--el-color-${statusColor});`"
+    >
       <el-button :type="statusColor" circle>
         <i v-if="orden.tipoOrden === 'Local'" class="fas fa-store"></i>
         <i v-else class="fas fa-motorcycle"></i>
@@ -21,7 +24,11 @@
       </div>
       <a href="#" @click="show.detOrd = true"> Ver detalles </a>
     </div>
-    <detalle-orden :ord-selected="orden" :show="show" @update-orders="updateOrders()"></detalle-orden>
+    <detalle-orden
+      :ord-selected="orden"
+      :show="show"
+      @update-orders="updateOrders()"
+    ></detalle-orden>
   </div>
 </template>
 
@@ -48,18 +55,18 @@ export default {
     };
   },
   computed: {
-    statusColor () {
+    statusColor() {
       if (!this.orden) return "danger";
       switch (this.orden.status) {
-      case "Completado":
-        return "success";
-      case "En proceso":
-        return "warning";
-      case "En camino":
-        return "primary";
-      default:
-        // In case of cancelado
-        return "danger";
+        case "Completado":
+          return "success";
+        case "En proceso":
+          return "warning";
+        case "En camino":
+          return "primary";
+        default:
+          // In case of cancelado
+          return "danger";
       }
     },
   },
@@ -69,7 +76,9 @@ export default {
   methods: {
     formatDate(id) {
       const date = new Date(id);
-      return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", { hour12: true })}`;
+      return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", {
+        hour12: true,
+      })}`;
     },
     updateOrders() {
       this.$emit("updateOrders");
@@ -83,7 +92,7 @@ export default {
   padding: 0.5rem;
   display: flex;
   align-items: center;
-  margin: 0.5rem .5rem;
+  margin: 0.5rem 0.5rem;
   box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
   background-color: #fff;
   border-radius: 1rem;

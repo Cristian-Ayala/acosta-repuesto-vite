@@ -36,7 +36,7 @@
             </div>
           </div>
         </div>
-        <div style="display: grid;grid-template-columns: 1fr 1fr;">
+        <div style="display: grid;">
           <order-view
             v-for="orden in ordenes"
             :key="orden._id"
@@ -102,7 +102,27 @@ export default {
     },
   }),
   computed: {
-    ...mapState("ordenes", ["ordenes", "ordSelected", "showDetOrd", "totalRows"]),
+    ...mapState("ordenes", ["ordSelected", "showDetOrd", "totalRows"]),
+    ordenes() {
+      const ord1 = {
+        nombreCliente: "Cristian Ayala",
+        _id: new Date().toISOString(),
+        tipoOrden: "Local",
+        status: "Completado",
+        telefono: "74705832",
+        totalOrden: "19.43",
+      };
+      const ord2 = {
+        nombreCliente: "Eunice Ayala",
+        _id: new Date().toISOString(),
+        tipoOrden: "Llevar",
+        status: "En proceso",
+        telefono: "78893242",
+        totalOrden: "22.11",
+      };
+      //  Esto venía desde vuex
+      return [ord1, ord2];
+    },
     allFilters() {
       const filters = [];
       if (this.filtersArray.date.end != null) filters.push(`Antes de: ${new Date(this.filtersArray.date.end).toLocaleDateString()}`);

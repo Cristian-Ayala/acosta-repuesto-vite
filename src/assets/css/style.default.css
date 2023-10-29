@@ -1246,6 +1246,7 @@ button {
 }
 @media (max-width: 1199.98px) {
   .sidebar {
+    overflow-y: scroll;
     width: 7rem;
     text-align: center;
     -webkit-transition: all 0.4s;

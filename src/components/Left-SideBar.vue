@@ -1,11 +1,11 @@
 <template>
   <div id="sidebar" class="sidebar shrink">
     <div class="wrapper-menu">
-      <div
+      <!-- <div
         class="text-gray-400 text-uppercase px-3 px-lg-4 py-4 font-weight-bold small headings-font-family"
       >
         MENÚ
-      </div>
+      </div> -->
       <ul class="sidebar-menu list-unstyled">
         <router-link v-slot="{ href, navigate, isExactActive }" to="/" custom>
           <a
@@ -90,6 +90,21 @@
           >
             <i class="fas fa-chart-bar text-gray my-2" aria-hidden="true"></i>
             <span>Estadísticas</span>
+          </a>
+        </router-link>
+        <router-link
+          v-slot="{ href, navigate, isExactActive }"
+          to="/clientes"
+          custom
+        >
+          <a
+            :href="href"
+            class="sidebar-link text-muted sidebar-list-item"
+            :class="{ active: isExactActive }"
+            @click.prevent="navigate()"
+          >
+            <i class="fas fa-user-alt text-gray my-2" aria-hidden="true"></i>
+            <span>Clientes</span>
           </a>
         </router-link>
       </ul>

@@ -155,7 +155,6 @@ export default {
       this.tmpFiltroNombre = filtroNombre.toString();
     },
     filtroUPC(filtroUPC) {
-      // this.setFiltroUPC(filtroUPC.toString());
       this.tmpFiltroUPC = filtroUPC;
     },
     tempFiltroUPC(tempFiltroUPC) {
@@ -168,7 +167,7 @@ export default {
   },
   methods: {
     ...mapActions("productos", ["aplicarFiltros", "borrarFiltros"]),
-    ...mapMutations("productos", ["setCalledFrom", "setFiltroUPC"]),
+    ...mapMutations("productos", ["setCalledFrom"]),
     getFilters() {
       this.tmpFiltroMarcasActivas = [...this.filtroMarcas];
       this.tmpFiltroCategoriasActivas = [...this.filtroCategorias];

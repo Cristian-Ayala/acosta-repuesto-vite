@@ -1,3 +1,4 @@
+<!-- TODO: falta probar este componente -->
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
   <el-dialog
@@ -67,7 +68,7 @@ export default {
         this.setFiltroUPC(a);
       }
       if (this.calledFrom === "AddEditProdMovile.vue") {
-        this.newProductMobile.doc.upc = a;
+        this.newProductMobile.upc = a;
       }
       this.barcode = a;
     },

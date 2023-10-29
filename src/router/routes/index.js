@@ -40,6 +40,12 @@ const routes = [
         component: () => import("@/views/Estadisticas.vue"),
         beforeEnter: authGuard,
       },
+      {
+        path: "/clientes",
+        name: "Clientes",
+        component: () => import("@/views/Clientes.vue"),
+        beforeEnter: authGuard,
+      },
     ],
   },
   {

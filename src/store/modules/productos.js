@@ -8,73 +8,53 @@ import {
   DELETE_PRODUCTO,
 } from "@/store/graphql/mutations/productos";
 
-function regexSearch(keyword) {
-  if (!keyword || keyword.trim() === "") return "nonexistent";
-  const arrayOfWords = keyword.split(" ");
-  const joinedRegex = arrayOfWords
-    .map((word) => (word !== " " ? `(?=.*${word})` : ""))
-    .join("");
-  return `^${joinedRegex}.+`;
-}
-
 export default (app) => ({
   namespaced: true,
   state: {
     productos: [],
-    producto: {
-      nombreProd: "",
-      activoProd: true,
-      stockProdStaAna: null,
-      stockProdMetapan: null,
-      upc: null,
-      nombreMarca: "",
-      nombreCategoria: "",
-      foto: "",
-      precioTaller: 0,
-      precioMayoreo: 0,
-      precioPublico: 0,
-    },
     newProd: [],
     newProductMobile: {},
-    localProductos: null,
     currentPage: 1,
     perPage: 10,
     totalRows: 0,
-    optionsPagination: {
-      descending: false,
-      limit: 10,
-      startkey: null,
-      skip: 0,
-      selectorFilter: {
-        $gt: null,
-      },
-    },
-    paginationHelper: {
-      firstDoc: null,
-      lastDoc: null,
-    },
     filtroCategorias: [],
     filtroMarcas: [],
     filtroNombre: "",
     filtroUPC: "",
     tempFiltroUPC: "",
     calledFrom: "",
-    prodSearchInOrdtotRows: 0,
     variables: {},
+    ordenDetalleProductos: {},
   },
   mutations: {
-    // TODO: Delete all mutations if not used
-    marcaSelected(state, marca) {
-      state.newProductMobile.doc.nombreMarca = marca;
-    },
-    categoriaSelected(state, categoria) {
-      state.newProductMobile.doc.nombreCategoria = categoria;
-    },
     setFiltroUPC(state, upc) {
       state.tempFiltroUPC = upc;
     },
     setCalledFrom(state, calledFrom) {
       state.calledFrom = calledFrom;
+    },
+    SET_DETALLE_PRODUCTOS(state, { prod, addOne = false, removeOne = false }) {
+      const tmpProd = { ...prod };
+      if (addOne) {
+        if (tmpProd.cantidad + 1 > tmpProd.stock) return;
+        tmpProd.cantidad += 1;
+        tmpProd.subtotal = app.config.globalProperties.$twoDecimalsOnly(
+          tmpProd.cantidad * tmpProd.price,
+        );
+      } else if (removeOne) {
+        if (state.ordenDetalleProductos[prod.id].cantidad === 1) {
+          delete state.ordenDetalleProductos[prod.id];
+          return;
+        }
+        tmpProd.cantidad -= 1;
+        tmpProd.subtotal = app.config.globalProperties.$twoDecimalsOnly(
+          tmpProd.cantidad * tmpProd.price,
+        );
+      }
+      state.ordenDetalleProductos[prod.id] = { ...tmpProd };
+    },
+    REMOVE_FROM_CART(state, id) {
+      delete state.ordenDetalleProductos[id];
     },
   },
   actions: {
@@ -345,73 +325,6 @@ export default (app) => ({
       state.filtroUPC = "";
       state.filtroNombre = "";
       dispatch("readAllProducts");
-    },
-    /* TODO: Delete this function when order is implemented */
-    getTotalProductosSearchOrdenes({ state }, selector) {
-      state.localProductos
-        .find({ selector, fields: ["_id"] })
-        .then((response) => {
-          state.prodSearchInOrdtotRows = response.docs.length;
-        })
-        .catch(window.console.error);
-    },
-    /* TODO: Delete this function when order is implemented */
-    async searchProductos({ state, dispatch }, variables) {
-      if (!variables.keyword) {
-        state.prodSearchInOrdtotRows = 0;
-        return [];
-      }
-      let resultado = null;
-      const searchParameters = {
-        selector: {
-          $or: [
-            { upc: variables.keyword },
-            {
-              nombreProd: {
-                $regex: RegExp(regexSearch(variables.keyword), "i"),
-              },
-            },
-          ],
-        },
-        limit: variables.limit,
-        skip: variables.skip,
-      };
-      if (variables.pagination?.page === 1)
-        dispatch("getTotalProductosSearchOrdenes", searchParameters.selector);
-      await state.localProductos
-        .find(searchParameters)
-        .then((res) => {
-          resultado = res.docs;
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-      return resultado;
-    },
-    /* TODO: Delete this function when order is implemented */
-    reduceQuantity(store, detalleOrden) {
-      const organizationDivision = localStorage.getItem("org_division");
-      Promise.all(
-        detalleOrden.map((producto) => {
-          const settings = {
-            method: "PUT",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              cantidad: producto.cantidad,
-              organization_division: organizationDivision,
-            }),
-            credentials: "include",
-          };
-          return fetch(
-            `${app.config.globalProperties.$url}productos/_design/productHandler/_update/reduceQuantity/${producto._id}`,
-            settings,
-          );
-        }),
-      );
-      // .then(resp => resp.json()).then(console.log);
     },
     async uploadAttachments({ commit }, file) {
       try {

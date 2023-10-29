@@ -4,5 +4,6 @@ import apollo from "./vue-apollo";
 import element from "./element-plus";
 import sentry from "./sentry";
 import importcss from "./importcss";
+import commonFn from "./commonFn";
 
-export default [auth0, apollo, element, sentry, importcss];
+export default [auth0, apollo, element, sentry, importcss, commonFn];
