@@ -44,3 +44,36 @@ export const GET_CLIENTES = gql`
     }
   }
 `;
+
+export const GET_CLIENT_WHERE_EMAIL_OR_DUI_IS_DUPLICATED = gql`
+  query GET_CLIENT_WHERE_EMAIL_OR_DUI_IS_DUPLICATED(
+    $dui: String = ""
+    $email: String = ""
+    $id: Int = null
+  ) {
+    duplicatedDui: acostarep_cliente(
+      where: {
+        dui: { _eq: $dui }
+        activo_cliente: { _eq: true }
+        id: { _neq: $id }
+      }
+    ) {
+      id
+      name
+      last_name
+      dui
+    }
+    duplicatedEmail: acostarep_cliente(
+      where: {
+        email: { _eq: $email }
+        activo_cliente: { _eq: true }
+        id: { _neq: $id }
+      }
+    ) {
+      id
+      name
+      last_name
+      email
+    }
+  }
+`;

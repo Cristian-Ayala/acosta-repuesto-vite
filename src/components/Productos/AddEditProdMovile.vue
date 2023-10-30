@@ -370,7 +370,6 @@ export default {
   computed: {},
   watch: {
     newProductMobile: {
-      // This will let Vue know to look inside the array
       handler() {
         if (this.newProductMobile.foto) {
           this.imagePreview = this.newProductMobile.foto;

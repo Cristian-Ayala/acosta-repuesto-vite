@@ -1,23 +1,27 @@
 <template>
   <div class="clientes">
     <div class="containerCliente">
-      <div
-        id="leftSide"
-        @click="showActions()"
-      >
+      <div id="leftSide">
         <el-button color="#143642" circle>
           <i class="fas fa-user-alt"></i>
         </el-button>
       </div>
       <div id="rigthSide">
         <div v-if="client.name || client.last_name" class="clienteName">
-          {{ `${client.name} ${client.last_name}` }}
+          {{
+            `${client.name ? client.name : ""} ${
+              client.last_name ? client.last_name : ""
+            }`
+          }}
         </div>
         <div v-if="client.email">
           {{ client.email }}
         </div>
         <div v-if="client.telefono">
           {{ client.telefono }}
+        </div>
+        <div v-if="client.dui">
+          {{ client.dui }}
         </div>
         <div v-if="client.direccion">
           {{ client.direccion }}
@@ -28,29 +32,11 @@
       </div>
     </div>
     <Transition name="scaleCenter">
-      <div
-        v-if="show.actions"
-        class="wrapperActions"
-        @click="show.actions = false"
-      >
-        <el-button
-          type="danger"
-          circle
-          @click="
-            setClienteSelected();
-            show.modalEliminarMar = true;
-          "
-        >
+      <div class="wrapperActions">
+        <el-button type="danger" circle @click="openDeleteModal()">
           <i class="fas fa-times" aria-hidden="true"></i>
         </el-button>
-        <el-button
-          type="warning"
-          circle
-          @click="
-            setClienteSelected();
-            show.modalAgregarMar = true;
-          "
-        >
+        <el-button type="warning" circle @click="openEditModal()">
           <i class="fas fa-pencil-alt" aria-hidden="true"></i>
         </el-button>
       </div>
@@ -70,29 +56,18 @@ export default {
       required: true,
     },
   },
-  emits: ["updateOrders"],
+  emits: ["openEditModal", "openDeleteModal"],
   data() {
-    return {
-      show: {
-        actions: false,
-      },
-    };
+    return {};
   },
   computed: {},
   mounted() {},
   methods: {
-    showActions() {
-      window.console.log("flag actions");
-      this.show.actions = true;
+    openEditModal() {
+      this.$emit("openEditModal", this.client);
     },
-    formatDate(id) {
-      const date = new Date(id);
-      return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", {
-        hour12: true,
-      })}`;
-    },
-    updateOrders() {
-      this.$emit("updateOrders");
+    openDeleteModal() {
+      this.$emit("openDeleteModal", this.client);
     },
   },
 };
@@ -123,9 +98,6 @@ export default {
   align-self: center;
 }
 .wrapperActions {
-  grid-column: 1;
-  grid-row: 1;
-  background: #ffffffb2;
   text-align: center;
   border-radius: 1rem;
 }

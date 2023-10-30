@@ -11,7 +11,7 @@
               color="#28a745"
               style="float: right"
               circle
-              @click="show.detOrden = true"
+              @click="createClient()"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </el-button>
@@ -50,51 +50,97 @@
             v-for="(cliente, index) in clientes"
             :key="index"
             :client="cliente"
+            @open-edit-modal="editClient(cliente)"
+            @open-delete-modal="deleteClient(cliente)"
           ></client-view>
         </div>
         <div v-if="show.clientTableLoading">
-          <clientes-view-loading v-for="i in 10" :key="i"/>
+          <clientes-view-loading v-for="i in 10" :key="i" />
         </div>
         <el-empty v-if="clientes.length === 0" description="No hay registros" />
       </div>
     </div>
     <!-- Fin del Cuerpo a escribir -->
+    <create-edit-client
+      :title="title"
+      :mostrar="show"
+      :client-selected="clientSelected"
+      @close-modal-and-refresh="closeModalAndRefresh()"
+    ></create-edit-client>
+    <delete-client
+      :show="show"
+      :client-prop="clientSelected"
+      @cliente-deleted="clienteDeleted()"
+    ></delete-client>
   </div>
 </template>
 
 <script>
 import ClientView from "@/components/Clientes/ClientesView.vue";
 import ClientesViewLoading from "@/components/Clientes/ClientesViewLoading.vue";
+import CreateEditClient from "@/components/Clientes/CreateEditClient.vue";
+import DeleteClient from "@/components/Clientes/DeleteClient.vue";
 
 export default {
   name: "ClientesIndex",
   components: {
     ClientView,
     ClientesViewLoading,
+    CreateEditClient,
+    DeleteClient,
   },
   props: {},
   data() {
     return {
       allFilters: [],
       show: {
-        detOrden: false,
         orderFilterDrawer: false,
         clientTableLoading: false,
+        modalAddEditClient: false,
+        modalDeleteClient: false,
       },
       clientes: [],
       totalClientes: 0,
+      title: "",
+      clientSelected: {},
     };
   },
   computed: {},
   watch: {},
-  async mounted() {
-    this.show.clientTableLoading = true;
-    const res = await this.$store.dispatch("clientes/getAll");
-    this.clientes = res.clientes;
-    this.totalClientes = res.totalClientes;
-    this.show.clientTableLoading = false;
+  mounted() {
+    this.getClientes();
   },
-  methods: {},
+  methods: {
+    async getClientes() {
+      this.show.clientTableLoading = true;
+      const res = await this.$store.dispatch("clientes/getAll");
+      this.clientes = res.clientes;
+      this.totalClientes = res.totalClientes;
+      this.show.clientTableLoading = false;
+    },
+    createClient() {
+      this.clientSelected = { CLEAR: true };
+      this.title = "Agregar Cliente";
+      this.show.modalAddEditClient = true;
+    },
+    editClient(client) {
+      this.clientSelected = client;
+      this.title = "Editar Cliente";
+      this.show.modalAddEditClient = true;
+    },
+    deleteClient(client) {
+      this.clientSelected = client;
+      this.show.modalDeleteClient = true;
+    },
+    closeModalAndRefresh() {
+      this.show.modalAddEditClient = false;
+      this.getClientes();
+    },
+    clienteDeleted() {
+      this.show.modalDeleteClient = false;
+      this.getClientes();
+    },
+  },
 };
 </script>
 
