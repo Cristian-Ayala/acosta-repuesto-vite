@@ -5,26 +5,22 @@
       :style="`background-color: var(--el-color-${statusColor});`"
     >
       <el-button :type="statusColor" circle>
-        <i v-if="orden.tipoOrden === 'Local'" class="fas fa-store"></i>
+        <i v-if="orden.tipo_orden_id === 23" class="fas fa-store"></i>
         <i v-else class="fas fa-motorcycle"></i>
       </el-button>
     </div>
     <div id="rigthSide">
-      <div v-if="orden && orden.nombreCliente" class="orderName">
-        {{ orden.nombreCliente }}
+      <div v-if="orden.cliente" class="orderName">
+        {{ `${orden.cliente.name} ${orden.cliente.last_name}` }}
       </div>
-      <div v-if="orden && orden._id">
-        {{ formatDate(orden._id) }}
+      <div>
+        {{ formatDate(orden.created_at) }}
       </div>
-      <div v-if="orden && orden.telefono">
-        {{ orden.telefono }}
-      </div>
-      <div v-if="orden && typeof orden.totalOrden === 'number'">
-        $ {{ orden.totalOrden }}
-      </div>
+      <div>$ {{ orden.total_orden }}</div>
       <a href="#" @click="show.detOrd = true"> Ver detalles </a>
     </div>
     <detalle-orden
+      v-if="show.detOrd"
       :ord-selected="orden"
       :show="show"
       @update-orders="updateOrders()"
@@ -33,12 +29,15 @@
 </template>
 
 <script>
-import DetalleOrden from "@/components/Ordenes/DetalleOrden.vue";
+import { defineAsyncComponent } from "vue";
+import { mapState } from "vuex";
 
 export default {
   name: "OrderView",
   components: {
-    DetalleOrden,
+    DetalleOrden: defineAsyncComponent(() =>
+      import("@/components/Ordenes/DetalleOrden.vue"),
+    ),
   },
   props: {
     orden: {
@@ -55,14 +54,14 @@ export default {
     };
   },
   computed: {
+    ...mapState("ordenes", ["enums"]),
     statusColor() {
-      if (!this.orden) return "danger";
-      switch (this.orden.status) {
-        case "Completado":
+      switch (this.orden.status_id) {
+        case this.enums.ORD_STATUS.COMPLETADO.id:
           return "success";
-        case "En proceso":
+        case this.enums.ORD_STATUS.EN_PROCESO.id:
           return "warning";
-        case "En camino":
+        case this.enums.ORD_STATUS.EN_CAMINO.id:
           return "primary";
         default:
           // In case of cancelado
@@ -70,12 +69,9 @@ export default {
       }
     },
   },
-  mounted() {
-    // console.log({ ...this.orden });
-  },
   methods: {
-    formatDate(id) {
-      const date = new Date(id);
+    formatDate(orderDate) {
+      const date = new Date(orderDate);
       return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", {
         hour12: true,
       })}`;

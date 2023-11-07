@@ -6,14 +6,14 @@ export const GET_CLIENTES = gql`
       order_by: { name: asc }
       where: {
         activo_cliente: { _eq: true }
-        _or: {
-          dui: { _ilike: $keyword }
-          email: { _ilike: $keyword }
-          last_name: { _ilike: $keyword }
-          name: { _ilike: $keyword }
-          telefono: { _ilike: $keyword }
-          empresa: { _ilike: $keyword }
-        }
+        _or: [
+          { dui: { _ilike: $keyword } }
+          { email: { _ilike: $keyword } }
+          { last_name: { _ilike: $keyword } }
+          { name: { _ilike: $keyword } }
+          { telefono: { _ilike: $keyword } }
+          { empresa: { _ilike: $keyword } }
+        ]
       }
     ) {
       direccion

@@ -56,6 +56,9 @@ export default (app) => ({
     REMOVE_FROM_CART(state, id) {
       delete state.ordenDetalleProductos[id];
     },
+    CLEAR_CART(state) {
+      state.ordenDetalleProductos = {};
+    },
   },
   actions: {
     async createProducto({ commit, dispatch }, producto) {

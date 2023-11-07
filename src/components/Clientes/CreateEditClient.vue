@@ -217,12 +217,12 @@ export default {
         },
       );
       if (hasDupEmailOrDui) return;
-      const creationID = await this.$store.dispatch(
+      const client = await this.$store.dispatch(
         "clientes/createUpdateCliente",
         { client: this.createEditClient },
       );
-      if (!creationID) return;
-      this.$emit("closeModalAndRefresh");
+      if (!client) return;
+      this.$emit("closeModalAndRefresh", client);
     },
   },
 };

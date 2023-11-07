@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/v-on-function-call -->
 <!-- eslint-disable vue/no-mutating-props -->
 <!-- eslint-disable vue/v-on-event-hyphenation -->
 <template>
@@ -27,45 +26,65 @@
               />
             </el-form-item>
             <el-form-item label="Nombre:">
-              <el-input
+              <el-select
                 id="nombre"
-                v-model="orden.nombreCliente"
-                placeholder=""
-              />
-            </el-form-item>
-            <el-form-item label="Teléfono:">
-              <el-input id="nombre" v-model="orden.telefono" placeholder="" />
+                v-model="orden.cliente_id"
+                placeholder="Seleccione un cliente"
+                filterable
+                clearable
+                remote
+                :remote-method="getClientes"
+                :loading="loading.clientes"
+              >
+                <el-option
+                  v-for="client in clientes"
+                  :key="client?.id || 0"
+                  :label="`${client.name} ${client.last_name}`"
+                  :value="client.id"
+                >
+                  <span>{{ `${client.name} ${client.last_name}` }}</span>
+                </el-option>
+                <div class="plusWrapper">
+                  <el-button
+                    type="success"
+                    circle
+                    @click="show.modalAddEditClient = true"
+                  >
+                    <el-icon><Plus /></el-icon>
+                  </el-button>
+                </div>
+              </el-select>
             </el-form-item>
             <el-form-item label="Descripción:">
-              <el-input v-model="orden.observacionesOrden" type="textarea" />
+              <el-input v-model="orden.observaciones_orden" type="textarea" />
             </el-form-item>
             <el-form-item label="Tipo de orden:">
               <el-select
                 id="tipoOrdenSelection"
-                v-model="tipoDeOrden.selected"
+                v-model="orden.tipo_orden_id"
                 placeholder="Select"
                 size="large"
               >
                 <el-option
-                  v-for="(item, index) in dropDownTypeOfOrder"
-                  :key="index"
+                  v-for="item in dropDownTypeOfOrder"
+                  :key="item.id"
                   :label="item.name"
-                  :value="item.name"
+                  :value="item.id"
                 />
               </el-select>
             </el-form-item>
             <el-form-item label="Tipo de Distribución:">
               <el-select
                 id="tipoDistribucionDropDown"
-                v-model="tipoDistribucion.selected"
+                v-model="orden.tipo_distribucion_id"
                 placeholder="Select"
                 size="large"
               >
                 <el-option
-                  v-for="(item, index) in tipoDistribucionArray"
-                  :key="index"
+                  v-for="item in tipoDistribucionArray"
+                  :key="item.id"
                   :label="item.name"
-                  :value="item.name"
+                  :value="item.id"
                 />
               </el-select>
             </el-form-item>
@@ -104,19 +123,32 @@
           </h3>
           <div id="metPagoDropdown">
             <el-select
-              id="tipoDistribucionDropDown"
-              v-model="dropDownMetodoPago.selected"
+              id="metPagoDropdown"
+              v-model="orden.metodo_pago_id"
               class="m-2"
               placeholder="Select"
               size="large"
             >
               <el-option
-                v-for="(item, index) in dropDownMetodoPago.data"
-                :key="index"
+                v-for="item in dropDownMetodoPago"
+                :key="item.id"
                 :label="item.name"
-                :value="item.name"
+                :value="item.id"
               />
             </el-select>
+          </div>
+          <div
+            v-if="orden.metodo_pago_id === 17"
+            class="text-center"
+            style="padding-top: 1rem"
+          >
+            <h6>¿Cuánto dinero recibe?</h6>
+            <el-input-number
+              v-model="amount_payed"
+              :precision="2"
+              :min="total"
+            />
+            <div>Vuelto: ${{ vuelto }}</div>
           </div>
         </div>
       </div>
@@ -148,11 +180,18 @@
       </span>
     </template>
   </el-dialog>
+  <create-edit-client
+    title="Crear Cliente"
+    :mostrar="show"
+    :client-selected="{ CLEAR: true }"
+    @close-modal-and-refresh="closeModalAndRefresh"
+  ></create-edit-client>
 </template>
 
 <script>
 import { mapState, mapMutations, mapActions } from "vuex";
 import ResumenNuevaOrden from "./ResumenNuevaOrden.vue";
+import CreateEditClient from "@/components/Clientes/CreateEditClient.vue";
 
 function todayDate() {
   const today = new Date();
@@ -167,50 +206,25 @@ function todayDate() {
 function initialState() {
   return {
     orden: {
-      nombreCliente: "",
-      observacionesOrden: "",
+      cliente_id: 1, // Por defecto
+      observaciones_orden: "",
+      metodo_pago_id: null,
+      tipo_distribucion_id: null,
+      tipo_orden_id: null,
     },
+    amount_payed: 0,
     paso: "resumen",
     date: "20-01-2021 14:30",
-    tipoDistribucionArray: [
-      {
-        name: "Público",
-      },
-      {
-        name: "Mayoreo",
-      },
-      {
-        name: "Taller",
-      },
-    ],
-    tipoDistribucion: {
-      selected: "Público",
-    },
-    tipoDeOrden: {
-      selected: "Local",
-    },
-    dropDownTypeOfOrder: [{ name: "Local" }, { name: "Delivery" }],
-    dropDownMetodoPago: {
-      data: [
-        {
-          name: "Tarjeta de Crédito",
-        },
-        {
-          name: "Tarjeta de Débito",
-        },
-        {
-          name: "Efectivo",
-        },
-        {
-          name: "Credito Fiscal",
-        },
-        {
-          name: "Criptomoneda",
-        },
-      ],
-      selected: "Efectivo",
+    defaultClient: {
+      id: 1,
+      name: "Usuario Por",
+      last_name: "Defecto",
     },
     userOrganization: null,
+    loading: {
+      clientes: false,
+    },
+    clientes: [],
   };
 }
 
@@ -219,6 +233,7 @@ export default {
   components: {
     // dropdown,
     ResumenNuevaOrden,
+    CreateEditClient,
   },
   props: {
     show: {
@@ -237,6 +252,10 @@ export default {
       "metPago",
       "prodSearch",
       "currentPage",
+      "tipoDistribucionArray",
+      "dropDownTypeOfOrder",
+      "dropDownMetodoPago",
+      "enums",
     ]),
     ...mapState("productos", ["productos", "ordenDetalleProductos"]),
     total() {
@@ -246,9 +265,23 @@ export default {
       });
       return this.$twoDecimalsOnly(total);
     },
+    vuelto() {
+      return this.$twoDecimalsOnly(this.amount_payed - this.total);
+    },
   },
-  watch: {},
+  watch: {
+    enums: {
+      handler(enums) {
+        if (!enums) return;
+        this.orden.metodo_pago_id = enums.PAY_METHOD.EFECTIVO.id;
+        this.orden.tipo_distribucion_id = enums.DIST_TYPE.PUBLICO.id;
+        this.orden.tipo_orden_id = enums.ORD_TYPE.LOCAL.id;
+      },
+      immediate: true,
+    },
+  },
   async mounted() {
+    this.clientes = [this.defaultClient];
     this.userOrganization = localStorage.getItem("locationSelected");
     this.date = todayDate();
   },
@@ -273,26 +306,36 @@ export default {
     ]),
     ...mapActions("ordenes", ["createRegistroOrdenes"]),
     async createOrder() {
-      const localOrder = { ...this.orden };
-      delete localOrder.totalOrden;
-      const orden = {
-        _id: `${new Date(this.date).toISOString().slice(0, -7)}${new Date()
-          .toISOString()
-          .slice(17)}`,
-        metodoPago: this.dropDownMetodoPago.selected,
-        tipoDistribucion: this.tipoDistribucion.selected,
-        totalOrden: this.total,
-        productos: Object.values(this.ordenDetalleProductos),
-        status:
-          this.tipoDeOrden.selected === "Local" ? "Completado" : "En proceso",
-        tipoOrden: this.tipoDeOrden.selected,
-        ...localOrder,
-      };
-      await this.createRegistroOrdenes(orden);
-      this.$emit("clearOrderFilters");
-      this.clearData();
-      // eslint-disable-next-line
-      this.show.newOrder = false;
+      const loading = this.$loading({ fullscreen: true });
+      try {
+        const orderType = this.dropDownTypeOfOrder.find(
+          (item) => item.id === this.orden.tipo_orden_id,
+        );
+        if (!orderType) {
+          loading.close();
+          return;
+        }
+        const order = {
+          status_id: orderType.code,
+          total_orden: this.total,
+          cede: localStorage.getItem("locationSelected"),
+          ...this.orden,
+        };
+        const resCreation = await this.createRegistroOrdenes({
+          order,
+          prodByOrder: Object.values(this.ordenDetalleProductos),
+        });
+        if (!resCreation) return;
+        // this.$emit("clearOrderFilters");
+        // eslint-disable-next-line
+        this.show.newOrder = false;
+        this.clearData();
+        this.$router.push({ name: "Ordenes" });
+        loading.close();
+      } catch (error) {
+        loading.close();
+        window.console.error(error);
+      }
     },
     clearData() {
       Object.assign(this.$data, initialState());
@@ -301,6 +344,27 @@ export default {
       // eslint-disable-next-line
       this.show.newOrder = false;
       this.clearData();
+    },
+    async getClientes(keyword) {
+      if (!keyword || keyword.trim() === "") {
+        this.clientes = [this.defaultClient];
+        return;
+      }
+      this.loading.clientes = true;
+      const res = await this.$store.dispatch("clientes/getAll", {
+        keyword: `%${keyword}%`,
+      });
+      this.clientes = res.clientes;
+      this.loading.clientes = false;
+    },
+    closeModalAndRefresh(client) {
+      /* eslint-disable vue/no-mutating-props */
+      this.orden.cliente_id = client?.id;
+      this.show.modalAddEditClient = false;
+      if (!client) return;
+      this.clientes = [client];
+      this.orden.cliente_id = client?.id;
+      this.getClientes();
     },
   },
 };
@@ -579,4 +643,13 @@ input::-webkit-input-placeholder {
     gap: 0.5rem;
     align-items: center;
 } */
+:deep(.el-select) {
+  width: 100%;
+}
+.plusWrapper {
+  display: flex;
+  place-content: center;
+  border-top: 1px solid #cfcfcf;
+  padding: 0.5rem 0;
+}
 </style>

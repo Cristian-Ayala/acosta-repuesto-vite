@@ -327,6 +327,7 @@ export default {
       default: () => ({}),
     },
   },
+  emits: ["loadingProduct"],
   setup() {
     return { v$: useVuelidate() };
   },
@@ -346,6 +347,7 @@ export default {
       loading: {
         marcas: false,
         categorias: false,
+        fullscreen: false,
       },
       marcas: [],
       categorias: [],
@@ -395,6 +397,7 @@ export default {
           this.newProductMobile = { ...newProductMobile };
           return;
         }
+        this.$emit("loadingProduct", true);
         this.categorias = await this.$store.dispatch(
           "categorias/getCategoriasByID",
           {
@@ -413,6 +416,7 @@ export default {
         delete value.categoria;
         /* eslint-enable */
         this.newProductMobile = value;
+        this.$emit("loadingProduct", false);
       },
       immediate: true,
     },

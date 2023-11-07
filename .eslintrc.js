@@ -118,11 +118,6 @@ module.exports = {
     // @see https://eslint.vuejs.org/rules/v-for-delimiter-style
     "vue/v-for-delimiter-style": "error",
 
-    // Enforce or forbid parentheses after method calls without arguments in
-    // `v-on` directives.
-    // @see https://eslint.vuejs.org/rules/v-on-function-call
-    "vue/v-on-function-call": ["error", "always"],
-
     // /////////////////////////////////////////////////////////////////////////
     // `vue/vue3-recommended`: Extension Rules
     //

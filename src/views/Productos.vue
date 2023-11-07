@@ -93,7 +93,11 @@
                   <i class="fas fa-times" aria-hidden="true"></i>
                 </el-button>
                 <el-button
-                  :type="ordenDetalleProductos[prod.id]?.cantidad ? 'warning' : 'success'"
+                  :type="
+                    ordenDetalleProductos[prod.id]?.cantidad
+                      ? 'warning'
+                      : 'success'
+                  "
                   plain
                   style="width: 100%; margin: 0.5rem 0 0 0"
                   @click="
@@ -151,6 +155,7 @@
         :title="title"
         :mostrar="show"
         :prod-selected="prodSelected"
+        @loading-product="loadingProduct"
       ></AddEditProdMovile>
       <EliminarProdMovil
         v-if="show.deleteProduc"
@@ -244,20 +249,9 @@ export default {
       return true;
     },
   },
-  watch: {
-    // 'show.addEditProdMovile': {
-    //   handler(valor) {
-    //     if (!this.$refs || !this.$refs.filtrosRef) return;
-    //     if (valor) {
-    //       this.$refs.filtrosRef.removeScannerListener(() => ({}));
-    //     } else {
-    //       this.$refs.filtrosRef.addScannerListener();
-    //     }
-    //   },
-    //   immediate: true,
-    // },
-  },
+  watch: {},
   mounted() {
+    this.$store.dispatch("ordenes/GET_TYPES");
     this.fetchProducts();
   },
   methods: {
@@ -307,8 +301,12 @@ export default {
     handleChangePage(currentPage) {
       this.$store.dispatch("productos/setPage", currentPage);
     },
-    addToCart(prod) {
-      window.console.log("prod", prod);
+    loadingProduct(value) {
+      let loading = null;
+      this.$nextTick(() => {
+        loading = this.$loading({ fullscreen: true });
+        if (!value) loading.close();
+      });
     },
   },
 };
