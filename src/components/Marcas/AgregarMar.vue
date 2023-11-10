@@ -53,7 +53,7 @@ export default {
       default: () => ({}),
     }
   },
-  emits: ["clearMarcaSelected", "getAllMarcas"],
+  emits: ["clearMarcaSelected", "getAllMarcas", "setMarcaSelected"],
   data() {
     return {
       marca: {
@@ -82,7 +82,8 @@ export default {
     ...mapActions("marcas", ["createUpdateRegistro"]),
     async createReg() {
       this.marca.nombre_marca = this.marca.nombre_marca.toLocaleUpperCase();
-      await this.createUpdateRegistro({ marca: this.marca });
+      const result = await this.createUpdateRegistro({ marca: this.marca });
+      this.$emit("setMarcaSelected", result);
       this.$emit("getAllMarcas");
       /* eslint-disable vue/no-mutating-props */
       this.show.modalAgregarMar = false;

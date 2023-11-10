@@ -32,7 +32,7 @@ export default () => ({
             root: true,
           });
         }
-        return res.data?.create_marca?.returning[0]?.id;
+        return res.data?.create_marca?.returning[0];
       } catch (error) {
         if (variables.marca.id) {
           commit(

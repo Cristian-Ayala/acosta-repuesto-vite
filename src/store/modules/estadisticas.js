@@ -36,10 +36,6 @@ export default (app) => ({
     },
     async GET_STATISTICS({ commit }, variables) {
       try {
-        window.console.log(
-          "JSON.stringify(variables, null, 2)",
-          JSON.stringify(variables, null, 2),
-        );
         const searchInfo = {
           query: GET_STATISTICS,
           fetchPolicy: "network-only",

@@ -32,7 +32,7 @@ export default () => ({
         commit("common/successNotification", "Categoria agregada con éxito", {
           root: true,
         });
-        return res.data?.insert_acostarep_categorias?.affected_rows;
+        return res.data?.insert_acostarep_categorias?.returning[0];
       } catch (error) {
         commit(
           "common/errorNotification",

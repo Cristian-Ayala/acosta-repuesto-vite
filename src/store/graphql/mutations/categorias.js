@@ -15,7 +15,11 @@ export const CREATE_UPDATE_CATEGORIA = gql`
         update_columns: $update_columns
       }
     ) {
-      affected_rows
+      returning {
+        id
+        nombre_categoria
+        descripcion_categoria
+      }
     }
   }
 `;

@@ -14,6 +14,8 @@ export const CREATE_UPDATE_MARCA = gql`
     ) {
       returning {
         id
+        nombre_marca
+        descripcion_marca
       }
     }
   }

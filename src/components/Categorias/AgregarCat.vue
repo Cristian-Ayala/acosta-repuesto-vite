@@ -51,6 +51,7 @@ export default {
       default: () => ({}),
     },
   },
+  emits: ["setCategoriaSelected"],
   data() {
     return {
       categoria: {
@@ -79,7 +80,7 @@ export default {
   methods: {
     ...mapMutations("common", ["errorNotification"]),
     ...mapActions("categorias", ["createCategory", "editCategory"]),
-    performAction() {
+    async performAction() {
       if (!this.categoria.nombre_categoria) {
         this.errorNotification(
           "Por favor, introduce un nombre para la categoria.",
@@ -87,9 +88,10 @@ export default {
         return;
       }
       if (this.categoria.id) {
-        this.editCategory({ categoria: this.categoria });
+        await this.editCategory({ categoria: this.categoria });
       } else {
-        this.createCategory({ categoria: this.categoria });
+        const res = await this.createCategory({ categoria: this.categoria });
+        this.$emit("setCategoriaSelected", res);
       }
       /* eslint-disable vue/no-mutating-props */
       this.show.modalAgregarCat = false;

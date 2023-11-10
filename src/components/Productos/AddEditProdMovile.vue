@@ -114,15 +114,17 @@
                 :label="mar.nombre_marca"
                 :value="mar.id"
               />
-              <div class="plusWrapper">
-                <el-button
-                  type="success"
-                  circle
-                  @click="show.modalAgregarMar = true"
-                >
-                  <el-icon><Plus /></el-icon>
-                </el-button>
-              </div>
+              <el-option label="" value="" disabled>
+                <span style="display: flex; place-content: center">
+                  <el-button
+                    type="success"
+                    circle
+                    @click="show.modalAgregarMar = true"
+                  >
+                    <el-icon><Plus /></el-icon>
+                  </el-button>
+                </span>
+              </el-option>
             </el-select>
           </div>
         </div>
@@ -151,15 +153,17 @@
                 :label="categoria.nombre_categoria"
                 :value="categoria.id"
               />
-              <div class="plusWrapper">
-                <el-button
-                  type="success"
-                  circle
-                  @click="show.modalAgregarCat = true"
-                >
-                  <el-icon><Plus /></el-icon>
-                </el-button>
-              </div>
+              <el-option label="" value="" disabled>
+                <span style="display: flex; place-content: center">
+                  <el-button
+                    type="success"
+                    circle
+                    @click="show.modalAgregarCat = true"
+                  >
+                    <el-icon><Plus /></el-icon>
+                  </el-button>
+                </span>
+              </el-option>
             </el-select>
           </div>
         </div>
@@ -275,8 +279,11 @@
       </template>
     </el-dialog>
     <!-- Fin del modal para eliminar (mobile) -->
-    <agregar-mar :show="show"></agregar-mar>
-    <agregar-cat :show="show"></agregar-cat>
+    <agregar-mar
+      :show="show"
+      @set-marca-selected="setMarcaSelected"
+    ></agregar-mar>
+    <agregar-cat :show="show" @set-categoria-selected="setCategoriaSelected"></agregar-cat>
     <u-p-c-reader :show="show"></u-p-c-reader>
   </div>
 </template>
@@ -480,8 +487,6 @@ export default {
         blobToURL(blob).then((url) => {
           this.imagePreview = url;
           this.loadingEffect = false;
-          // console.log(`KB length: ${  blob.size}`) / 1e3;
-          // console.log(`MB: ${  blob.size / 1e6}`);
         });
       });
     },
@@ -539,6 +544,14 @@ export default {
       this.newProductMobile.UPLOAD_NEW_PICTURE = true;
       this.newProductMobile.foto = "";
     },
+    setMarcaSelected(marca) {
+      this.newProductMobile.id_marca = marca.id;
+      this.marcas = [marca];
+    },
+    setCategoriaSelected(categoria) {
+      this.newProductMobile.id_categoria = categoria.id;
+      this.categorias = [categoria];
+    }
   },
 };
 </script>
