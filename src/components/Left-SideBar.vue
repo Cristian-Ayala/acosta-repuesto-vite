@@ -108,8 +108,10 @@
           </a>
         </router-link>
       </ul>
-      <el-avatar v-if="profilePicture" :size="30" :src="profilePicture" />
-      <span class="username">{{ userName }}</span>
+      <div @click="areaSelected()">
+        <el-avatar v-if="profilePicture" :size="30" :src="profilePicture" />
+        <span class="username">{{ userName }}</span>
+      </div>
     </div>
     <a
       href="#"
@@ -119,16 +121,29 @@
       <i class="fas fa-door-open mr-3 text-black my-2" aria-hidden="true"></i>
       <span>Salir</span>
     </a>
+    <change-area-selected
+      v-if="showModalToChangeAreaSelected"
+      :show="showModalToChangeAreaSelected"
+      @close-area-selection="() => showModalToChangeAreaSelected = false"
+    ></change-area-selected>
   </div>
 </template>
 
 <script>
+import { defineAsyncComponent } from "vue";
+
 export default {
   name: "LeftSideBar",
+  components: {
+    ChangeAreaSelected: defineAsyncComponent(() =>
+      import("./ChangeAreaSelected.vue"),
+    ),
+  },
   data() {
     return {
       profilePicture: localStorage.getItem("profilePicture") || null,
       userName: localStorage.getItem("userName") || null,
+      showModalToChangeAreaSelected: false,
     };
   },
   computed: {},
@@ -138,6 +153,12 @@ export default {
       this.$auth0.logout({
         logoutParams: { returnTo: window.location.origin },
       });
+    },
+    areaSelected() {
+      const areas = JSON.parse(
+        JSON.stringify(localStorage.getItem("sucursales")),
+      );
+      if (areas.length > 1) this.showModalToChangeAreaSelected = true;
     },
   },
 };
