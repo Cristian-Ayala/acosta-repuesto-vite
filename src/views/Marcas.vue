@@ -7,7 +7,12 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Marcas
             </h6>
-            <el-button color="#28a745" circle @click="createNewMarca()">
+            <el-button
+              v-if="isAbleToModify"
+              color="#28a745"
+              circle
+              @click="createNewMarca()"
+            >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </el-button>
           </div>
@@ -27,7 +32,7 @@
                   <th class="onlyOnWeb">#</th>
                   <th>Nombre</th>
                   <th class="onlyOnWeb">Descripción</th>
-                  <th>Operaciones</th>
+                  <th v-if="isAbleToModify">Operaciones</th>
                 </tr>
               </thead>
               <tbody v-if="marcas">
@@ -38,7 +43,7 @@
                 >
                   <td>{{ mar.nombre_marca }}</td>
                   <td class="onlyOnWeb">{{ mar.descripcion_marca }}</td>
-                  <td>
+                  <td v-if="isAbleToModify">
                     <el-button
                       type="danger"
                       circle
@@ -68,12 +73,14 @@
         </div>
       </div>
       <agregar-mar
+        v-if="show.modalAgregarMar"
         :show="show"
         :marca-prop="marcaSelected"
         @clear-marca-selected="() => (marcaSelected = {})"
         @get-all-marcas="getAllMarcas()"
       ></agregar-mar>
       <delete-mar
+        v-if="show.modalEliminarMar"
         :show="show"
         :marca-prop="marcaSelected"
         @clear-marca-selected="() => (marcaSelected = {})"
@@ -84,12 +91,19 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+import { defineAsyncComponent } from "vue";
+
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Marcas",
   components: {
-    AgregarMar: () => import("@/components/Marcas/AgregarMar.vue"),
-    DeleteMar: () => import("@/components/Marcas/DeleteMar.vue"),
+    AgregarMar: defineAsyncComponent(() =>
+      import("@/components/Marcas/AgregarMar.vue"),
+    ),
+    DeleteMar: defineAsyncComponent(() =>
+      import("@/components/Marcas/DeleteMar.vue"),
+    ),
   },
   data: () => ({
     displayOption: "",
@@ -101,7 +115,9 @@ export default {
     marcas: [],
     marcaSelected: {},
   }),
-  computed: {},
+  computed: {
+    ...mapState("auth", ["isAbleToModify"]),
+  },
   async mounted() {
     this.marcas = await this.$store.dispatch("marcas/getAll");
   },
@@ -124,7 +140,7 @@ export default {
     },
     async getAllMarcas() {
       this.marcas = await this.$store.dispatch("marcas/getAll");
-    }
+    },
   },
 };
 </script>

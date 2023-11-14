@@ -121,7 +121,7 @@ export default {
         filters.push(`Hasta${this.getDayMonthYear(this.filtersQuery.toDate)}`);
       }
       filters.push(this.filtersQuery.orgDivSelected);
-      filters.push(this.filtersQuery.createdBy);
+      filters.push(this.filtersQuery.createdBy != null ? this.filtersQuery.createdBy : "Todos los empleados");
       return filters;
     },
   },
@@ -170,10 +170,6 @@ export default {
       this.$nextTick(() => {
         this.loading = this.$loading({ fullscreen: true });
       });
-      // window.console.log(
-      //   "JSON.stringify(params, null, 2)",
-      //   JSON.stringify(params, null, 2),
-      // );
       const dates = this.getStartAndEndDate(params?.date || { start: null });
       const filters = {
         ...dates,

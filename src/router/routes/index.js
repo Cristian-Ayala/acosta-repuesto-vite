@@ -62,6 +62,15 @@ const routes = [
         },
       },
       {
+        path: "/logout",
+        name: "Logout",
+        component: () => import("@/views/LogOut.vue"),
+        meta: {
+          allowAnonymous: true,
+          layout: "Blank",
+        },
+      },
+      {
         path: "/cookies",
         name: "Cookies",
         component: () => import("@/views/Cookies.vue"),

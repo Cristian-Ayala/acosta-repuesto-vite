@@ -17,8 +17,6 @@
 </template>
 
 <script>
-
-
 export default {
   name: "LoadingScreen",
 };

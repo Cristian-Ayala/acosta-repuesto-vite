@@ -76,7 +76,6 @@ export default {
     user: {
       handler(user) {
         if (!user) return;
-        // console.log("user 2", JSON.stringify(user, null, 2));
         localStorage.setItem("sucursales", JSON.stringify(user.metadata.sucursal));
         localStorage.setItem("userName", user.name);
         localStorage.setItem("email", user.email);

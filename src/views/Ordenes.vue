@@ -7,13 +7,6 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Ordenes
             </h6>
-            <el-button
-              type="success"
-              style="float: right"
-              @click="show.detOrden = true"
-            >
-              <i class="fa fa-plus" aria-hidden="true"></i>
-            </el-button>
           </div>
           <div class="card-body">
             <div class="filtros">

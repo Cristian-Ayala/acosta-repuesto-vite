@@ -8,7 +8,12 @@
               <h6 class="text-uppercase mb-0" style="display: inline-block">
                 Productos
               </h6>
-              <el-button color="#28a745" circle @click="createProduct()">
+              <el-button
+                v-if="isAbleToModify"
+                color="#28a745"
+                circle
+                @click="createProduct()"
+              >
                 <i class="fa fa-plus" aria-hidden="true"></i>
               </el-button>
             </div>
@@ -72,6 +77,7 @@
                   Categoria: {{ prod.categoria?.nombre_categoria }}<br />
                 </div>
                 <el-button
+                  v-if="isAbleToModify"
                   type="warning"
                   circle
                   @click="
@@ -83,6 +89,7 @@
                   <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                 </el-button>
                 <el-button
+                  v-if="isAbleToModify"
                   type="danger"
                   circle
                   @click="
@@ -174,22 +181,31 @@
 
 <script>
 import { mapState, mapMutations } from "vuex";
+import { defineAsyncComponent } from "vue";
 
 export default {
   name: "ProductosIndex",
   components: {
-    AddEditProdMovile: () =>
+    AddEditProdMovile: defineAsyncComponent(() =>
       import("@/components/Productos/AddEditProdMovile.vue"),
-    EliminarProdMovil: () =>
+    ),
+    EliminarProdMovil: defineAsyncComponent(() =>
       import("@/components/Productos/EliminarProdMovil.vue"),
-    AddToCartModal: () => import("@/components/Productos/AddToCartModal.vue"),
+    ),
+    AddToCartModal: defineAsyncComponent(() =>
+      import("@/components/Productos/AddToCartModal.vue"),
+    ),
     FiltrosProductos: () =>
       import("@/components/Productos/FiltrosProductos.vue"),
     ImgWithBackUp: () => import("@/components/ImgWithBackUp.vue"),
     LoadingProductos: () =>
       import("@/components/Productos/LoadingProductos.vue"),
-    DraggableButton: () => import("@/components/Productos/DraggableButton.vue"),
-    NuevaOrden: () => import("@/components/Ordenes/NuevaOrden.vue"),
+    DraggableButton: defineAsyncComponent(() =>
+      import("@/components/Productos/DraggableButton.vue"),
+    ),
+    NuevaOrden: defineAsyncComponent(() =>
+      import("@/components/Ordenes/NuevaOrden.vue"),
+    ),
   },
   data() {
     return {
@@ -208,6 +224,7 @@ export default {
     };
   },
   computed: {
+    ...mapState("auth", ["isAbleToModify"]),
     // TODO: depurar este computed
     ...mapState("productos", [
       "currentPage",

@@ -7,7 +7,7 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Categorias
             </h6>
-            <el-button color="#28a745" circle @click="createBtn()">
+            <el-button v-if="isAbleToModify" color="#28a745" circle @click="createBtn()">
               <i class="fa fa-plus" aria-hidden="true"></i>
             </el-button>
           </div>
@@ -25,14 +25,14 @@
               <thead>
                 <tr>
                   <th>Nombre</th>
-                  <th>Operaciones</th>
+                  <th v-if="isAbleToModify">Operaciones</th>
                 </tr>
               </thead>
               <tbody v-if="categorias && !loadingTableCategoria">
                 <tr v-for="(cat, index) in categorias" :key="index">
                   <td>{{ cat.nombre_categoria }}</td>
                   <td class="onlyOnWeb">{{ cat.descripcion_categoria }}</td>
-                  <td>
+                  <td v-if="isAbleToModify">
                     <el-button
                       type="danger"
                       circle
@@ -57,7 +57,10 @@
                 </tr>
               </tbody>
             </table>
-            <div class="mt-3" style="margin-left: -12px; justify-content: center;">
+            <div
+              class="mt-3"
+              style="margin-left: -12px; justify-content: center"
+            >
               <el-pagination
                 v-show="!loadingTableCategoria"
                 :page-size="pageSize"
@@ -74,24 +77,32 @@
         </div>
       </div>
       <agregar-cat
+        v-if="show.modalAgregarCat"
         :show="show"
         :category-prop="categoriaSelected"
       ></agregar-cat>
-      <delete-cat :show="show" :category-prop="categoriaSelected"></delete-cat>
+      <delete-cat
+        v-if="show.modalEliminarCat"
+        :show="show"
+        :category-prop="categoriaSelected"
+      ></delete-cat>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
-import AgregarCat from "@/components/Categorias/AgregarCat.vue";
-import DeleteCat from "@/components/Categorias/DeleteCat.vue";
+import { defineAsyncComponent } from "vue";
 
 export default {
   name: "CategoriasIndex",
   components: {
-    AgregarCat,
-    DeleteCat,
+    AgregarCat: defineAsyncComponent(() =>
+      import("@/components/Categorias/AgregarCat.vue"),
+    ),
+    DeleteCat: defineAsyncComponent(() =>
+      import("@/components/Categorias/DeleteCat.vue"),
+    ),
   },
   data: () => ({
     displayOption: "",
@@ -106,6 +117,7 @@ export default {
     pageSize: 10,
   }),
   computed: {
+    ...mapState("auth", ["isAbleToModify"]),
     ...mapState("categorias", [
       "categorias",
       "categoriasCount",

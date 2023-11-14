@@ -17,11 +17,16 @@ import { useAuth0 } from "@auth0/auth0-vue";
 export default {
   name: "LogInAuth0",
   setup() {
-    const { loginWithRedirect, idTokenClaims, user, isAuthenticated } = useAuth0();
+    const { loginWithRedirect, idTokenClaims, user, isAuthenticated } =
+      useAuth0();
 
     return {
       login: () => {
-        loginWithRedirect();
+        loginWithRedirect({
+          appState: {
+            returnTo: window.location.pathname,
+          },
+        });
       },
       idTokenClaims,
       /* eslint-disable no-underscore-dangle */
@@ -40,19 +45,6 @@ export default {
       deep: true,
       immediate: true,
     },
-    user: {
-      handler(user) {
-        console.log("user", { ...user });
-      },
-      deep: true,
-      immediate: true,
-    },
-  },
-  mounted() {
-
-    // useAuth0().logout({
-    //   returnTo: "http://localhost:5173",
-    // });
   },
 };
 </script>

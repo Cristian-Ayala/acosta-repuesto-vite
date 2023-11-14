@@ -2,7 +2,7 @@
   <!-- eslint-disable vue/no-mutating-props -->
   <el-drawer
     v-model="show.estadisticasFilterDrawer"
-    title="Filtro para ordenes"
+    title="Filtro de estadísticas"
     direction="btt"
     size="80%"
   >
@@ -154,7 +154,7 @@ export default {
     },
     organizationUnits: {
       async handler(cedes) {
-        if (!cedes && this.user.role !== "gerente_area") return;
+        if (!cedes || this.user.role !== "gerente_area") return;
         [this.filters.orgDivSelected] = cedes;
         this.users = await this.$store.dispatch("estadisticas/GET_USERS", {
           cedes,
