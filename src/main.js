@@ -1,30 +1,23 @@
 import { createApp } from "vue";
-import { createRouter, createWebHistory } from "vue-router";
-import ElementPlus from "element-plus";
-import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 import { createStore } from "./store";
 import App from "./App.vue";
-import routes from "./router";
-import isLoggedIn from "./router/middleware/auth";
 import "element-plus/dist/index.css";
+import plugins from "./plugins/index";
+import router from "./router";
 
-const router = createRouter({
-  history: createWebHistory(),
-  // base: process.env.BASE_URL,
-  routes,
-  linkActiveClass: "active-link",
-  linkExactActiveClass: "exact-active-link",
-});
-
-router.beforeEach(async (to, from, next) => {
-  if (to.matched.some(record => record.meta.allowAnonymous)) next()
-  else if (!(await isLoggedIn())) next({ name: "Login" })
-  else next()
-  // to.name !== 'Login' &&
-})
+function installPlugins({ app }) {
+  plugins.forEach((plugin) => {
+    try {
+      plugin({ app, router });
+    } catch (error) {
+      window.console.error("Error occurred while loading plugin:", error, plugin);
+    }
+  });
+}
 
 const app = createApp(App);
 app.config.globalProperties.$url = import.meta.env.VITE_BACKEND_URL;
+app.config.globalProperties.$FILE_MANAGER = import.meta.env.VITE_FILE_MANAGER;
 app.config.errorHandler = function errorHandler(err, instance, info) {
   window.console.error(err, instance, info);
   console.log(`Error: ${err.toString()}\nInfo: ${info}`);
@@ -37,8 +30,5 @@ app.config.performance = true;
 const store = createStore(app);
 app.use(store);
 app.use(router);
-app.use(ElementPlus);
-Object.entries(ElementPlusIconsVue).forEach(([key, component]) => {
-  app.component(key, component);
-});
+installPlugins({ app });
 app.mount("#app");

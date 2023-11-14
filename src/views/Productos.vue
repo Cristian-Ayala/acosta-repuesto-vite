@@ -8,14 +8,24 @@
               <h6 class="text-uppercase mb-0" style="display: inline-block">
                 Productos
               </h6>
-              <el-button color="#28a745" circle @click="createProduct()">
+              <el-button
+                v-if="isAbleToModify"
+                color="#28a745"
+                circle
+                @click="createProduct()"
+              >
                 <i class="fa fa-plus" aria-hidden="true"></i>
               </el-button>
             </div>
             <div class="filtros">
               <div class="d-inline-flex pr-2 pb-2">
-                <el-button type="primary" round @click="show.modalFiltros = true"
-                >Filtros ({{ allFilters.length }})</el-button>
+                <el-button
+                  type="primary"
+                  round
+                  @click="show.modalFiltros = true"
+                >
+                  Filtros ({{ allFilters.length }})
+                </el-button>
               </div>
               <div
                 v-if="allFilters && allFilters.length > 0"
@@ -35,37 +45,43 @@
               </div>
             </div>
           </div>
-          <div class="bodyProducts">
+          <div v-if="loadingTableProductos" class="skeletonContainer">
+            <loading-productos v-for="i in 8" :key="i"></loading-productos>
+          </div>
+          <div v-else class="bodyProducts">
             <el-card
               v-for="prod in productos"
               :key="prod.upc"
               :body-style="{ padding: '0px' }"
             >
-              <img :src="prod.doc.foto" class="image">
+              <img-with-back-up
+                :source="`${$FILE_MANAGER}photo/${prod.foto}`"
+              />
               <div style="padding: 14px; text-align: center">
-                <span>{{ prod.doc.nombreProd }}</span>
+                <span>{{ prod.nombre_producto }}</span>
                 <div class="bottom">
-                  <!-- UPC: {{ prod.doc.upc }}<br /> -->
+                  <!-- UPC: {{ prod.upc }}<br /> -->
                   <div style="display: flex; justify-content: space-around">
-                    <span class="productPrices"
-                    >P.M.: <br>${{ prod.doc.precioMayoreo }}</span
-                    >
-                    <span class="productPrices"
-                    >P.P.: <br>${{ prod.doc.precioPublico }}</span
-                    >
-                    <span class="productPrices"
-                    >P.T.: <br>${{ prod.doc.precioTaller }}</span
-                    >
+                    <span class="productPrices">
+                      P.M.: <br />${{ prod.precio_mayoreo }}
+                    </span>
+                    <span class="productPrices">
+                      P.P.: <br />${{ prod.precio_publico }}
+                    </span>
+                    <span class="productPrices">
+                      P.T.: <br />${{ prod.precio_taller }}
+                    </span>
                   </div>
-                  Stock: {{ getStock(prod.doc) }}<br>
-                  Marca: {{ prod.doc.nombreMarca }}<br>
-                  Categoria: {{ prod.doc.nombreCategoria }}<br>
+                  Stock: {{ getStock(prod) }}<br />
+                  Marca: {{ prod.marca?.nombre_marca }}<br />
+                  Categoria: {{ prod.categoria?.nombre_categoria }}<br />
                 </div>
                 <el-button
+                  v-if="isAbleToModify"
                   type="warning"
                   circle
                   @click="
-                    prodSelected(prod);
+                    prodSelected = JSON.parse(JSON.stringify(prod));
                     title = 'Editar producto';
                     show.addEditProdMovile = true;
                   "
@@ -73,50 +89,123 @@
                   <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                 </el-button>
                 <el-button
+                  v-if="isAbleToModify"
                   type="danger"
                   circle
                   @click="
-                    prodSelected(prod);
+                    prodSelected = JSON.parse(JSON.stringify(prod));
                     show.deleteProduc = true;
                   "
                 >
                   <i class="fas fa-times" aria-hidden="true"></i>
+                </el-button>
+                <el-button
+                  :type="
+                    ordenDetalleProductos[prod.id]?.cantidad
+                      ? 'warning'
+                      : 'success'
+                  "
+                  plain
+                  style="width: 100%; margin: 0.5rem 0 0 0"
+                  @click="
+                    prodSelected = JSON.parse(JSON.stringify(prod));
+                    show.addToCartModal = true;
+                  "
+                >
+                  <i class="fas fa-cart-plus" aria-hidden="true"></i>
+                  <span style="padding-left: 0.5em">
+                    {{
+                      ordenDetalleProductos[prod.id]?.cantidad
+                        ? "Agregar/Quitar"
+                        : "Agregar"
+                    }}
+                  </span>
                 </el-button>
               </div>
             </el-card>
           </div>
           <div class="mt-3" style="margin-left: -12px">
             <el-pagination
-              v-model:currentPage="currentPageLocal"
+              :current-page="currentPage"
               small
               background
               layout="prev, pager, next"
               :total="totalRows"
               :page-size="perPage"
               hide-on-single-page
+              @current-change="handleChangePage($event)"
             />
           </div>
         </div>
       </div>
       <!-- eslint-disable  vue/component-name-in-template-casing -->
-      <AddEditProdMovile v-if="show.addEditProdMovile" :title="title" :mostrar=show></AddEditProdMovile>
-      <EliminarProdMovil :mostrar=show></EliminarProdMovil>
-      <FiltrosProductos ref="filtrosRef" :mostrar=show></FiltrosProductos>
-      <!-- <ConfirmarTransacciones :show=show></ConfirmarTransacciones> -->
+      <DraggableButton
+        v-if="showCartButton && Object.keys(ordenDetalleProductos).length"
+      >
+        <el-button
+          class="cartButton"
+          type="success"
+          size="large"
+          circle
+          @click="show.newOrder = true"
+        >
+          <i
+            class="fas fa-cart-plus"
+            aria-hidden="true"
+            style="font-size: large"
+          ></i>
+        </el-button>
+      </DraggableButton>
+      <NuevaOrden v-if="show.newOrder" :show="show"></NuevaOrden>
+      <AddEditProdMovile
+        v-if="show.addEditProdMovile"
+        :title="title"
+        :mostrar="show"
+        :prod-selected="prodSelected"
+        @loading-product="loadingProduct"
+      ></AddEditProdMovile>
+      <EliminarProdMovil
+        v-if="show.deleteProduc"
+        :mostrar="show"
+        :new-product-mobile="prodSelected"
+      ></EliminarProdMovil>
+      <AddToCartModal
+        v-if="show.addToCartModal"
+        :prod-selected="prodSelected"
+        :mostrar="show"
+      ></AddToCartModal>
+      <FiltrosProductos ref="filtrosRef" :mostrar="show"></FiltrosProductos>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
+import { mapState, mapMutations } from "vuex";
+import { defineAsyncComponent } from "vue";
 
 export default {
   name: "ProductosIndex",
   components: {
-    AddEditProdMovile: () => import("@/components/Productos/AddEditProdMovile.vue"),
-    // ConfirmarTransacciones: () => import('@/components/Productos/ConfirmarTransacciones.vue'),
-    EliminarProdMovil: () => import("@/components/Productos/EliminarProdMovil.vue"),
-    FiltrosProductos: () => import("@/components/Productos/FiltrosProductos.vue"),
+    AddEditProdMovile: defineAsyncComponent(() =>
+      import("@/components/Productos/AddEditProdMovile.vue"),
+    ),
+    EliminarProdMovil: defineAsyncComponent(() =>
+      import("@/components/Productos/EliminarProdMovil.vue"),
+    ),
+    AddToCartModal: defineAsyncComponent(() =>
+      import("@/components/Productos/AddToCartModal.vue"),
+    ),
+    FiltrosProductos: () =>
+      import("@/components/Productos/FiltrosProductos.vue"),
+    ImgWithBackUp: () => import("@/components/ImgWithBackUp.vue"),
+    LoadingProductos: () =>
+      import("@/components/Productos/LoadingProductos.vue"),
+    DraggableButton: defineAsyncComponent(() =>
+      import("@/components/Productos/DraggableButton.vue"),
+    ),
+    NuevaOrden: defineAsyncComponent(() =>
+      import("@/components/Ordenes/NuevaOrden.vue"),
+    ),
   },
   data() {
     return {
@@ -124,17 +213,22 @@ export default {
       searchDisplay: "",
       tab: "",
       title: "Editar",
-      currentPageLocal: 1,
       show: {
         addEditProdMovile: false,
         modalFiltros: false,
         deleteProduc: false,
+        addToCartModal: false,
+        newOrder: false,
       },
-      userOrganization: null,
+      prodSelected: null,
     };
   },
   computed: {
+    ...mapState("auth", ["isAbleToModify"]),
+    // TODO: depurar este computed
     ...mapState("productos", [
+      "currentPage",
+      "loadingTableProductos",
       "productos",
       "producto",
       "cacheEditProd",
@@ -144,19 +238,20 @@ export default {
       "editTransaction",
       "numeroDeEditados",
       "newProductMobile",
-      "currentPage",
       "perPage",
       "totalRows",
       "filtroCategorias",
       "filtroMarcas",
       "filtroNombre",
       "filtroUPC",
+      "ordenDetalleProductos",
     ]),
-    ...mapState("categorias", ["categorias"]),
     allFilters() {
       const filters = [];
-      const categories = this.filtroCategorias.map((cat) => cat);
-      const brands = this.filtroMarcas.map((marca) => marca);
+      const categories = this.filtroCategorias.map(
+        (cat) => cat?.nombre_categoria,
+      );
+      const brands = this.filtroMarcas.map((marca) => marca?.nombre_marca);
       if (this.filtroNombre) {
         filters.push(this.filtroNombre);
       }
@@ -165,28 +260,16 @@ export default {
       }
       return filters.concat(categories).concat(brands);
     },
-  },
-  watch: {
-    currentPageLocal(valor) {
-      this.setPage(valor);
+    showCartButton() {
+      if (Object.values(this.show).some((value) => value === true))
+        return false;
+      return true;
     },
-    currentPage(valor) {
-      this.currentPageLocal = valor;
-    },
-    // 'show.addEditProdMovile': {
-    //   handler(valor) {
-    //     if (!this.$refs || !this.$refs.filtrosRef) return;
-    //     if (valor) {
-    //       this.$refs.filtrosRef.removeScannerListener(() => ({}));
-    //     } else {
-    //       this.$refs.filtrosRef.addScannerListener();
-    //     }
-    //   },
-    //   immediate: true,
-    // },
   },
-  created() {
-    this.userOrganization = localStorage.getItem("org_division");
+  watch: {},
+  mounted() {
+    this.$store.dispatch("ordenes/GET_TYPES");
+    this.fetchProducts();
   },
   methods: {
     ...mapMutations("productos", [
@@ -200,9 +283,10 @@ export default {
       "removeNewRegistro",
       "saveNewProduct",
       "editNewRegistro",
-      "prodSelected",
     ]),
-    ...mapActions("productos", ["setPage"]),
+    fetchProducts() {
+      this.$store.dispatch("productos/readAllProducts");
+    },
 
     filtro(valor) {
       if (this.searchDisplay.trim() === "") return true;
@@ -216,20 +300,30 @@ export default {
       return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
     },
     createProduct() {
-      this.prodSelected({});
+      this.prodSelected = { CLEAR: true };
       this.title = "Agregar producto";
       this.show.addEditProdMovile = true;
     },
     getStock(prod) {
-      switch (this.userOrganization) {
-      case "Santa-Ana":
-        return prod.stockProdStaAna;
-      case "Metapan":
-        return prod.stockProdMetapan;
-      default:
-        window.console.warning("No se encontró la división");
-        return 0;
+      switch (localStorage.getItem("locationSelected")) {
+        case "Santa Ana":
+          return prod.stock_prod_sta_ana;
+        case "Metapan":
+          return prod.stock_prod_metapan;
+        default:
+          window.console.warn("No se encontró la división");
+          return 0;
       }
+    },
+    handleChangePage(currentPage) {
+      this.$store.dispatch("productos/setPage", currentPage);
+    },
+    loadingProduct(value) {
+      let loading = null;
+      this.$nextTick(() => {
+        loading = this.$loading({ fullscreen: true });
+        if (!value) loading.close();
+      });
     },
   },
 };
@@ -361,11 +455,6 @@ td input {
   padding: 0;
   font-size: 12px;
 }
-.image {
-  width: 100%;
-  max-height: 7.5rem;
-  object-fit: cover;
-}
 .bodyProducts {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -379,18 +468,32 @@ td input {
   transform: scale(0.9);
 }
 div:deep(.el-pagination.is-background.el-pagination--small) {
-    justify-content: center;
+  justify-content: center;
 }
 :global(footer.el-dialog__footer) {
   padding: var(--el-dialog-padding-primary);
 }
 :deep(ul.el-pager > li.number) {
-    display: none;
+  display: none;
 }
-:deep(ul.el-pager > li.number.is-active), :deep(ul.el-pager > li:first-child), :deep(ul.el-pager > li:last-child) {
-    display: block;
+:deep(ul.el-pager > li.number.is-active),
+:deep(ul.el-pager > li:first-child),
+:deep(ul.el-pager > li:last-child) {
+  display: block;
 }
 :deep(ul.el-pager > li.more) {
-    pointer-events: none;
+  pointer-events: none;
+}
+.skeletonContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  justify-items: center;
+}
+.cartButton {
+  border: 1px solid #656565;
+  box-shadow: -1px 0rem 2rem rgb(0 0 0 / 64%);
+  width: 2.5rem !important;
+  height: 2.5rem !important;
 }
 </style>

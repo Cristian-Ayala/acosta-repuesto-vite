@@ -1,49 +1,55 @@
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
-  <el-dialog
-    v-model="show.detOrd"
-    title="Detalle Orden"
-    width="90%"
-    top="5vh"
-  >
+  <el-dialog v-model="show.detOrd" title="Detalle Orden" fullscreen>
     <div class="card-body">
       <h5>Fecha:</h5>
-      <p>{{ formatDate(ordSelected._id) }}</p>
+      <p>{{ formatDate(ordSelected.created_at) }}</p>
 
-      <h5 v-if="ordSelected.nombreCliente">Nombre del cliente:</h5>
-      <p>{{ ordSelected.nombreCliente }}</p>
-
-      <h5>Método de pago:</h5>
-      <p>{{ ordSelected.metodoPago }}</p>
+      <h5 v-if="ordSelected.cliente">Nombre del cliente:</h5>
+      <p>
+        {{ `${ordSelected.cliente.name} ${ordSelected.cliente.last_name}` }}
+      </p>
 
       <div class="line"></div>
       <div>
         <h5>Productos:</h5>
         <!-- tabla de productos -->
-        <el-table :data="ordSelected.productos" style="width: 100%" stripe>
+        <el-table
+          v-loading="loadingDetalleOrd"
+          :data="productosInOrder"
+          style="width: 100%"
+          stripe
+        >
           <!-- <el-table-column prop="upc" label="UPC" /> -->
-          <el-table-column prop="nombreProd" label="Nombre" width="300"/>
-          <el-table-column prop="precioPublico" label="Precio unitario" />
+          <el-table-column label="Nombre" width="300">
+            <template #default="scope">
+              {{ scope.row.producto?.nombre_producto }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="precio" label="Precio unitario" />
           <el-table-column prop="cantidad" label="Cantidad" />
           <!-- <el-table-column prop="descuento" label="Descuento" /> -->
-          <el-table-column prop="subtotal" label="Sub-Total" />
+          <el-table-column prop="sub_total" label="Sub-Total" />
         </el-table>
       </div>
       <h6 style="margin-top: 1rem; font-weight: 900; text-align: center">
-        Total: {{ ordSelected.totalOrden }}
+        Total: {{ ordSelected.total_orden }}
       </h6>
       <div class="line"></div>
-      <h5 v-if="ordSelected.observacionesOrden">Descripción:</h5>
-      <p>{{ ordSelected.observacionesOrden }}</p>
+      <h5 v-if="ordSelected.observaciones_orden">Descripción:</h5>
+      <p>{{ ordSelected.observaciones_orden }}</p>
+
+      <h5>Método de pago:</h5>
+      <p>{{ getMetPago(ordSelected.metodo_pago_id) }}</p>
 
       <h5>Tipo de orden:</h5>
-      <p>{{ ordSelected.tipoOrden }}</p>
+      <p>{{ getTipoOrd(ordSelected.tipo_orden_id) }}</p>
 
       <h5>Tipo de distribución:</h5>
-      <p>{{ ordSelected.tipoDistribucion }}</p>
+      <p>{{ getDistributionType(ordSelected.tipo_distribucion_id) }}</p>
 
       <h5>Estado:</h5>
-      <p>{{ ordSelected.status }}</p>
+      <p>{{ getStatus(ordSelected.status_id) }}</p>
 
       <div class="line"></div>
     </div>
@@ -51,16 +57,16 @@
       <span class="dialog-footer">
         <el-button @click="show.detOrd = false">Cerrar</el-button>
         <el-button
-          v-if="ordSelected.status === 'En proceso'"
+          v-if="ordSelected.status_id === enums.ORD_STATUS.EN_PROCESO.id"
           type="warning"
-          @click="changeDeliveryStatusLocal('En camino')"
+          @click="changeDeliveryStatusLocal(enums.ORD_STATUS.EN_CAMINO.id)"
         >
           En camino
         </el-button>
         <el-button
-          v-if="ordSelected.status === 'En camino'"
+          v-if="ordSelected.status_id === enums.ORD_STATUS.EN_CAMINO.id"
           type="success"
-          @click="changeDeliveryStatusLocal('Completado')"
+          @click="changeDeliveryStatusLocal(enums.ORD_STATUS.COMPLETADO.id)"
         >
           Completar
         </el-button>
@@ -70,7 +76,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "DetalleOrden",
@@ -87,22 +93,62 @@ export default {
   emits: ["updateOrders"],
   data() {
     return {
+      loadingDetalleOrd: false,
+      productosInOrder: [],
     };
   },
+  computed: {
+    ...mapState("ordenes", [
+      "dropDownMetodoPago",
+      "dropDownTypeOfOrder",
+      "tipoDistribucionArray",
+      "dropdownStatus",
+      "enums",
+    ]),
+  },
   watch: {
+    ordSelected: {
+      immediate: true,
+      async handler(orden) {
+        if (!orden) return;
+        this.loadingDetalleOrd = true;
+        this.productosInOrder = await this.GET_DETALLE_ORDEN({
+          id_orden: this.ordSelected.id,
+        });
+        this.loadingDetalleOrd = false;
+      },
+    },
   },
   methods: {
-    ...mapActions("ordenes", ["changeDeliveryStatus"]),
+    ...mapActions("ordenes", ["changeDeliveryStatus", "GET_DETALLE_ORDEN"]),
     formatDate(id) {
       const date = new Date(id);
-      return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", { hour12: true })}`;
+      return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", {
+        hour12: true,
+      })}`;
     },
-    async changeDeliveryStatusLocal (status){
-      await this.changeDeliveryStatus({ id: this.ordSelected._id, status });
+    async changeDeliveryStatusLocal(statusId) {
+      await this.changeDeliveryStatus({ id_orden: this.ordSelected.id, statusId });
       this.$emit("updateOrders");
       // eslint-disable-next-line
       this.show.detOrd = false;
-    }
+    },
+    getMetPago(id) {
+      const res = this.dropDownMetodoPago.find((item) => item.id === id);
+      return res?.name;
+    },
+    getTipoOrd(id) {
+      const res = this.dropDownTypeOfOrder.find((item) => item.id === id);
+      return res?.name;
+    },
+    getDistributionType(id) {
+      const res = this.tipoDistribucionArray.find((item) => item.id === id);
+      return res?.name;
+    },
+    getStatus(id) {
+      const status = this.dropdownStatus.find((item) => item.id === id);
+      return status?.name;
+    },
   },
 };
 </script>
@@ -120,10 +166,9 @@ export default {
 :deep(.modal-content) {
   height: 100% !important;
 }
-:deep(.modal-body) {
-  height: 80vh;
-  overflow-y: auto;
-}
+/* :deep(.el-dialog__body) {
+  background-color: #e3e3e3;
+} */
 :deep(.bg-success) {
   background-image: radial-gradient(
     circle farthest-corner at 50.4% 50.5%,

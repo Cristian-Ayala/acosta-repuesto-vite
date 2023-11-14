@@ -1,12 +1,8 @@
 module.exports = {
   root: true,
-  extends: [
-    "airbnb-base",
-    "plugin:vue/vue3-recommended",
-    "prettier",
-  ],
+  extends: ["airbnb-base", "plugin:vue/vue3-recommended", "prettier"],
   rules: {
-    indent: ["error", 2],
+    indent: ["error", 2, { "SwitchCase": 1, "ignoredNodes": ["ConditionalExpression"] }],
     // Disallow the use of console.
     // @see https://eslint.org/docs/rules/no-console
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
@@ -58,41 +54,6 @@ module.exports = {
     //   https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/style.js
     quotes: ["error", "double"],
 
-
-    // /////////////////////////////////////////////////////////////////////////
-    // `vue/vue3-recommended`: Overwrites
-    // @see https://eslint.vuejs.org/rules/
-    // /////////////////////////////////////////////////////////////////////////
-
-    // Enforce consistent indentation in `<template>`.
-    // @see https://eslint.vuejs.org/rules/html-indent
-    "vue/html-indent": [
-      "error",
-      2,
-      {
-        attribute: 1,
-        baseIndent: 1,
-        closeBracket: 0,
-        alignAttributesVertically: true,
-        ignores: [],
-      },
-    ],
-
-    // Enforce self-closing style.
-    // @see https://eslint.vuejs.org/rules/html-self-closing
-    "vue/html-self-closing": [
-      "error",
-      {
-        html: {
-          void: "never",
-          normal: "never",
-          component: "any",
-        },
-        svg: "never",
-        math: "never",
-      },
-    ],
-
     // /////////////////////////////////////////////////////////////////////////
     // `vue/vue3-recommended`: Optional (Uncategorized) Rules
     // @see https://eslint.vuejs.org/rules/#uncategorized
@@ -109,17 +70,9 @@ module.exports = {
       },
     ],
 
-    // Enforce unified line brake in HTML comments.
-    // @see https://eslint.vuejs.org/rules/html-comment-content-newline
-    "vue/html-comment-content-newline": "error",
-
     // Enforce unified spacing in HTML comments.
     // @see https://eslint.vuejs.org/rules/html-comment-content-spacing
     "vue/html-comment-content-spacing": "error",
-
-    // Enforce consistent indentation in HTML comments.
-    // @see https://eslint.vuejs.org/rules/html-comment-indent
-    "vue/html-comment-indent": "error",
 
     // Enforce `inheritAttrs` to be set to `false` when using `v-bind="$attrs"`.
     // @see https://eslint.vuejs.org/rules/no-duplicate-attr-inheritance
@@ -165,11 +118,6 @@ module.exports = {
     // @see https://eslint.vuejs.org/rules/v-for-delimiter-style
     "vue/v-for-delimiter-style": "error",
 
-    // Enforce or forbid parentheses after method calls without arguments in
-    // `v-on` directives.
-    // @see https://eslint.vuejs.org/rules/v-on-function-call
-    "vue/v-on-function-call": ["error", "always"],
-
     // /////////////////////////////////////////////////////////////////////////
     // `vue/vue3-recommended`: Extension Rules
     //
@@ -212,7 +160,7 @@ module.exports = {
       "error",
       { properties: "never", ignoreDestructuring: false },
     ],
-    "no-underscore-dangle":  ["error", { "allow": ["_id", "_deleted", "_rev"] }],
+    "no-underscore-dangle": ["error", { allow: ["_id", "__typename"] }],
     // Require or disallow trailing commas.
     // @see https://eslint.vuejs.org/rules/comma-dangle,
     //   https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/style.js,
@@ -438,21 +386,6 @@ module.exports = {
         allowAllPropertiesOnSameLine: true,
       },
     ],
-
-    // Enforce consistent linebreak style for operators.
-    // @see https://eslint.vuejs.org/rules/operator-linebreak,
-    //   https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/style.js,
-    //   https://eslint.org/docs/rules/operator-linebreak
-    "vue/operator-linebreak": [
-      "error",
-      "before",
-      {
-        overrides: {
-          "=": "none",
-        },
-      },
-    ],
-
     // Suggest using template literals instead of string concatenation.
     // @see https://eslint.vuejs.org/rules/prefer-template,
     //   https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/es6.js,
@@ -489,6 +422,7 @@ module.exports = {
     //   https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/es6.js,
     //   https://eslint.org/docs/rules/template-curly-spacing
     "vue/template-curly-spacing": "error",
+    "import/extensions": [0, { js: "always"  }],
   },
   overrides: [
     {
@@ -496,7 +430,7 @@ module.exports = {
       rules: {
         "vue/comment-directive": "off",
         "max-len": "off",
-      }
-    }
-  ]
+      },
+    },
+  ],
 };

@@ -13,5 +13,10 @@ export default {
   components: {
     HomeBar,
   },
+  mounted() {
+    const queryParams = new URLSearchParams(window.location.search);
+    const errorValue = queryParams.get("errorasd");
+    if (errorValue) this.$router.push({ name: "LogOut" });
+  },
 };
 </script>

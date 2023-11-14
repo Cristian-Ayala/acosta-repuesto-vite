@@ -6,9 +6,7 @@
     direction="btt"
     size="80%"
   >
-    <el-form
-      label-position="top"
-    >
+    <el-form label-position="top">
       <el-form-item label="Fecha">
         <el-radio-group v-model="dateType" size="large">
           <el-radio-button label="Por día" />
@@ -34,7 +32,9 @@
             />
           </el-col>
           <el-col :span="4">
-            <label v-if="dateType === 'Por rango'" style="text-align: center;">-</label>
+            <label v-if="dateType === 'Por rango'" style="text-align: center"
+              >-</label
+            >
           </el-col>
           <el-col :span="10">
             <el-date-picker
@@ -52,68 +52,94 @@
       <el-form-item label="Precio">
         <el-row>
           <el-col :span="10">
-            <input v-model.number="filters.price.priceGte" type="number" class="numberInput">
+            <input
+              v-model.number="filters.price.priceGte"
+              type="number"
+              class="numberInput"
+            />
           </el-col>
           <el-col :span="4">
-            <label style="text-align: center;">-</label>
+            <label style="text-align: center">-</label>
           </el-col>
           <el-col :span="10">
-            <input v-model.number="filters.price.priceLte" type="number" class="numberInput">
+            <input
+              v-model.number="filters.price.priceLte"
+              type="number"
+              class="numberInput"
+            />
           </el-col>
         </el-row>
       </el-form-item>
       <el-form-item label="Tipo de orden">
-        <el-radio-group v-model="filters.orderType" size="large">
-          <el-radio-button label="Local" />
-          <el-radio-button label="Delivery" />
-          <el-radio-button label="Todas" />
+        <el-radio-group v-model="filters.orderTypeID" size="large">
+          <el-radio-button
+            v-for="type in dropDownTypeOfOrder"
+            :key="type.id"
+            :label="type.id"
+          >
+            {{ type.name }}
+          </el-radio-button>
+          <el-radio-button :label="null"> Todas </el-radio-button>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="Tipo de distribución">
-        <el-radio-group v-model="filters.tipoDistribucion" size="large">
-          <el-radio-button label="Mayoreo" />
-          <el-radio-button label="Público" />
-          <el-radio-button label="Taller" />
-          <el-radio-button label="Todas" />
+        <el-radio-group v-model="filters.distributionTypeID">
+          <el-radio-button
+            v-for="type in tipoDistribucionArray"
+            :key="type.id"
+            :label="type.id"
+          >
+            {{ type.name }}
+          </el-radio-button>
+          <el-radio-button :label="null"> Todas </el-radio-button>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="Estado de la orden">
-        <el-radio-group v-model="filters.status" size="large">
-          <el-radio-button label="En proceso" />
-          <el-radio-button label="Completado" />
-          <el-radio-button label="Todas" />
+      <el-form-item label="Estado de la orden" size="small">
+        <el-radio-group v-model="filters.statusID">
+          <el-radio-button
+            v-for="status in dropdownStatus"
+            :key="status.id"
+            :label="status.id"
+          >
+            {{ status.name }}
+          </el-radio-button>
+          <el-radio-button :label="null"> Todas </el-radio-button>
         </el-radio-group>
       </el-form-item>
     </el-form>
     <template #footer>
       <div style="flex: auto">
-        <el-button @click="clearFilters();show.orderFilterDrawer = false">Limpiar filtros</el-button>
-        <el-button type="success" @click="confirmClick();">Aplicar filtros</el-button>
+        <el-button
+          @click="
+            clearFilters();
+            show.orderFilterDrawer = false;
+          "
+          >Limpiar filtros</el-button
+        >
+        <el-button type="success" @click="confirmClick()"
+          >Aplicar filtros</el-button
+        >
       </div>
     </template>
   </el-drawer>
 </template>
 
 <script>
-function initialState() {
-  return {
-    dateType: "Por día",
-    filters: {
-      date: {
-        start: new Date(),
-        end: null,
-      },
-      price: {
-        priceLte: 0.0,
-        priceGte: 0.0,
-      },
-      orderType: "Todas",
-      tipoDistribucion: "Todas",
-      status: "Todas",
-    },
-  };
-}
+import { mapState } from "vuex";
 
+const filters = {
+  date: {
+    start: new Date(),
+    end: null,
+  },
+  price: {
+    priceLte: null,
+    priceGte: null,
+  },
+  orderTypeID: null,
+  distributionTypeID: null,
+  statusID: null,
+};
 
 export default {
   name: "OrderFilters",
@@ -125,7 +151,17 @@ export default {
   },
   emits: ["filtersConfirmed"],
   data() {
-    return initialState();
+    return {
+      dateType: "Por día",
+      filters: JSON.parse(JSON.stringify(filters)),
+    };
+  },
+  computed: {
+    ...mapState("ordenes", [
+      "tipoDistribucionArray",
+      "dropDownTypeOfOrder",
+      "dropdownStatus",
+    ]),
   },
   watch: {
     dateType() {
@@ -135,6 +171,9 @@ export default {
       this.filters.date.end = null;
     },
   },
+  async mounted() {
+    this.confirmClick();
+  },
   methods: {
     disabledStartDate(time) {
       return time.getTime() > Date.now();
@@ -142,31 +181,38 @@ export default {
     disabledEndDate(time) {
       // 2023-02-03T05:59:59.999Z
       if (this.filters.date.start == null) return true;
-      return time.getTime() < this.filters.date.start || time.getTime() > Date.now();
+      return (
+        time.getTime() < this.filters.date.start || time.getTime() > Date.now()
+      );
     },
     confirmClick() {
       const options = { ...this.filters };
-      if (typeof(options.price.priceGte) !== "number") options.price.priceGte = 0;
-      if (typeof(options.price.priceLte) !== "number") options.price.priceLte = 0;
+      if (typeof options.price.priceGte !== "number")
+        options.price.priceGte = null;
+      if (typeof options.price.priceLte !== "number")
+        options.price.priceLte = null;
       this.$emit("filtersConfirmed", options);
       // eslint-disable-next-line
       this.show.orderFilterDrawer = false;
     },
     clearFilters() {
-      Object.assign(this.$data, initialState());
+      this.filters = JSON.parse(JSON.stringify(filters));
+      this.dateType = "Por día";
       this.confirmClick();
     },
   },
-}
+};
 </script>
 
 <style>
-form > div > div, form > div > label {
+form > div > div,
+form > div > label {
   justify-content: center;
-  text-align: center!important;
+  text-align: center !important;
 }
 
-div:global(.el-date-editor.el-input), div:global(.el-date-editor.el-input__wrapper) {
+div:global(.el-date-editor.el-input),
+div:global(.el-date-editor.el-input__wrapper) {
   width: fit-content;
   height: fit-content;
 }

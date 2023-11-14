@@ -2,37 +2,22 @@
   <tr v-if="prod.cantidad > 0" class="w-100">
     <td>
       <div class="h-100">
-        <!-- eslint-disable-next-line -->
-        <p class="align-self-center" v-html="prod.nombreProd"></p>
-        <div v-if="showQuantity">
+        <p class="align-self-center">{{ prod.name }}</p>
+        <div>
           <p style="font-size: 0.6rem">
-            <b>Precio:</b> ${{ prod.precioPublico }} <b>Cantidad:</b>
-            {{ ordenDetalleProductos[prod.upc].cantidad }} <b>Subtotal:</b> ${{
-              ordenDetalleProductos[prod.upc].subtotal
-            }}
+            <span> <b>Precio:</b> ${{ prod.price }} </span>
+            <span> <b>Cantidad:</b> {{ prod.cantidad }} </span>
+            <span> <b>Subtotal:</b> ${{ prod.subtotal }} </span>
           </p>
         </div>
       </div>
     </td>
     <td class="tdVerdeClick">
-      <div
-        v-if="!showQuantity"
-        class="add"
-        @click="$emit('addTmpProducts', prod, indexForComponent, true, true)"
-      >
-        <i class="fas fa-plus"></i>
-      </div>
-      <div v-else class="h-100">
-        <div
-          class="plus_minus"
-          @click="$emit('addTmpProducts', prod, indexForComponent, true, true)"
-        >
+      <div class="h-100">
+        <div class="plus_minus" @click="addProdQuantity(true)">
           <i class="fas fa-plus"></i>
         </div>
-        <div
-          class="plus_minus"
-          @click="$emit('addTmpProducts', prod, indexForComponent, false, true)"
-        >
+        <div class="plus_minus" @click="addProdQuantity(false)">
           <i class="fas fa-minus"></i>
         </div>
       </div>
@@ -41,6 +26,8 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex";
+
 export default {
   name: "ResumenNuevaOrden",
   props: {
@@ -48,25 +35,18 @@ export default {
       type: Object,
       required: true,
     },
-    indexForComponent: {
-      type: Number,
-      required: true,
-    },
-    ordenDetalleProductos: {
-      type: Object,
-      required: true,
-    },
   },
-  emits: ["addTmpProducts"],
   data() {
-    return {
-      showQuantity: false,
-    };
+    return {};
   },
-  created() {
-    this.showQuantity =
-      this.ordenDetalleProductos[this.prod.upc] !== undefined &&
-      this.ordenDetalleProductos[this.prod.upc].cantidad >= 1;
+  methods: {
+    ...mapMutations("productos", ["SET_DETALLE_PRODUCTOS"]),
+    addProdQuantity(add) {
+      const action = {};
+      if (add) action.addOne = true;
+      else action.removeOne = true;
+      this.SET_DETALLE_PRODUCTOS({ prod: this.prod, ...action });
+    },
   },
 };
 </script>
@@ -98,5 +78,8 @@ export default {
   border-radius: 0;
   box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
   border: 1px solid black;
+}
+p > span {
+  padding-right: 0.3rem;
 }
 </style>

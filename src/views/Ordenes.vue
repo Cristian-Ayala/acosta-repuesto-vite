@@ -7,15 +7,16 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Ordenes
             </h6>
-            <el-button type="success" style="float: right" @click="show.detOrden = true">
-              <i class="fa fa-plus" aria-hidden="true"></i>
-            </el-button>
           </div>
           <div class="card-body">
             <div class="filtros">
               <div class="d-inline-flex pr-2 pb-2">
-                <el-button type="primary" round @click="show.orderFilterDrawer = true"
-                >Filtros ({{ allFilters.length }})</el-button>
+                <el-button
+                  type="primary"
+                  round
+                  @click="show.orderFilterDrawer = true"
+                  >Filtros ({{ allFilters.length }})</el-button
+                >
               </div>
               <div
                 v-if="allFilters && allFilters.length > 0"
@@ -36,10 +37,13 @@
             </div>
           </div>
         </div>
-        <div style="display: grid;grid-template-columns: 1fr 1fr;">
+        <div v-if="show.loadingOrders">
+          <orden-view-loading v-for="i in 10" :key="i" />
+        </div>
+        <div v-else style="display: grid">
           <order-view
             v-for="orden in ordenes"
-            :key="orden._id"
+            :key="orden.id"
             :orden="orden"
             @update-orders="updateOrders()"
           ></order-view>
@@ -52,16 +56,23 @@
           small
           background
           layout="prev, pager, next"
-          :total="totalRows"
-          :page-size="pagination.limit"
+          :total="ordenesCount"
+          :page-size="pagination.perPage"
           hide-on-single-page
         />
       </div>
     </div>
     <!-- Fin del Cuerpo a escribir -->
-    <nueva-orden v-if="show.detOrden" :show="show" @clear-order-filters="clearOrderFilters()"></nueva-orden>
-    <!-- eslint-disable-next-line vue/v-on-function-call -->
-    <order-filters ref="filterOder" :show="show" @filters-confirmed="filtersConfirmed"></order-filters>
+    <nueva-orden
+      v-if="show.detOrden"
+      :show="show"
+      @clear-order-filters="clearOrderFilters()"
+    ></nueva-orden>
+    <order-filters
+      ref="filterOder"
+      :show="show"
+      @filters-confirmed="filtersConfirmed"
+    ></order-filters>
   </div>
 </template>
 
@@ -82,37 +93,68 @@ export default {
     show: {
       detOrden: false,
       orderFilterDrawer: false,
+      loadingOrders: false,
     },
-    filtersArray: {
-      date: {
-        start: null,
-        end: null,
-      },
-      price: {
-        priceLte: 0.0,
-        priceGte: 0.0,
-      },
-      orderType: "Todas",
-      tipoDistribucion: "Todas",
-      status: "Todas",
-    },
+    filtersArray: {},
     pagination: {
       page: 1,
-      limit: 10,
+      perPage: 10,
     },
   }),
   computed: {
-    ...mapState("ordenes", ["ordenes", "ordSelected", "showDetOrd", "totalRows"]),
+    ...mapState("ordenes", [
+      "ordenes",
+      "ordenesCount",
+      "dropDownTypeOfOrder",
+      "tipoDistribucionArray",
+      "dropdownStatus",
+    ]),
     allFilters() {
       const filters = [];
-      if (this.filtersArray.date.end != null) filters.push(`Antes de: ${new Date(this.filtersArray.date.end).toLocaleDateString()}`);
-      if (this.filtersArray.date.start != null && this.filtersArray.date.end != null) filters.push(`Despues de: ${new Date(this.filtersArray.date.start).toLocaleDateString()}`);
+      if (this.filtersArray.date?.end != null)
+        filters.push(
+          `Antes de: ${new Date(
+            this.filtersArray.date.end,
+          ).toLocaleDateString()}`,
+        );
+      if (
+        this.filtersArray.date?.start != null &&
+        this.filtersArray.date?.end != null
+      )
+        filters.push(
+          `Despues de: ${new Date(
+            this.filtersArray.date.start,
+          ).toLocaleDateString()}`,
+        );
       else filters.push(`Día: ${new Date().toLocaleDateString()}`);
-      if (this.filtersArray.price.priceLte != null && this.filtersArray.price.priceLte !== 0) filters.push(`<= $${this.filtersArray.price.priceLte}`);
-      if (this.filtersArray.price.priceGte != null && this.filtersArray.price.priceGte !== 0) filters.push(`>= $${this.filtersArray.price.priceGte}`);
-      if (this.filtersArray.orderType !== "Todas") filters.push(this.filtersArray.orderType);
-      if (this.filtersArray.tipoDistribucion !== "Todas") filters.push(this.filtersArray.tipoDistribucion);
-      if (this.filtersArray.status !== "Todas") filters.push(this.filtersArray.status);
+      if (
+        this.filtersArray.price?.priceLte != null &&
+        this.filtersArray.price?.priceLte !== 0
+      )
+        filters.push(`<= $${this.filtersArray.price?.priceLte}`);
+      if (
+        this.filtersArray.price?.priceGte != null &&
+        this.filtersArray.price?.priceGte !== 0
+      )
+        filters.push(`>= $${this.filtersArray.price?.priceGte}`);
+      if (this.filtersArray.orderTypeID) {
+        const orderType = this.dropDownTypeOfOrder.find(
+          ({ id }) => id === this.filtersArray.orderTypeID,
+        );
+        filters.push(orderType.name);
+      }
+      if (this.filtersArray.distributionTypeID) {
+        const distType = this.tipoDistribucionArray.find(
+          ({ id }) => id === this.filtersArray.distributionTypeID,
+        );
+        filters.push(distType.name);
+      }
+      if (this.filtersArray.statusID) {
+        const status = this.dropdownStatus.find(
+          ({ id }) => id === this.filtersArray.statusID,
+        );
+        filters.push(status.name);
+      }
       return filters;
     },
   },
@@ -122,21 +164,32 @@ export default {
       this.updateOrders();
     },
   },
-  created() {
-    this.readAllOrdenes({ pagination: this.pagination});
-  },
+  mounted() {},
   methods: {
     ...mapMutations("ordenes", ["clickRow"]),
     ...mapActions("ordenes", ["readAllOrdenes"]),
-    filtersConfirmed(filters) {
+    async filtersConfirmed(filters) {
+      this.show.loadingOrders = true;
+      await this.$store.dispatch("ordenes/GET_TYPES");
       this.filtersArray = { ...filters };
-      this.readAllOrdenes({ ...this.filtersArray, pagination: this.pagination});
+      await this.readAllOrdenes({
+        ...this.filtersArray,
+        limit: this.pagination.perPage,
+        offset: this.pagination.perPage * (this.pagination.page - 1),
+      });
+      this.show.loadingOrders = false;
     },
     clearOrderFilters() {
       this.$refs.filterOder.clearFilters();
     },
-    updateOrders() {
-      this.readAllOrdenes({ ...this.filtersArray, pagination: this.pagination});
+    async updateOrders() {
+      this.show.loadingOrders = true;
+      await this.readAllOrdenes({
+        ...this.filtersArray,
+        limit: this.pagination.perPage,
+        offset: this.pagination.perPage * (this.pagination.page - 1),
+      });
+      this.show.loadingOrders = false;
     },
   },
 };
@@ -158,15 +211,16 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 .card-header {
-  box-shadow: none
+  box-shadow: none;
 }
 .card-body {
   padding: 0%;
 }
 .card {
-    background-color: #f7f8fa;
+  background-color: #f7f8fa;
 }
 .filtros {
   box-shadow: 1px 0.5rem 0.8rem rgb(0 0 0 / 10%);
