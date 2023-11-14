@@ -2,13 +2,11 @@
   <!-- eslint-disable vue/no-mutating-props -->
   <el-drawer
     v-model="show.estadisticasFilterDrawer"
-    title="Filtro para ordenes"
+    title="Filtro de estadísticas"
     direction="btt"
     size="80%"
   >
-    <el-form
-      label-position="top"
-    >
+    <el-form label-position="top">
       <el-form-item label="Fecha">
         <el-radio-group v-model="dateType" size="large">
           <el-radio-button label="Por día" />
@@ -34,7 +32,9 @@
             />
           </el-col>
           <el-col :span="4">
-            <label v-if="dateType === 'Por rango'" style="text-align: center;">-</label>
+            <label v-if="dateType === 'Por rango'" style="text-align: center"
+              >-</label
+            >
           </el-col>
           <el-col :span="10">
             <el-date-picker
@@ -49,56 +49,41 @@
           </el-col>
         </el-row>
       </el-form-item>
-      <el-form-item v-if="users != null" label="Tipo de filtro">
-        <el-radio-group v-model="filters.typeOfFilter" size="large">
-          <el-radio-button label="Por usuario" />
-          <el-radio-button label="Por cede" />
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item v-if="users != null && filters.typeOfFilter === 'Por usuario'" label="Seleccionar usuario">
-        <el-select v-model="filters.userSelected" placeholder="Seleccione un usuario" size="large">
-          <el-option
-            label="Todos los usuarios"
-            value="Todos"
-          />
-          <el-option
-            v-if="user.role === 'manager'"
-            :label="user.name"
-            :value="user.name"
-          >
-            <span style="float: left">{{ user.name }}</span>
-            <span
-              style="
-                float: right;
-                color: var(--el-text-color-secondary);
-                font-size: 13px;
-              "
-            >{{ user.orgDiv }}</span
-            >
-          </el-option>
+      <el-form-item v-if="users != null && users.length > 1" label="Seleccionar usuario">
+        <el-select
+          v-model="filters.userSelected"
+          placeholder="Seleccione un usuario"
+          size="large"
+        >
+          <el-option label="Todos los usuarios" value="Todos" />
           <el-option
             v-for="item in users"
-            :key="item._id"
-            :label="item.name"
-            :value="item.name"
+            :key="item.id"
+            :label="item.created_by"
+            :value="item.created_by"
           >
-            <span style="float: left">{{ item.name }}</span>
+            <span style="float: left">{{ item.created_by }}</span>
             <span
               style="
                 float: right;
                 color: var(--el-text-color-secondary);
                 font-size: 13px;
               "
-            >{{ item.organization_unit }}</span
+              >{{ item.cede }}</span
             >
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item
-        v-if="users != null && filters.typeOfFilter === 'Por cede' && organizationUnits != null"
+        v-if="organizationUnits != null && organizationUnits.length > 1"
         label="Seleccionar una cede"
       >
-        <el-select v-model="filters.orgDivSelected" placeholder="Seleccione una cede" size="large">
+        <el-select
+          v-model="filters.orgDivSelected"
+          placeholder="Seleccione una cede"
+          size="large"
+        >
+          <el-option label="Todas las cedes" value="Todos" />
           <el-option
             v-for="item in organizationUnits"
             :key="item"
@@ -110,16 +95,23 @@
     </el-form>
     <template #footer>
       <div style="flex: auto">
-        <el-button @click="clearFilters();show.estadisticasFilterDrawer = false">Limpiar filtros</el-button>
-        <el-button type="success" @click="confirmClick();">Aplicar filtros</el-button>
+        <el-button
+          @click="
+            clearFilters();
+            show.estadisticasFilterDrawer = false;
+          "
+          >Limpiar filtros</el-button
+        >
+        <el-button type="success" @click="confirmClick()"
+          >Aplicar filtros</el-button
+        >
       </div>
     </template>
   </el-drawer>
 </template>
 
 <script>
-import { mapActions } from "vuex";
-
+const sucursales = JSON.parse(localStorage.getItem("sucursales"));
 function initialState() {
   return {
     dateType: "Por día",
@@ -128,23 +120,18 @@ function initialState() {
         start: new Date(),
         end: null,
       },
-      price: {
-        priceLte: 0.0,
-        priceGte: 0.0,
-      },
-      userSelected: "Todos",
-      typeOfFilter: "Por usuario",
-      orgDivSelected: null,
+      userSelected: localStorage.getItem("email"),
+      orgDivSelected: sucursales[0],
     },
-    users: null,
+    users: [],
     user: {
-      name: null,
-      role: null,
-      orgDiv: null,
+      name: localStorage.getItem("email"),
+      role: localStorage.getItem("role"),
+      orgDiv: localStorage.getItem("locationSelected"),
     },
+    organizationUnits: sucursales,
   };
 }
-
 
 export default {
   name: "EstadisticaFilters",
@@ -158,14 +145,6 @@ export default {
   data() {
     return initialState();
   },
-  computed: {
-    organizationUnits() {
-      if (this.users == null) return null;
-      let orgDiv = this.users.map((user) => user.organization_unit);
-      orgDiv = [...new Set(orgDiv)];
-      return orgDiv
-    },
-  },
   watch: {
     dateType() {
       this.filters.date.start = null;
@@ -173,30 +152,36 @@ export default {
     "filters.date.start": function resetEndDate() {
       this.filters.date.end = null;
     },
-    "filters.typeOfFilter": function resetUserSelected(newValue) {
-      if (newValue === "Por cede") this.filters.userSelected = "Todos";
+    organizationUnits: {
+      async handler(cedes) {
+        if (!cedes || this.user.role !== "gerente_area") return;
+        [this.filters.orgDivSelected] = cedes;
+        this.users = await this.$store.dispatch("estadisticas/GET_USERS", {
+          cedes,
+        });
+      },
+      immediate: true,
     },
   },
   async created() {
-    this.users = await this.getAllUsuarios();
-    if (this.users == null) this.filters.userSelected = localStorage.getItem("user_name");
-    this.filters.orgDivSelected = localStorage.getItem("org_division");
-    this.user.name = localStorage.getItem("user_name");
-    this.user.role = localStorage.getItem("role");
-    this.user.orgDiv = localStorage.getItem("org_division");
+    this.confirmClick();
   },
   methods: {
-    ...mapActions("usuarios", ["getAllUsuarios"]),
     disabledStartDate(time) {
       return time.getTime() > Date.now();
     },
     disabledEndDate(time) {
       // 2023-02-03T05:59:59.999Z
       if (this.filters.date.start == null) return true;
-      return time.getTime() < this.filters.date.start || time.getTime() > Date.now();
+      return (
+        time.getTime() < this.filters.date.start || time.getTime() > Date.now()
+      );
     },
     confirmClick() {
       const options = { ...this.filters };
+      if (options.userSelected === "Todos") options.userSelected = null;
+      if (options.orgDivSelected === "Todos")
+        options.orgDivSelected = this.organizationUnits;
       this.$emit("filtersConfirmed", options);
       // eslint-disable-next-line
       this.show.estadisticasFilterDrawer = false;
@@ -206,16 +191,18 @@ export default {
       this.confirmClick();
     },
   },
-}
+};
 </script>
 
 <style>
-form > div > div, form > div > label {
+form > div > div,
+form > div > label {
   justify-content: center;
-  text-align: center!important;
+  text-align: center !important;
 }
 
-div:global(.el-date-editor.el-input), div:global(.el-date-editor.el-input__wrapper) {
+div:global(.el-date-editor.el-input),
+div:global(.el-date-editor.el-input__wrapper) {
   width: fit-content;
   height: fit-content;
 }

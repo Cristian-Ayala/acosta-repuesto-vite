@@ -1,37 +1,43 @@
 <template>
   <div class="order">
-    <div id="leftSide" :style="`background-color: var(--el-color-${statusColor});`">
+    <div
+      id="leftSide"
+      :style="`background-color: var(--el-color-${statusColor});`"
+    >
       <el-button :type="statusColor" circle>
-        <i v-if="orden.tipoOrden === 'Local'" class="fas fa-store"></i>
+        <i v-if="orden.tipo_orden_id === 23" class="fas fa-store"></i>
         <i v-else class="fas fa-motorcycle"></i>
       </el-button>
     </div>
     <div id="rigthSide">
-      <div v-if="orden && orden.nombreCliente" class="orderName">
-        {{ orden.nombreCliente }}
+      <div v-if="orden.cliente" class="orderName">
+        {{ `${orden.cliente.name} ${orden.cliente.last_name}` }}
       </div>
-      <div v-if="orden && orden._id">
-        {{ formatDate(orden._id) }}
+      <div>
+        {{ formatDate(orden.created_at) }}
       </div>
-      <div v-if="orden && orden.telefono">
-        {{ orden.telefono }}
-      </div>
-      <div v-if="orden && typeof orden.totalOrden === 'number'">
-        $ {{ orden.totalOrden }}
-      </div>
+      <div>$ {{ orden.total_orden }}</div>
       <a href="#" @click="show.detOrd = true"> Ver detalles </a>
     </div>
-    <detalle-orden :ord-selected="orden" :show="show" @update-orders="updateOrders()"></detalle-orden>
+    <detalle-orden
+      v-if="show.detOrd"
+      :ord-selected="orden"
+      :show="show"
+      @update-orders="updateOrders()"
+    ></detalle-orden>
   </div>
 </template>
 
 <script>
-import DetalleOrden from "@/components/Ordenes/DetalleOrden.vue";
+import { defineAsyncComponent } from "vue";
+import { mapState } from "vuex";
 
 export default {
   name: "OrderView",
   components: {
-    DetalleOrden,
+    DetalleOrden: defineAsyncComponent(() =>
+      import("@/components/Ordenes/DetalleOrden.vue"),
+    ),
   },
   props: {
     orden: {
@@ -48,28 +54,27 @@ export default {
     };
   },
   computed: {
-    statusColor () {
-      if (!this.orden) return "danger";
-      switch (this.orden.status) {
-      case "Completado":
-        return "success";
-      case "En proceso":
-        return "warning";
-      case "En camino":
-        return "primary";
-      default:
-        // In case of cancelado
-        return "danger";
+    ...mapState("ordenes", ["enums"]),
+    statusColor() {
+      switch (this.orden.status_id) {
+        case this.enums.ORD_STATUS.COMPLETADO.id:
+          return "success";
+        case this.enums.ORD_STATUS.EN_PROCESO.id:
+          return "warning";
+        case this.enums.ORD_STATUS.EN_CAMINO.id:
+          return "primary";
+        default:
+          // In case of cancelado
+          return "danger";
       }
     },
   },
-  mounted() {
-    // console.log({ ...this.orden });
-  },
   methods: {
-    formatDate(id) {
-      const date = new Date(id);
-      return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", { hour12: true })}`;
+    formatDate(orderDate) {
+      const date = new Date(orderDate);
+      return `${date.toLocaleDateString()} ${date.toLocaleTimeString("en-US", {
+        hour12: true,
+      })}`;
     },
     updateOrders() {
       this.$emit("updateOrders");
@@ -83,7 +88,7 @@ export default {
   padding: 0.5rem;
   display: flex;
   align-items: center;
-  margin: 0.5rem .5rem;
+  margin: 0.5rem 0.5rem;
   box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
   background-color: #fff;
   border-radius: 1rem;

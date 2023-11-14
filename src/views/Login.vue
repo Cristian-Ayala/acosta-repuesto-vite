@@ -34,14 +34,6 @@
 </template>
 
 <script>
-// import PouchDB from 'pouchdb-browser';
-// PouchDB.plugin(require("pouchdb-authentication").default);
-// const remoteUsuarios = null;
-// const remotedb = async (url) => {
-//   remoteUsuarios = await new PouchDB(url + "marcas", {
-//     skip_setup: true,
-//   });
-// };
 export default {
   name: "LoginIndex",
   components: {},
@@ -112,7 +104,6 @@ export default {
         // const data = await fetchResponse.json();
         // console.log(data);
         this.$router.push({ path: "/" });
-        // const result = await remoteUsuarios.logIn(this.username, this.password)
         // if (result.ok) this.$router.push({ path: '/' });
       } catch (error) {
         console.error(JSON.stringify(error));

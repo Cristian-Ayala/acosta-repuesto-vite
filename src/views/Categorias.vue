@@ -7,100 +7,163 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Categorias
             </h6>
-            <el-button color="#28a745" circle @click="show.modalAgregarCat = true">
+            <el-button v-if="isAbleToModify" color="#28a745" circle @click="createBtn()">
               <i class="fa fa-plus" aria-hidden="true"></i>
             </el-button>
           </div>
           <div class="card-body">
-            <div class="form-group position-relative mb-0">
-              <button
-                type="submit"
-                style="top: -3px; left: 0"
-                class="position-absolute bg-white border-0 p-0"
-              >
-                <i class="o-search-magnify-1 text-gray text-lg"></i>
-              </button>
+            <div class="form-group position-relative mb-0 flex-middle">
+              <i class="fas fa-search text-gray"></i>
               <input
                 v-model="searchDisplay"
                 type="search"
                 placeholder="Buscar categorias..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
-              >
+              />
             </div>
             <table class="table card-text table-hover">
               <thead>
                 <tr>
-                  <th class="onlyOnWeb">#</th>
                   <th>Nombre</th>
-                  <th class="onlyOnWeb">Descripción</th>
-                  <th>Operaciones</th>
+                  <th v-if="isAbleToModify">Operaciones</th>
                 </tr>
               </thead>
-              <tbody v-if="categorias">
-                <tr
-                  v-for="(cat, index) in categorias"
-                  v-show="filtro(index)"
-                  :key="index"
-                >
-                  <th scope="row" class="onlyOnWeb">{{ index + 1 }}</th>
-                  <td>{{ cat.doc.nombreCategoria }}</td>
-                  <td class="onlyOnWeb">{{ cat.doc.descripcion }}</td>
-                  <td>
-                    <el-button type="danger" circle @click="getCategoriaSelected(cat);show.modalEliminarCat = true">
+              <tbody v-if="categorias && !loadingTableCategoria">
+                <tr v-for="(cat, index) in categorias" :key="index">
+                  <td>{{ cat.nombre_categoria }}</td>
+                  <td class="onlyOnWeb">{{ cat.descripcion_categoria }}</td>
+                  <td v-if="isAbleToModify">
+                    <el-button
+                      type="danger"
+                      circle
+                      @click="
+                        setCategoriaSelected(cat);
+                        show.modalEliminarCat = true;
+                      "
+                    >
                       <i class="fas fa-times" aria-hidden="true"></i>
                     </el-button>
-                    <el-button type="warning" circle @click="getCategoriaSelected(cat);show.modalEditCat = true">
+                    <el-button
+                      type="warning"
+                      circle
+                      @click="
+                        setCategoriaSelected(cat);
+                        show.modalAgregarCat = true;
+                      "
+                    >
                       <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                     </el-button>
                   </td>
                 </tr>
               </tbody>
             </table>
-            <el-skeleton v-if="categorias.length === 0" :rows="4" animated/>
+            <div
+              class="mt-3"
+              style="margin-left: -12px; justify-content: center"
+            >
+              <el-pagination
+                v-show="!loadingTableCategoria"
+                :page-size="pageSize"
+                :current-page="page"
+                layout="prev, pager, next"
+                :total="categoriasCount"
+                :hide-on-single-page="true"
+                small
+                @current-change="handleChangePage($event)"
+              />
+            </div>
+            <el-skeleton v-if="loadingTableCategoria" :rows="4" animated />
           </div>
         </div>
       </div>
-      <agregar-cat :show="show"></agregar-cat>
-      <delete-cat :show="show"></delete-cat>
-      <edit-cat :show="show"></edit-cat>
+      <agregar-cat
+        v-if="show.modalAgregarCat"
+        :show="show"
+        :category-prop="categoriaSelected"
+      ></agregar-cat>
+      <delete-cat
+        v-if="show.modalEliminarCat"
+        :show="show"
+        :category-prop="categoriaSelected"
+      ></delete-cat>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
-import AgregarCat from "@/components/Categorias/AgregarCat.vue";
-import DeleteCat from "@/components/Categorias/DeleteCat.vue";
-import EditCat from "@/components/Categorias/EditCat.vue";
+import { mapState, mapActions } from "vuex";
+import { defineAsyncComponent } from "vue";
 
 export default {
   name: "CategoriasIndex",
   components: {
-    AgregarCat,
-    DeleteCat,
-    EditCat,
+    AgregarCat: defineAsyncComponent(() =>
+      import("@/components/Categorias/AgregarCat.vue"),
+    ),
+    DeleteCat: defineAsyncComponent(() =>
+      import("@/components/Categorias/DeleteCat.vue"),
+    ),
   },
   data: () => ({
     displayOption: "",
     searchDisplay: "",
     show: {
       modalAgregarCat: false,
-      modalEditCat: false,
       modalEliminarCat: false,
-    }
+    },
+    categoriaSelected: {},
+    debounceTimer: null,
+    page: 1,
+    pageSize: 10,
   }),
   computed: {
-    ...mapState("categorias", ["categorias", "categoria"]),
+    ...mapState("auth", ["isAbleToModify"]),
+    ...mapState("categorias", [
+      "categorias",
+      "categoriasCount",
+      "loadingTableCategoria",
+    ]),
+  },
+  watch: {
+    searchDisplay() {
+      this.page = 1;
+      // reset the debounce timer if the user types a new letter
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+      }
+      this.fetchCategorias(500);
+    },
+    page() {
+      this.fetchCategorias();
+    },
+  },
+  mounted() {
+    this.fetchCategorias();
   },
   methods: {
-    ...mapMutations("categorias", ["clearDataCat", "getCategoriaSelected"]),
-    filtro(index) {
-      if (this.searchDisplay === "") return true;
-      const array = (
-        this.categorias[index].doc.nombreCategoria +
-        this.categorias[index].doc.descripcion
-      ).toUpperCase();
-      return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
+    ...mapActions("categorias", ["getCategorias"]),
+    setCategoriaSelected(categoria) {
+      const tmpCategoria = JSON.parse(JSON.stringify(categoria));
+      delete tmpCategoria.__typename;
+      this.categoriaSelected = tmpCategoria;
+    },
+    createBtn() {
+      this.categoriaSelected.clear = true;
+      this.show.modalAgregarCat = true;
+    },
+    fetchCategorias(delay = 0) {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        const searchVariables = {
+          nombreCat: this.searchDisplay ? `%${this.searchDisplay}%` : "%%",
+          limit: this.pageSize,
+          offset: this.pageSize * (this.page - 1),
+        };
+        this.getCategorias(searchVariables);
+      }, delay);
+    },
+    handleChangePage(currentPage) {
+      this.page = currentPage;
     },
   },
 };
@@ -112,5 +175,25 @@ export default {
   height: 2rem;
   padding: 0;
   font-size: 12px;
+}
+div:deep(.el-pagination.is-background.el-pagination--small) {
+  justify-content: center;
+}
+div:deep(.el-pagination.el-pagination--small) {
+  place-content: center;
+}
+:global(footer.el-dialog__footer) {
+  padding: var(--el-dialog-padding-primary);
+}
+:deep(ul.el-pager > li.number) {
+  display: none;
+}
+:deep(ul.el-pager > li.number.is-active),
+:deep(ul.el-pager > li:first-child),
+:deep(ul.el-pager > li:last-child) {
+  display: block;
+}
+:deep(ul.el-pager > li.more) {
+  pointer-events: none;
 }
 </style>

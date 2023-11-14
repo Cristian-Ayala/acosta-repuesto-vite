@@ -8,31 +8,23 @@
               Marcas
             </h6>
             <el-button
+              v-if="isAbleToModify"
               color="#28a745"
               circle
-              @click="
-                clearData();
-                show.modalAgregarMar = true;
-              "
+              @click="createNewMarca()"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </el-button>
           </div>
           <div class="card-body">
-            <div class="form-group position-relative mb-0">
-              <button
-                type="submit"
-                style="top: -3px; left: 0"
-                class="position-absolute bg-white border-0 p-0"
-              >
-                <i class="o-search-magnify-1 text-gray text-lg"></i>
-              </button>
+            <div class="form-group position-relative mb-0 flex-middle">
+              <i class="fas fa-search text-gray"></i>
               <input
-                v-model="searchDisplay"
+                v-model.trim="searchDisplay"
                 type="search"
                 placeholder="Buscar marca..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
-              >
+              />
             </div>
             <table class="table card-text table-hover">
               <thead>
@@ -40,38 +32,37 @@
                   <th class="onlyOnWeb">#</th>
                   <th>Nombre</th>
                   <th class="onlyOnWeb">Descripción</th>
-                  <th>Operaciones</th>
+                  <th v-if="isAbleToModify">Operaciones</th>
                 </tr>
               </thead>
               <tbody v-if="marcas">
                 <tr
                   v-for="(mar, index) in marcas"
                   v-show="filtro(index)"
-                  :key="mar.doc.nombreMarca"
+                  :key="index"
                 >
-                  <th scope="row" class="onlyOnWeb">{{ index + 1 }}</th>
-                  <td>{{ mar.doc.nombreMarca }}</td>
-                  <td class="onlyOnWeb">{{ mar.doc.descripMarca }}</td>
-                  <td>
+                  <td>{{ mar.nombre_marca }}</td>
+                  <td class="onlyOnWeb">{{ mar.descripcion_marca }}</td>
+                  <td v-if="isAbleToModify">
                     <el-button
                       type="danger"
                       circle
                       @click="
-                        getMarcaSelected(mar);
+                        setMarcaSelected(mar);
                         show.modalEliminarMar = true;
                       "
                     >
-                      <i class="fas fa-times" aria-hidden="true" ></i>
+                      <i class="fas fa-times" aria-hidden="true"></i>
                     </el-button>
                     <el-button
                       type="warning"
                       circle
                       @click="
-                        getMarcaSelected(mar);
-                        show.modalEditarMar = true;
+                        setMarcaSelected(mar);
+                        show.modalAgregarMar = true;
                       "
                     >
-                      <i class="fas fa-pencil-alt" aria-hidden="true" ></i>
+                      <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                     </el-button>
                   </td>
                 </tr>
@@ -81,47 +72,74 @@
           </div>
         </div>
       </div>
-      <agregar-mar :show="show"></agregar-mar>
-      <delete-mar :show="show"></delete-mar>
-      <edit-mar :show="show"></edit-mar>
+      <agregar-mar
+        v-if="show.modalAgregarMar"
+        :show="show"
+        :marca-prop="marcaSelected"
+        @clear-marca-selected="() => (marcaSelected = {})"
+        @get-all-marcas="getAllMarcas()"
+      ></agregar-mar>
+      <delete-mar
+        v-if="show.modalEliminarMar"
+        :show="show"
+        :marca-prop="marcaSelected"
+        @clear-marca-selected="() => (marcaSelected = {})"
+        @get-all-marcas="getAllMarcas()"
+      ></delete-mar>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
-import AgregarMar from "@/components/Marcas/AgregarMar.vue";
-import DeleteMar from "@/components/Marcas/DeleteMar.vue";
-import EditMar from "@/components/Marcas/EditMar.vue";
+import { mapState } from "vuex";
+import { defineAsyncComponent } from "vue";
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Marcas",
   components: {
-    AgregarMar,
-    DeleteMar,
-    EditMar,
+    AgregarMar: defineAsyncComponent(() =>
+      import("@/components/Marcas/AgregarMar.vue"),
+    ),
+    DeleteMar: defineAsyncComponent(() =>
+      import("@/components/Marcas/DeleteMar.vue"),
+    ),
   },
   data: () => ({
     displayOption: "",
     searchDisplay: "",
     show: {
       modalAgregarMar: false,
-      modalEditarMar: false,
       modalEliminarMar: false,
     },
+    marcas: [],
+    marcaSelected: {},
   }),
   computed: {
-    ...mapState("marcas", ["marcas", "marca"]),
+    ...mapState("auth", ["isAbleToModify"]),
+  },
+  async mounted() {
+    this.marcas = await this.$store.dispatch("marcas/getAll");
   },
   methods: {
-    ...mapMutations("marcas", ["clearData", "getMarcaSelected"]),
+    setMarcaSelected(marca) {
+      const tmpMarca = JSON.parse(JSON.stringify(marca));
+      delete tmpMarca.__typename;
+      this.marcaSelected = tmpMarca;
+    },
     filtro(index) {
       if (this.searchDisplay === "") return true;
       const marcaBusqueda = (
-        this.marcas[index].doc.nombreMarca + this.marcas[index].doc.descripMarca
+        this.marcas[index].nombre_marca + this.marcas[index].descripcion_marca
       ).toUpperCase();
       return marcaBusqueda.indexOf(this.searchDisplay.toUpperCase()) >= 0;
+    },
+    createNewMarca() {
+      this.marcaSelected.clearProp = true;
+      this.show.modalAgregarMar = true;
+    },
+    async getAllMarcas() {
+      this.marcas = await this.$store.dispatch("marcas/getAll");
     },
   },
 };

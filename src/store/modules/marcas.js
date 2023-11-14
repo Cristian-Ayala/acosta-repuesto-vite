@@ -1,139 +1,113 @@
-import { ElMessage } from "element-plus";
-import PouchDB from "pouchdb-browser";
-import router from "../../router/index";
+import { apolloClient } from "@/plugins/vue-apollo";
+import { GET_MARCAS, GET_MARCAS_BY_ID } from "@/store/graphql/queries/marcas";
+import {
+  CREATE_UPDATE_MARCA,
+  DELETE_MARCA,
+} from "@/store/graphql/mutations/marcas";
 
-export default (app) => ({
+export default () => ({
   namespaced: true,
-  state: {
-    marcas: [],
-    marca: {
-      nombreMarca: "",
-      descripMarca: "",
-    },
-    marSelected: {},
-    localMarca: null,
-    PouchDB,
-  },
-  mutations: {
-    clearData(state) {
-      state.marca = {
-        nombreMarca: "",
-        descripMarca: "",
-      };
-    },
-    getMarcaSelected(state, mar) {
-      state.marca = mar;
-      state.marSelected = JSON.parse(JSON.stringify(mar));
-    },
-    errorNotification(state, message) {
-      ElMessage({
-        showClose: true,
-        message,
-        type: "error",
-      });
-    },
-    successNotification(state, message) {
-      ElMessage({
-        showClose: true,
-        message,
-        type: "success",
-      });
-    },
-  },
+  state: {},
+  mutations: {},
   actions: {
-    createRegistro({ state, dispatch, commit }) {
-      if (state.marca.nombreMarca.trim() !== "") {
-        // For puchDB we need to add an _id field
-        state.marca._id = new Date().toISOString();
-        state.marca.nombreMarca = state.marca.nombreMarca.trim().toLocaleUpperCase();
-        state.localMarca
-          .put(state.marca)
-          .then(() => {
-            dispatch("getAll").then(() => commit("successNotification", "Marca agregada con éxito"));
-          })
-          .catch((err) => {
-            commit("errorNotification", `Error al guardar la marca. ${err}`);
+    async createUpdateRegistro({ commit }, variables) {
+      try {
+        if (variables.marca.nombre_marca === "")
+          throw new Error(
+            "Por favor, introduce un nombre para la marca. (DO NOT REPORT THIS ERROR)",
+          );
+        const insertMutation = {
+          mutation: CREATE_UPDATE_MARCA,
+          variables,
+        };
+        const res = await apolloClient.mutate(insertMutation);
+        if (!res || res.errors)
+          throw new Error("al crear la marca.\n", res.errors);
+        if (variables.marca.id) {
+          commit("common/successNotification", "Marca editada con éxito", {
+            root: true,
           });
-      } else {
-        commit("errorNotification", "Por favor, introduce un nombre para la marca");
+        } else {
+          commit("common/successNotification", "Marca agregada con éxito", {
+            root: true,
+          });
+        }
+        return res.data?.create_marca?.returning[0];
+      } catch (error) {
+        if (variables.marca.id) {
+          commit(
+            "common/errorNotification",
+            `Error al editar la marca. ${error}`,
+          );
+        } else if (error.message.includes("introduce un nombre")) {
+          commit(
+            "common/errorNotification",
+            "Por favor, introduce un nombre para la marca",
+            { root: true },
+          );
+        } else {
+          commit(
+            "common/errorNotification",
+            `Error al crear la marca. ${error}`,
+            { root: true },
+          );
+        }
+        window.console.error("Error in createRegistro (Marcas):", error);
+        return null;
       }
     },
-    getAll({ state, commit }) {
-      state.localMarca
-        .allDocs({
-          include_docs: true,
-          descending: false,
-        })
-        .then((doc) => {
-          state.marcas = doc.rows.sort((a, b) => {
-            if (a.doc.nombreMarca > b.doc.nombreMarca) return 1;
-            if (b.doc.nombreMarca > a.doc.nombreMarca) return -1;
-            return 0;
-          });
-        })
-        .catch((err) => commit("errorNotification", `Error al listar la marca. ${err}`));
+    async getAll(store, variables) {
+      try {
+        const searchInfo = {
+          query: GET_MARCAS,
+          fetchPolicy: "network-only",
+          variables,
+        };
+        const result = await apolloClient.query(searchInfo);
+        if (result && result.data) return result.data.marcas;
+        return [];
+      } catch (err) {
+        window.console.error(err);
+        return [];
+      }
     },
-    edithRegistro({ state, commit, dispatch }) {
-      const marcaDoc = state.marSelected.doc;
-      marcaDoc.nombreMarca = marcaDoc.nombreMarca.trim().toLocaleUpperCase();
-      if (marcaDoc.nombreMarca === "") return;
-      state.localMarca
-        .put(marcaDoc)
-        .then(() => {
-          dispatch("getAll").then(() => commit("successNotification", "Marca editada con éxito"));
-        })
-        .catch((err) => {
-          commit("errorNotification", `Error al editar la marca. ${err}`);
+    async removeRegistro({ commit }, variables) {
+      try {
+        if (!variables.id) throw new Error("No existe ID de la marca.");
+        const deleteMutation = {
+          mutation: DELETE_MARCA,
+          variables,
+        };
+        const res = await apolloClient.mutate(deleteMutation);
+        if (!res || res.errors)
+          throw new Error("al eliminar la marca.\n", res.errors);
+        commit("common/successNotification", "Marca eliminada con éxito", {
+          root: true,
         });
+        return res.data?.create_marca?.returning[0]?.id;
+      } catch (error) {
+        commit(
+          "common/errorNotification",
+          `Error al eliminar la marca. ${error}`,
+          { root: true },
+        );
+        return null;
+      }
     },
-    removeRegistro({ state, commit, dispatch }) {
-      state.marca.doc._deleted = true;
-      state.localMarca
-        .put(state.marca.doc)
-        .then(() => {
-          dispatch("getAll");
-          commit("successNotification", "Marca eliminada con éxito");
-        })
-        .catch((err) => {
-          commit("errorNotification", `Error al eliminar la marca. ${err}`);
-        });
-    },
-    initDB({ state, dispatch }) {
-      const remoteMarca = new state.PouchDB(
-        `${app.config.globalProperties.$url}marcas`,
-        {
-          fetch(url, opts) {
-            return state.PouchDB.fetch(url, opts, {
-              credentials: "include",
-            });
-          },
-        },
-      );
-      remoteMarca.info().catch((err) => {
-        if (err.status === 401) {
-          router
-            .push({
-              path: "/login",
-            })
-            .catch(() => {});
-        }
-      });
-
-      state.localMarca = new state.PouchDB("marcas");
-      // do one way, one-off sync from the server until completion
-      state.localMarca.replicate.from(remoteMarca).on("complete", () => {
-        // console.log("Se terminó la replicación");
-        dispatch("getAll");
-        // then two-way, continuous, retriable sync
-        state.localMarca
-          .sync(remoteMarca, {
-            live: true,
-            retry: true,
-          })
-          .on("change", () => {
-            dispatch("getAll");
-          });
-      });
+    async GET_MARCA_BY_ID(store, variables) {
+      try {
+        const searchInfo = {
+          query: GET_MARCAS_BY_ID,
+          fetchPolicy: "network-only",
+          variables,
+        };
+        const result = await apolloClient.query(searchInfo);
+        if (result && result.data) return result.data.marcas;
+        return [];
+      } catch (err) {
+        window.console.error(err);
+        return [];
+      }
     },
   },
 });

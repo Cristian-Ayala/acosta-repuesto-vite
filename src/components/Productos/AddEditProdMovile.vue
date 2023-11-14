@@ -11,15 +11,20 @@
       top="5vh"
     >
       <div v-if="newProductMobile">
-        <div class="form-group row">
+        <div
+          class="form-group row"
+          :class="{
+            'has-error': v$.newProductMobile.upc.$invalid,
+          }"
+        >
           <label class="col-md-3 form-control-label">UPC:</label>
           <div class="col-md-9"></div>
-          <div v-if="newProductMobile.doc" class="col-md-9 input-group">
+          <div v-if="newProductMobile" class="col-md-9 input-group">
             <input
-              v-model="newProductMobile.doc.upc"
+              v-model="newProductMobile.upc"
               type="text"
               class="form-control"
-            >
+            />
             <span
               class="input-group-text"
               @click="
@@ -33,37 +38,43 @@
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
-        <div class="form-group row">
+        <div
+          class="form-group row"
+          :class="{
+            'has-error': v$.newProductMobile.nombre_producto.$invalid,
+          }"
+        >
           <label class="col-md-3 form-control-label">Nombre</label>
-          <div v-if="newProductMobile.doc" class="col-md-9">
+          <div class="col-md-9">
             <input
-              v-model="newProductMobile.doc.nombreProd"
+              v-model.trim="newProductMobile.nombre_producto"
               type="text"
               class="form-control"
-            >
+            />
           </div>
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
+        <!-- TODO: sustituir por componente de element plus -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Foto:</label>
-          <div v-if="newProductMobile.doc" class="col-md-9">
+          <div class="col-md-9">
             <h6 v-if="error">{{ error }}</h6>
             <div v-if="loadingEffect" class="spinner-border" role="status">
               <span class="sr-only">Cargando...</span>
             </div>
             <input
-              v-if="!imagePreview && !loadingEffect"
+              v-show="!imagePreview && !loadingEffect"
               id="uploadPictures"
               type="file"
               accept="image/x-png,image/jpeg,image/webp"
-              style="color: transparent"
+              style="color: transparent; width: 55%"
               @change="
                 upload();
                 loadingEffect = true;
                 error = '';
               "
-            >
+            />
             <div
               v-if="imagePreview && !loadingEffect"
               class="image-preview-container"
@@ -74,123 +85,179 @@
                 alt="Picture"
                 width="150"
                 height="100%"
-              >
-              <el-button type="danger" @click="imagePreview = ''">Quitar</el-button>
+              />
+              <el-button type="danger" @click="removeImg()"> Quitar </el-button>
             </div>
           </div>
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
-        <div class="form-group row">
+        <div
+          class="form-group row"
+          :class="{
+            'has-error': v$.newProductMobile.id_marca.$invalid,
+          }"
+        >
           <label class="col-md-3 form-control-label">Marca</label>
-          <div v-if="newProductMobile.doc" class="col-md-9">
+          <div class="col-md-9">
             <el-select
-              v-model="newProductMobile.doc.nombreMarca"
-              class="m-2"
+              v-model="newProductMobile.id_marca"
               placeholder="Seleccione una marca"
-              size="large"
+              filterable
+              remote
+              :remote-method="remoteMethodMarcas"
+              :loading="loading.marcas"
             >
               <el-option
-                v-for="marca in marcas"
-                :key="marca.doc.nombreMarca"
-                :label="marca.doc.nombreMarca"
-                :value="marca.doc.nombreMarca"
+                v-for="mar in marcas"
+                :key="mar.id"
+                :label="mar.nombre_marca"
+                :value="mar.id"
               />
-              <div class="plusWrapper">
-                <el-button type="success" circle @click="clearData(); show.modalAgregarMar = true;">
-                  <el-icon><Plus/></el-icon>
-                </el-button>
-              </div>
+              <el-option label="" value="" disabled>
+                <span style="display: flex; place-content: center">
+                  <el-button
+                    type="success"
+                    circle
+                    @click="show.modalAgregarMar = true"
+                  >
+                    <el-icon><Plus /></el-icon>
+                  </el-button>
+                </span>
+              </el-option>
             </el-select>
           </div>
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
-        <div class="form-group row">
+        <div
+          class="form-group row"
+          :class="{
+            'has-error': v$.newProductMobile.id_categoria.$invalid,
+          }"
+        >
           <label class="col-md-3 form-control-label">Categoria</label>
-          <div v-if="newProductMobile.doc" class="col-md-9">
+          <div class="col-md-9">
             <el-select
-              v-model="newProductMobile.doc.nombreCategoria"
+              v-model="newProductMobile.id_categoria"
               class="m-2"
               placeholder="Seleccione una categoria"
-              size="large"
+              filterable
+              remote
+              :remote-method="remoteMethodCategorias"
+              :loading="loading.categorias"
             >
               <el-option
                 v-for="categoria in categorias"
-                :key="categoria.doc.nombreCategoria"
-                :label="categoria.doc.nombreCategoria"
-                :value="categoria.doc.nombreCategoria"
+                :key="categoria.id"
+                :label="categoria.nombre_categoria"
+                :value="categoria.id"
               />
-              <div class="plusWrapper">
-                <el-button type="success" circle @click="clearData(); show.modalAgregarCat = true;">
-                  <el-icon><Plus/></el-icon>
-                </el-button>
-              </div>
+              <el-option label="" value="" disabled>
+                <span style="display: flex; place-content: center">
+                  <el-button
+                    type="success"
+                    circle
+                    @click="show.modalAgregarCat = true"
+                  >
+                    <el-icon><Plus /></el-icon>
+                  </el-button>
+                </span>
+              </el-option>
             </el-select>
           </div>
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
-        <div class="form-group row">
+        <div
+          class="form-group row"
+          :class="{
+            'has-error': v$.newProductMobile.precio_mayoreo.$invalid,
+          }"
+        >
           <label class="col-md-3 form-control-label">Precio Mayorista:</label>
-          <div v-if="newProductMobile.doc" class="col-md-9">
-            <input
-              v-model="newProductMobile.doc.precioMayoreo"
-              type="number"
-              class="form-control"
-              min="0"
-            >
+          <div class="col-md-9">
+            <el-input-number
+              v-model="newProductMobile.precio_mayoreo"
+              :precision="2"
+              :min="0"
+            />
           </div>
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
         <!-- ------------------------------------------ -->
-        <div class="form-group row">
+        <div
+          class="form-group row"
+          :class="{
+            'has-error': v$.newProductMobile.precio_publico.$invalid,
+          }"
+        >
           <label class="col-md-3 form-control-label">Precio Público:</label>
-          <div v-if="newProductMobile.doc" class="col-md-9">
-            <input
-              v-model="newProductMobile.doc.precioPublico"
-              type="number"
-              class="form-control"
-              min="0"
-            >
+          <div class="col-md-9">
+            <el-input-number
+              v-model="newProductMobile.precio_publico"
+              :precision="2"
+              :min="0"
+            />
           </div>
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
         <!-- ------------------------------------------ -->
-        <div class="form-group row">
+        <div
+          class="form-group row"
+          :class="{
+            'has-error': v$.newProductMobile.precio_taller.$invalid,
+          }"
+        >
           <label class="col-md-3 form-control-label">Precio Taller:</label>
-          <div v-if="newProductMobile.doc" class="col-md-9">
-            <input
-              v-model="newProductMobile.doc.precioTaller"
-              type="number"
-              class="form-control"
-              min="0"
-            >
+          <div class="col-md-9">
+            <el-input-number
+              v-model="newProductMobile.precio_taller"
+              :precision="2"
+              :min="0"
+            />
           </div>
         </div>
         <div class="line"></div>
         <!-- ------------------------------------------ -->
-        <div v-if="organizationDivision === 'Santa-Ana'" class="form-group row">
-          <label class="col-md-3 form-control-label">Stock:</label>
-          <div v-if="newProductMobile.doc" class="col-md-9">
+        <div
+          v-if="organizationDivision.includes('Santa Ana')"
+          class="form-group row"
+          :class="{
+            'has-error': v$.newProductMobile.stock_prod_sta_ana.$invalid,
+          }"
+        >
+          <label class="col-md-3 form-control-label">Stock - Santa Ana:</label>
+          <div class="col-md-9">
             <el-input-number
               id="decrementIncrement"
-              v-model="newProductMobile.doc.stockProdStaAna"
+              v-model="newProductMobile.stock_prod_sta_ana"
+              :precision="0"
               :min="0"
-              :max="1000000"/>
+              :max="1000000"
+            />
           </div>
         </div>
+        <div class="line"></div>
         <!-- ------------------------------------------ -->
-        <div v-if="organizationDivision === 'Metapan'" class="form-group row">
-          <label class="col-md-3 form-control-label">Stock:</label>
-          <div v-if="newProductMobile.doc" class="col-md-9">
+        <div
+          v-if="organizationDivision.includes('Metapan')"
+          class="form-group row"
+          :class="{
+            'has-error': v$.newProductMobile.stock_prod_metapan.$invalid,
+          }"
+        >
+          <label class="col-md-3 form-control-label">Stock - Metapan:</label>
+          <div class="col-md-9">
             <el-input-number
               id="decrementIncrement"
-              v-model="newProductMobile.doc.stockProdMetapan"
+              v-model="newProductMobile.stock_prod_metapan"
+              :precision="0"
               :min="0"
-              :max="1000000"/>
+              :max="1000000"
+            />
           </div>
         </div>
         <div class="line"></div>
@@ -198,10 +265,13 @@
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="mostrar.addEditProdMovile = false">Cancelar</el-button>
+          <el-button @click="mostrar.addEditProdMovile = false">
+            Cancelar
+          </el-button>
           <el-button
             type="primary"
-            @click="confirmation(newProductMobile);mostrar.addEditProdMovile = false;"
+            :disabled="formHasErrors"
+            @click="confirm()"
           >
             Confirmar
           </el-button>
@@ -209,14 +279,19 @@
       </template>
     </el-dialog>
     <!-- Fin del modal para eliminar (mobile) -->
-    <agregar-mar :show="show"></agregar-mar>
-    <agregar-cat :show="show"></agregar-cat>
+    <agregar-mar
+      :show="show"
+      @set-marca-selected="setMarcaSelected"
+    ></agregar-mar>
+    <agregar-cat :show="show" @set-categoria-selected="setCategoriaSelected"></agregar-cat>
     <u-p-c-reader :show="show"></u-p-c-reader>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
+import { useVuelidate } from "@vuelidate/core";
+import { required, integer } from "@vuelidate/validators";
+import { mapMutations, mapActions } from "vuex";
 import { blobToURL, fromBlob } from "image-resize-compress";
 import AgregarMar from "@/components/Marcas/AgregarMar.vue";
 import AgregarCat from "@/components/Categorias/AgregarCat.vue";
@@ -225,6 +300,18 @@ import UPCReader from "@/components/Productos/UPCReader.vue";
 // Variables for upc barcode scanner
 let code = "";
 let reading = false;
+const newProductMobile = Object.freeze({
+  upc: "",
+  nombre_producto: "",
+  foto: "",
+  id_marca: null,
+  id_categoria: null,
+  precio_mayoreo: null,
+  precio_publico: null,
+  precio_taller: null,
+  stock_prod_sta_ana: null,
+  stock_prod_metapan: null,
+});
 
 export default {
   name: "AddEditProdMovile",
@@ -242,6 +329,14 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    prodSelected: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+  emits: ["loadingProduct"],
+  setup() {
+    return { v$: useVuelidate() };
   },
   data() {
     return {
@@ -255,57 +350,103 @@ export default {
         modalUPCBarcode: false,
       },
       organizationDivision: "",
+      newProductMobile: { ...newProductMobile },
+      loading: {
+        marcas: false,
+        categorias: false,
+        fullscreen: false,
+      },
+      marcas: [],
+      categorias: [],
+      formHasErrors: false,
     };
   },
-  computed: {
-    ...mapState("productos", ["newProductMobile"]),
-    ...mapState("marcas", ["marcas"]),
-    ...mapState("categorias", ["categorias"]),
+  validations() {
+    return {
+      newProductMobile: {
+        upc: { required, $autoDirty: true },
+        nombre_producto: { required },
+        id_marca: { required },
+        id_categoria: { required },
+        precio_mayoreo: { required, minLength: 0 },
+        precio_publico: { required, minLength: 0 },
+        precio_taller: { required, minLength: 0 },
+        stock_prod_sta_ana: { required, minLength: 0, integer },
+        stock_prod_metapan: { required, minLength: 0, integer },
+      },
+    };
   },
+  computed: {},
   watch: {
     newProductMobile: {
-      // This will let Vue know to look inside the array
       handler() {
-        if (this.newProductMobile.doc) {
-          if (this.newProductMobile.doc.nombreCategoria) {
-            this.descripcionDropdown =
-              this.newProductMobile.doc.nombreCategoria;
-          } else {
-            this.descripcionDropdown = "";
-          }
-          if (this.newProductMobile.doc.nombreMarca) {
-            this.marcaDropdown = this.newProductMobile.doc.nombreMarca;
-          } else {
-            this.marcaDropdown = "";
-          }
-          if (this.newProductMobile.doc.foto) {
-            this.imagePreview = this.newProductMobile.doc.foto;
-          } else {
-            this.imagePreview = "";
-          }
+        if (this.newProductMobile.foto) {
+          this.imagePreview = this.newProductMobile.foto;
+        } else {
+          this.imagePreview = "";
         }
       },
     },
-    // barcode() {
-    //   this.newProductMobile = this.barcode;
-    // },
+    "v$.$errors": {
+      handler(value) {
+        if (!value || !Array.isArray(value)) {
+          this.formHasErrors = true;
+          return;
+        }
+        this.formHasErrors = value.length > 0;
+      },
+      deep: true,
+    },
+    prodSelected: {
+      async handler(value) {
+        if (!value) return;
+        if (value.CLEAR) {
+          this.newProductMobile = { ...newProductMobile };
+          return;
+        }
+        this.$emit("loadingProduct", true);
+        this.categorias = await this.$store.dispatch(
+          "categorias/getCategoriasByID",
+          {
+            id: value.categoria?.id,
+          },
+        );
+        this.marcas = await this.$store.dispatch("marcas/GET_MARCA_BY_ID", {
+          id: value.marca?.id,
+        });
+        /* eslint-disable */
+        value.id_categoria = value.categoria?.id;
+        value.id_marca = value.marca?.id;
+        value.foto = `${this.$FILE_MANAGER}photo/${value.foto}`;
+        delete value.__typename;
+        delete value.marca;
+        delete value.categoria;
+        /* eslint-enable */
+        this.newProductMobile = value;
+        this.$emit("loadingProduct", false);
+      },
+      immediate: true,
+    },
   },
-  mounted() {
-    this.organizationDivision = localStorage.getItem("org_division");
+  async mounted() {
+    this.organizationDivision = localStorage.getItem("sucursales");
     this.modalIsActive();
+    this.v$.$validate();
   },
   methods: {
     ...mapMutations("productos", [
       "removeRegistro",
       "applyAllChanges",
-      "marcaSelected",
-      "categoriaSelected",
-      "fotoSelected",
       "setCalledFrom",
     ]),
     ...mapActions("productos", ["confirmation"]),
-    ...mapMutations("marcas", ["clearData"]),
-    ...mapMutations("categorias", ["clearDataCat"]),
+    /* eslint-disable vue/no-mutating-props */
+    async confirm() {
+      const res = await this.confirmation(this.newProductMobile);
+      if (!res) return;
+      this.mostrar.addEditProdMovile = false;
+    },
+    /* eslint-enable vue/no-mutating-props */
     upload() {
       return new Promise((resolve, reject) => {
         const filePicker = document.getElementById("uploadPictures");
@@ -315,7 +456,8 @@ export default {
           return;
         }
         const myFile = filePicker.files[0];
-
+        /* eslint-disable-next-line */
+        this.newProductMobile.foto = myFile;
         // Options for file
         const quality = 100;
         const width = "auto";
@@ -329,10 +471,13 @@ export default {
     checkSize(myFile, quality, width, height, format) {
       fromBlob(myFile, quality, width, height, format).then((blob) => {
         if (blob.size > 400000) {
-          if (quality > 20) this.checkSize(myFile, quality -20, width, height, format);
-          else if (quality === 20) this.checkSize(myFile, 10, width, height, format);
-          else if (quality === 10) this.checkSize(myFile, 1, width, height, format);
-          else{
+          if (quality > 20)
+            this.checkSize(myFile, quality - 20, width, height, format);
+          else if (quality === 20)
+            this.checkSize(myFile, 10, width, height, format);
+          else if (quality === 10)
+            this.checkSize(myFile, 1, width, height, format);
+          else {
             this.error = "La imagen es demasiado grande";
             this.loadingEffect = false;
           }
@@ -341,10 +486,7 @@ export default {
         // will generate a url to the converted file
         blobToURL(blob).then((url) => {
           this.imagePreview = url;
-          this.fotoSelected(url);
           this.loadingEffect = false;
-          // console.log(`KB length: ${  blob.size}`) / 1e3;
-          // console.log(`MB: ${  blob.size / 1e6}`);
         });
       });
     },
@@ -352,7 +494,6 @@ export default {
       document.addEventListener("keypress", this.listenerFunction);
     },
     modalWillHide(done) {
-      window.console.log("remove modal");
       document.removeEventListener("keypress", this.listenerFunction);
       done();
     },
@@ -361,8 +502,8 @@ export default {
       if (e.key === "Enter") {
         if (code.length > 10) {
           window.console.log("code", code);
-          this.newProductMobile.doc.upc = code;
-          this.$refs.dewdew.cwrcv();
+          this.newProductMobile.upc = code;
+          // this.$refs.dewdew.cwrcv();
           /// code ready to use
           code = "";
         }
@@ -378,6 +519,39 @@ export default {
         }, 200); // 200 works fine for me but you can adjust it
       }
     },
+    async remoteMethodMarcas(marcaKeyWord) {
+      if (!marcaKeyWord || marcaKeyWord.trim() === "") return;
+      this.loading.marcas = true;
+      this.marcas = await this.$store.dispatch("marcas/getAll", {
+        nombreMarca: `%${marcaKeyWord}%`,
+      });
+      this.loading.marcas = false;
+    },
+    async remoteMethodCategorias(categoriaKeyWord) {
+      if (!categoriaKeyWord || categoriaKeyWord.trim() === "") return;
+      this.loading.categorias = true;
+      this.categorias = await this.$store.dispatch(
+        "categorias/getCategoriasByKeyword",
+        {
+          nombreCat: `%${categoriaKeyWord}%`,
+        },
+      );
+      this.loading.categorias = false;
+    },
+    removeImg() {
+      this.imagePreview = "";
+      /* eslint-disable-next-line */
+      this.newProductMobile.UPLOAD_NEW_PICTURE = true;
+      this.newProductMobile.foto = "";
+    },
+    setMarcaSelected(marca) {
+      this.newProductMobile.id_marca = marca.id;
+      this.marcas = [marca];
+    },
+    setCategoriaSelected(categoria) {
+      this.newProductMobile.id_categoria = categoria.id;
+      this.categorias = [categoria];
+    }
   },
 };
 </script>
@@ -435,9 +609,13 @@ display: inline-flex;
   font-weight: 300;
   margin-bottom: 0;
   background-image: none;
-  background-size: 0 2px, 100% 1px;
+  background-size:
+    0 2px,
+    100% 1px;
   background-repeat: no-repeat;
-  background-position: bottom, 50% calc(100% - 1px);
+  background-position:
+    bottom,
+    50% calc(100% - 1px);
   background-color: #343a40;
   transition: background 0s ease-out;
   float: none;
@@ -481,5 +659,29 @@ img.image-preview {
   height: 100%;
   margin-right: 2rem;
 }
-</style>
+:deep(.el-input-number) {
+  width: 100%;
+}
+:deep(div.el-input__wrapper) {
+  border-radius: 1rem;
+}
+:deep(.el-input-number__decrease) {
+  border-radius: 1rem 0 0 1rem;
+}
+:deep(.el-input-number__increase) {
+  border-radius: 0 1rem 1rem 0;
+}
+.has-error > label {
+  color: var(--el-color-error-dark-2);
+}
 
+.has-error > div > input {
+  border: 1px solid var(--el-color-error-dark-2);
+}
+.has-error :deep(div.el-input__wrapper) {
+  border: 1px solid var(--el-color-error-dark-2);
+}
+.has-error :deep(input::placeholder) {
+  color: var(--el-color-error-dark-2);
+}
+</style>
