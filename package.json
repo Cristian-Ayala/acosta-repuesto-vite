@@ -7,7 +7,7 @@
     "lint": "eslint --ext .js,.vue src/ --fix",
     "dev": "vite --host",
     "eslint": "eslint --ext .js,.vue src",
-    "preview": "vite preview --port 5000"
+    "preview": "vite preview --port 5173"
   },
   "dependencies": {
     "@apollo/client": "^3.8.1",
