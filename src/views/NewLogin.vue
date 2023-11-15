@@ -39,7 +39,6 @@ export default {
     idTokenClaims: {
       handler(token) {
         if (!token) return;
-        console.log("token", token.__raw);
         window.localStorage.setItem("id_token", token.__raw);
       },
       deep: true,

@@ -69,14 +69,6 @@ export default {
       // If false, the third-party domain cookies are disable
       if(!cookieSuccess) that.$router.push({ path: "/cookies" });
     };
-    // Fin de script para probar si las cookies de terceros estan habilitadas
-    // remotedb(this.$url)
-    //   .then((res) => {
-    //     console.log(JSON.stringify(res));
-    //   })
-    //   .catch((err) => {
-    //     console.log(JSON.stringify(err));
-    //   });
   },
   methods: {
     async login() {
@@ -100,11 +92,7 @@ export default {
       };
       try {
         await fetch(`${import.meta.env.VITE_BACKEND_URL}_session`, settings);
-        // const fetchResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}_session`, settings);
-        // const data = await fetchResponse.json();
-        // console.log(data);
         this.$router.push({ path: "/" });
-        // if (result.ok) this.$router.push({ path: '/' });
       } catch (error) {
         console.error(JSON.stringify(error));
         this.error = true;
@@ -117,7 +105,7 @@ export default {
         document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
         return cookiesEnabled;
       } catch (e) {
-        console.log(e);
+        console.error(e);
         return false;
       }
     },

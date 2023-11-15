@@ -1,4 +1,3 @@
-<!-- TODO: falta probar este componente -->
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
   <el-dialog

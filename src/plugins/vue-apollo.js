@@ -1,4 +1,9 @@
-import { ApolloClient, ApolloLink, HttpLink } from "@apollo/client/core";
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  defaultDataIdFromObject,
+} from "@apollo/client/core";
 import { InMemoryCache } from "@apollo/client/cache";
 import { setContext } from "@apollo/client/link/context";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
@@ -33,7 +38,17 @@ const mergeFuction = (existing, incoming) => {
   return mergedData;
 };
 const cache = new InMemoryCache({
-  dataIdFromObject: (o) => o.id,
+  dataIdFromObject: (responseObject) => {
+    // Cases are DEMO only, just in case needed in the future
+    switch (responseObject.__typename) {
+      case "Product":
+        return `Product:${responseObject.upc}`;
+      case "User":
+        return `User:${responseObject.name}:${responseObject.email}`;
+      default:
+        return defaultDataIdFromObject(responseObject);
+    }
+  },
   typePolicies: {
     Query: {
       fields: {

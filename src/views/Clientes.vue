@@ -17,35 +17,28 @@
             </el-button>
           </div>
           <div class="card-body">
-            <div class="filtros">
-              <div class="d-inline-flex pr-2 pb-2">
-                <el-button
-                  type="primary"
-                  round
-                  @click="show.orderFilterDrawer = true"
-                  >Filtros ({{ allFilters.length }})</el-button
-                >
-              </div>
-              <div
-                v-if="allFilters && allFilters.length > 0"
-                class="d-inline-flex auto-scroll pb-2"
-              >
-                <el-button
-                  v-for="filter in allFilters"
-                  :key="filter"
-                  type="primary"
-                  round
-                  disabled
-                  class="btn-sm pr-2 pl-2"
-                  @click="show.orderFilterDrawer = true"
-                >
-                  {{ filter }}
-                </el-button>
-              </div>
+            <div
+              class="form-group mb-0 flex-middle"
+              style="
+                padding-left: 1rem;
+                background: #fff;
+                border-radius: 0 0 1rem 1rem;
+              "
+            >
+              <i class="fas fa-search text-gray"></i>
+              <input
+                v-model.trim="searchKeyword"
+                type="search"
+                placeholder="Buscar cliente..."
+                class="form-control form-control-sm border-0 no-shadow pl-4"
+              />
             </div>
           </div>
         </div>
-        <div style="display: grid">
+        <div v-if="show.clientTableLoading">
+          <clientes-view-loading v-for="i in 10" :key="i" />
+        </div>
+        <div v-else style="display: grid">
           <client-view
             v-for="(cliente, index) in clientes"
             :key="index"
@@ -53,9 +46,6 @@
             @open-edit-modal="editClient(cliente)"
             @open-delete-modal="deleteClient(cliente)"
           ></client-view>
-        </div>
-        <div v-if="show.clientTableLoading">
-          <clientes-view-loading v-for="i in 10" :key="i" />
         </div>
         <el-empty v-if="clientes.length === 0" description="No hay registros" />
       </div>
@@ -92,7 +82,7 @@ export default {
   props: {},
   data() {
     return {
-      allFilters: [],
+      searchKeyword: "",
       show: {
         orderFilterDrawer: false,
         clientTableLoading: false,
@@ -103,20 +93,35 @@ export default {
       totalClientes: 0,
       title: "",
       clientSelected: {},
+      debounceTimer: null,
     };
   },
   computed: {},
-  watch: {},
-  mounted() {
-    this.getClientes();
+  watch: {
+    searchKeyword: {
+      handler(newKeyword) {
+        if (this.debounceTimer) {
+          clearTimeout(this.debounceTimer);
+        }
+        const keyword =
+          newKeyword != null && newKeyword !== "" ? `%${newKeyword}%` : null;
+        this.getClientes({ keyword });
+      },
+      immediate: true,
+    },
   },
   methods: {
-    async getClientes() {
+    getClientes(variables) {
       this.show.clientTableLoading = true;
-      const res = await this.$store.dispatch("clientes/getAll");
-      this.clientes = res.clientes;
-      this.totalClientes = res.totalClientes;
-      this.show.clientTableLoading = false;
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+      }
+      this.debounceTimer = setTimeout(async () => {
+        const res = await this.$store.dispatch("clientes/getAll", variables);
+        this.clientes = res.clientes;
+        this.totalClientes = res.totalClientes;
+        this.show.clientTableLoading = false;
+      }, 500);
     },
     createClient() {
       this.clientSelected = { CLEAR: true };

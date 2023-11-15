@@ -225,19 +225,11 @@ export default {
   },
   computed: {
     ...mapState("auth", ["isAbleToModify"]),
-    // TODO: depurar este computed
     ...mapState("productos", [
       "currentPage",
       "loadingTableProductos",
       "productos",
       "producto",
-      "cacheEditProd",
-      "editedProd",
-      "newProd",
-      "deleteTransaction",
-      "editTransaction",
-      "numeroDeEditados",
-      "newProductMobile",
       "perPage",
       "totalRows",
       "filtroCategorias",

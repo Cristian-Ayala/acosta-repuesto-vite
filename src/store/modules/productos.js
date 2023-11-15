@@ -13,7 +13,6 @@ export default (app) => ({
   state: {
     productos: [],
     newProd: [],
-    newProductMobile: {},
     currentPage: 1,
     perPage: 10,
     totalRows: 0,

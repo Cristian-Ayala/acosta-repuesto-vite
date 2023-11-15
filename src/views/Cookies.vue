@@ -98,7 +98,6 @@ export default {
       //   !timedOut ? this.$router.push({ path: "/login" }) : (this.visible = true);
       // this.$router.go();
       this.$router.push({ path: "/login" })
-      console.log("click");
     },
   },
 };

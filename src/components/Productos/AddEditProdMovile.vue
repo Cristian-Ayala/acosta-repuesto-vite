@@ -464,7 +464,6 @@ export default {
         const height = "auto";
         const format = "webp";
         this.checkSize(myFile, quality, width, height, format);
-        // console.log(myFile);//prints the file in JSON
         resolve();
       });
     },
