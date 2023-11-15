@@ -13,7 +13,7 @@
             v-model.trim="marca.nombre_marca"
             type="text"
             class="form-control"
-          >
+          />
         </div>
       </div>
       <div class="line"></div>
@@ -51,7 +51,7 @@ export default {
     marcaProp: {
       type: Object,
       default: () => ({}),
-    }
+    },
   },
   emits: ["clearMarcaSelected", "getAllMarcas", "setMarcaSelected"],
   data() {
@@ -72,8 +72,9 @@ export default {
         } else {
           this.marca = newValue;
         }
-      }
-    }
+      },
+      immediate: true,
+    },
   },
   beforeUnmount() {
     this.$emit("clearMarcaSelected");
