@@ -46,8 +46,8 @@
             @open-edit-modal="editClient(cliente)"
             @open-delete-modal="deleteClient(cliente)"
           ></client-view>
+          <el-empty v-if="clientes.length === 0" description="No hay registros" />
         </div>
-        <el-empty v-if="clientes.length === 0" description="No hay registros" />
       </div>
     </div>
     <!-- Fin del Cuerpo a escribir -->
