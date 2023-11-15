@@ -25,13 +25,7 @@
               type="text"
               class="form-control"
             />
-            <span
-              class="input-group-text"
-              @click="
-                show.modalUPCBarcode = true;
-                setCalledFrom('AddEditProdMovile.vue');
-              "
-            >
+            <span class="input-group-text" @click="show.modalUPCBarcode = true">
               <i class="fas fa-barcode"></i>
             </span>
           </div>
@@ -283,8 +277,14 @@
       :show="show"
       @set-marca-selected="setMarcaSelected"
     ></agregar-mar>
-    <agregar-cat :show="show" @set-categoria-selected="setCategoriaSelected"></agregar-cat>
-    <u-p-c-reader :show="show"></u-p-c-reader>
+    <agregar-cat
+      :show="show"
+      @set-categoria-selected="setCategoriaSelected"
+    ></agregar-cat>
+    <u-p-c-reader
+      :show="show"
+      @set-upc-selected="setUpcSelected"
+    ></u-p-c-reader>
   </div>
 </template>
 
@@ -434,11 +434,7 @@ export default {
     this.v$.$validate();
   },
   methods: {
-    ...mapMutations("productos", [
-      "removeRegistro",
-      "applyAllChanges",
-      "setCalledFrom",
-    ]),
+    ...mapMutations("productos", ["removeRegistro", "applyAllChanges"]),
     ...mapActions("productos", ["confirmation"]),
     /* eslint-disable vue/no-mutating-props */
     async confirm() {
@@ -550,7 +546,10 @@ export default {
     setCategoriaSelected(categoria) {
       this.newProductMobile.id_categoria = categoria.id;
       this.categorias = [categoria];
-    }
+    },
+    setUpcSelected(upc) {
+      this.newProductMobile.upc = upc;
+    },
   },
 };
 </script>

@@ -14,15 +14,13 @@
       @loaded="() => onLoaded()"
     ></stream-barcode-reader>
     <span v-if="barcode">
-      ¿Es este el UPC: <b>{{ barcode }}</b>?
+      ¿Es este el UPC: <b>{{ barcode }}</b
+      >?
     </span>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="barcode = ''">Escanear de nuevo</el-button>
-        <el-button
-          type="primary"
-          @click="show.modalUPCBarcode = false;"
-        >
+        <el-button type="primary" @click="show.modalUPCBarcode = false">
           Si
         </el-button>
       </span>
@@ -31,7 +29,6 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
 import StreamBarcodeReader from "@/components/StreamBarcodeReader.vue";
 
 export default {
@@ -45,30 +42,20 @@ export default {
       default: () => ({}),
     },
   },
+  emits: ["setUpcSelected"],
   data() {
     return {
       showBarcode: false,
       barcode: "",
     };
   },
-  computed: {
-    ...mapState("productos", ["newProductMobile", "calledFrom"]),
-  },
-  watch: {
-    calledFrom() {
-      this.barcode = "";
-    },
+  mounted() {
+    this.barcode = "";
   },
   methods: {
-    ...mapMutations("productos", ["setFiltroUPC"]),
     onDecode(a) {
-      console.log(this.calledFrom);
-      if (this.calledFrom === "FiltrosProductos.vue") {
-        this.setFiltroUPC(a);
-      }
-      if (this.calledFrom === "AddEditProdMovile.vue") {
-        this.newProductMobile.upc = a;
-      }
+      window.console.log("decoded upc:", a);
+      this.$emit("setUpcSelected", a);
       this.barcode = a;
     },
     onLoaded() {

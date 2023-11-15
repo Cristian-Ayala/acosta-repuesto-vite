@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
           globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
         },
         manifest: {
-          id: "3.0.0",
+          id: "3.0.1",
           version: "1.0.0",
           manifest_version: 1,
           name: "Acosta Repuestos",

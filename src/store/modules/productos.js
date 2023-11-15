@@ -21,17 +21,10 @@ export default (app) => ({
     filtroNombre: "",
     filtroUPC: "",
     tempFiltroUPC: "",
-    calledFrom: "",
     variables: {},
     ordenDetalleProductos: {},
   },
   mutations: {
-    setFiltroUPC(state, upc) {
-      state.tempFiltroUPC = upc;
-    },
-    setCalledFrom(state, calledFrom) {
-      state.calledFrom = calledFrom;
-    },
     SET_DETALLE_PRODUCTOS(state, { prod, addOne = false, removeOne = false }) {
       const tmpProd = { ...prod };
       if (addOne) {
