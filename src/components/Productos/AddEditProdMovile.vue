@@ -53,35 +53,11 @@
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Foto:</label>
           <div class="col-md-9">
-            <h6 v-if="error">{{ error }}</h6>
-            <div v-if="loadingEffect" class="spinner-border" role="status">
-              <span class="sr-only">Cargando...</span>
-            </div>
-            <input
-              v-show="!imagePreview && !loadingEffect"
-              id="uploadPictures"
-              type="file"
-              accept="image/x-png,image/jpeg,image/webp"
-              style="color: transparent; width: 55%"
-              @change="
-                upload();
-                loadingEffect = true;
-                error = '';
-              "
-            />
-            <div
-              v-if="imagePreview && !loadingEffect"
-              class="image-preview-container"
-            >
-              <img
-                class="image-preview"
-                :src="imagePreview"
-                alt="Picture"
-                width="150"
-                height="100%"
-              />
-              <el-button type="danger" @click="removeImg()"> Quitar </el-button>
-            </div>
+            <upload-image
+              key="addEditProdMovileUploadPhoto"
+              v-model="fotoArray"
+              @new-picture-flag="newPictureFlag"
+            ></upload-image>
           </div>
         </div>
         <div class="line"></div>
@@ -292,10 +268,10 @@
 import { useVuelidate } from "@vuelidate/core";
 import { required, integer } from "@vuelidate/validators";
 import { mapMutations, mapActions } from "vuex";
-import { blobToURL, fromBlob } from "image-resize-compress";
 import AgregarMar from "@/components/Marcas/AgregarMar.vue";
 import AgregarCat from "@/components/Categorias/AgregarCat.vue";
 import UPCReader from "@/components/Productos/UPCReader.vue";
+import UploadImage from "@/components/Productos/UploadImage.vue";
 
 // Variables for upc barcode scanner
 let code = "";
@@ -319,6 +295,7 @@ export default {
     AgregarMar,
     AgregarCat,
     UPCReader,
+    UploadImage,
   },
   props: {
     title: {
@@ -340,9 +317,7 @@ export default {
   },
   data() {
     return {
-      imagePreview: "",
       showBarcode: false,
-      loadingEffect: false,
       error: "",
       show: {
         modalAgregarMar: false,
@@ -359,6 +334,7 @@ export default {
       marcas: [],
       categorias: [],
       formHasErrors: false,
+      fotoArray: [],
     };
   },
   validations() {
@@ -378,15 +354,6 @@ export default {
   },
   computed: {},
   watch: {
-    newProductMobile: {
-      handler() {
-        if (this.newProductMobile.foto) {
-          this.imagePreview = this.newProductMobile.foto;
-        } else {
-          this.imagePreview = "";
-        }
-      },
-    },
     "v$.$errors": {
       handler(value) {
         if (!value || !Array.isArray(value)) {
@@ -421,6 +388,7 @@ export default {
         delete value.__typename;
         delete value.marca;
         delete value.categoria;
+        this.fotoArray = [value.foto];
         /* eslint-enable */
         this.newProductMobile = value;
         this.$emit("loadingProduct", false);
@@ -438,52 +406,14 @@ export default {
     ...mapActions("productos", ["confirmation"]),
     /* eslint-disable vue/no-mutating-props */
     async confirm() {
+      const loading = this.$loading({ fullscreen: true });
+      if (this.newProductMobile.UPLOAD_NEW_PICTURE && this.fotoArray.length) {
+        [this.newProductMobile.foto] = this.fotoArray;
+      }
       const res = await this.confirmation(this.newProductMobile);
       if (!res) return;
       this.mostrar.addEditProdMovile = false;
-    },
-    /* eslint-enable vue/no-mutating-props */
-    upload() {
-      return new Promise((resolve, reject) => {
-        const filePicker = document.getElementById("uploadPictures");
-
-        if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {
-          reject(new Error("No hay imagen seleccionada"));
-          return;
-        }
-        const myFile = filePicker.files[0];
-        /* eslint-disable-next-line */
-        this.newProductMobile.foto = myFile;
-        // Options for file
-        const quality = 100;
-        const width = "auto";
-        const height = "auto";
-        const format = "webp";
-        this.checkSize(myFile, quality, width, height, format);
-        resolve();
-      });
-    },
-    checkSize(myFile, quality, width, height, format) {
-      fromBlob(myFile, quality, width, height, format).then((blob) => {
-        if (blob.size > 400000) {
-          if (quality > 20)
-            this.checkSize(myFile, quality - 20, width, height, format);
-          else if (quality === 20)
-            this.checkSize(myFile, 10, width, height, format);
-          else if (quality === 10)
-            this.checkSize(myFile, 1, width, height, format);
-          else {
-            this.error = "La imagen es demasiado grande";
-            this.loadingEffect = false;
-          }
-          return;
-        }
-        // will generate a url to the converted file
-        blobToURL(blob).then((url) => {
-          this.imagePreview = url;
-          this.loadingEffect = false;
-        });
-      });
+      loading.close();
     },
     modalIsActive() {
       document.addEventListener("keypress", this.listenerFunction);
@@ -533,11 +463,9 @@ export default {
       );
       this.loading.categorias = false;
     },
-    removeImg() {
-      this.imagePreview = "";
+    newPictureFlag() {
       /* eslint-disable-next-line */
       this.newProductMobile.UPLOAD_NEW_PICTURE = true;
-      this.newProductMobile.foto = "";
     },
     setMarcaSelected(marca) {
       this.newProductMobile.id_marca = marca.id;
