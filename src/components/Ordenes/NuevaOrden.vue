@@ -32,9 +32,8 @@
                 placeholder="Seleccione un cliente"
                 filterable
                 clearable
-                remote
-                :remote-method="getClientes"
                 :loading="loading.clientes"
+                @input="clientSearch"
               >
                 <el-option
                   v-for="client in clientes"
@@ -225,6 +224,7 @@ function initialState() {
       clientes: false,
     },
     clientes: [],
+    debounceTimer: null,
   };
 }
 
@@ -365,6 +365,12 @@ export default {
       this.clientes = [client];
       this.orden.cliente_id = client?.id;
       this.getClientes();
+    },
+    clientSearch(event) {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.getClientes(event.target.value);
+      }, 500);
     },
   },
 };

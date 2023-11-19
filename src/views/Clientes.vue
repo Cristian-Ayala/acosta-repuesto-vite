@@ -27,10 +27,11 @@
             >
               <i class="fas fa-search text-gray"></i>
               <input
-                v-model.trim="searchKeyword"
+                :value="searchKeyword"
                 type="search"
                 placeholder="Buscar cliente..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
+                @input="filterClientes"
               />
             </div>
           </div>
@@ -46,7 +47,10 @@
             @open-edit-modal="editClient(cliente)"
             @open-delete-modal="deleteClient(cliente)"
           ></client-view>
-          <el-empty v-if="clientes.length === 0" description="No hay registros" />
+          <el-empty
+            v-if="clientes.length === 0"
+            description="No hay registros"
+          />
         </div>
       </div>
     </div>
@@ -97,18 +101,9 @@ export default {
     };
   },
   computed: {},
-  watch: {
-    searchKeyword: {
-      handler(newKeyword) {
-        if (this.debounceTimer) {
-          clearTimeout(this.debounceTimer);
-        }
-        const keyword =
-          newKeyword != null && newKeyword !== "" ? `%${newKeyword}%` : null;
-        this.getClientes({ keyword });
-      },
-      immediate: true,
-    },
+  watch: {},
+  mounted() {
+    this.getClientes({ keyword: null });
   },
   methods: {
     getClientes(variables) {
@@ -144,6 +139,17 @@ export default {
     clienteDeleted() {
       this.show.modalDeleteClient = false;
       this.getClientes();
+    },
+    filterClientes(event) {
+      if (this.debounceTimer) {
+        this.searchKeyword = event?.target?.value || "";
+        clearTimeout(this.debounceTimer);
+      }
+      const keyword =
+        this.searchKeyword != null && this.searchKeyword !== ""
+          ? `%${this.searchKeyword}%`
+          : null;
+      this.getClientes({ keyword });
     },
   },
 };

@@ -74,9 +74,8 @@
               v-model="newProductMobile.id_marca"
               placeholder="Seleccione una marca"
               filterable
-              remote
-              :remote-method="remoteMethodMarcas"
               :loading="loading.marcas"
+              @input="brandSearch"
             >
               <el-option
                 v-for="mar in marcas"
@@ -113,9 +112,8 @@
               class="m-2"
               placeholder="Seleccione una categoria"
               filterable
-              remote
-              :remote-method="remoteMethodCategorias"
               :loading="loading.categorias"
+              @input="categorySearch"
             >
               <el-option
                 v-for="categoria in categorias"
@@ -335,6 +333,7 @@ export default {
       categorias: [],
       formHasErrors: false,
       fotoArray: [],
+      debounceTimer: null,
     };
   },
   validations() {
@@ -477,6 +476,18 @@ export default {
     },
     setUpcSelected(upc) {
       this.newProductMobile.upc = upc;
+    },
+    async brandSearch(event) {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.remoteMethodMarcas(event.target.value);
+      }, 500);
+    },
+    async categorySearch(event) {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.remoteMethodCategorias(event.target.value);
+      }, 500);
     },
   },
 };
