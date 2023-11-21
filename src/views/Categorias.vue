@@ -74,6 +74,10 @@
               />
             </div>
             <el-skeleton v-if="loadingTableCategoria" :rows="4" animated />
+            <el-empty
+              v-else-if="categorias.length === 0"
+              description="Categorias no encontradas"
+            />
           </div>
         </div>
       </div>

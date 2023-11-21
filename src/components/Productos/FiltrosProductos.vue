@@ -92,7 +92,10 @@
       </span>
     </template>
   </el-dialog>
-  <u-p-c-reader :show="show" @set-upc-selected="filtroUPC"></u-p-c-reader>
+  <u-p-c-reader
+    :show="show"
+    @set-upc-selected="(upc) => (tmpFiltroUPC = upc)"
+  ></u-p-c-reader>
 </template>
 
 <script>

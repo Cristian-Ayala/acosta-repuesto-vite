@@ -125,6 +125,10 @@
                 </el-button>
               </div>
             </el-card>
+            <el-empty
+              v-if="productos.length === 0"
+              description="Productos no encontrados"
+            />
           </div>
           <div class="mt-3" style="margin-left: -12px">
             <el-pagination
@@ -499,5 +503,8 @@ div:deep(.el-pagination.is-background.el-pagination--small) {
   box-shadow: -1px 0rem 2rem rgb(0 0 0 / 64%);
   width: 2.5rem !important;
   height: 2.5rem !important;
+}
+.bodyProducts:has(div.el-empty) {
+  display: block;
 }
 </style>

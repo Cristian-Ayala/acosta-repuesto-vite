@@ -144,7 +144,7 @@ export default {
     },
     filterBrand(event) {
       this.searchDisplay = event?.target?.value?.trim() || "";
-    }
+    },
   },
 };
 </script>
