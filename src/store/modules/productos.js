@@ -60,7 +60,7 @@ export default (app) => ({
           dispatch("upcMessages", uniqueUPC);
           return null;
         }
-        if (producto.foto && producto.foto instanceof File) {
+        if (producto.foto) {
           const fotoUploaded = await dispatch(
             "uploadAttachments",
             producto.foto,

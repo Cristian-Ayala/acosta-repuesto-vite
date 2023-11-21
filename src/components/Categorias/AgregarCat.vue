@@ -82,12 +82,18 @@ export default {
     ...mapMutations("common", ["errorNotification"]),
     ...mapActions("categorias", ["createCategory", "editCategory"]),
     async performAction() {
-      if (!this.categoria.nombre_categoria) {
+      if (
+        !this.categoria.nombre_categoria ||
+        this.categoria.nombre_categoria.trim() === ""
+      ) {
         this.errorNotification(
           "Por favor, introduce un nombre para la categoria.",
         );
         return;
       }
+      this.categoria.nombre_categoria = this.categoria.nombre_categoria
+        .trim()
+        .toLocaleUpperCase();
       if (this.categoria.id) {
         await this.editCategory({ categoria: this.categoria });
       } else {

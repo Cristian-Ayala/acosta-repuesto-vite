@@ -410,7 +410,10 @@ export default {
         [this.newProductMobile.foto] = this.fotoArray;
       }
       const res = await this.confirmation(this.newProductMobile);
-      if (!res) return;
+      if (!res) {
+        loading.close()
+        return;
+      }
       this.mostrar.addEditProdMovile = false;
       loading.close();
     },

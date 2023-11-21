@@ -109,7 +109,6 @@ const handleDownload = async (file) => {
 const upload = ref();
 
 const handleRemove = () => {
-  emits("newPictureFlag", fileList.value);
   upload.value.clearFiles();
 };
 
@@ -139,6 +138,7 @@ function cleanBlobName(blob) {
 
 const handleOnSuccess = async (file) => {
   const compressedFile = await imageCompression(file, optionsImgCompress);
+  emits("newPictureFlag");
   emits("update:modelValue", [cleanBlobName(compressedFile)]);
 };
 
