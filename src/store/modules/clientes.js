@@ -49,7 +49,7 @@ export default () => ({
         return null;
       }
     },
-    async getAll(store, variables) {
+    async getAllClients(store, variables) {
       try {
         const searchInfo = {
           query: GET_CLIENTES,
@@ -60,7 +60,7 @@ export default () => ({
         if (result && result.data)
           return {
             clientes: result.data.clientes,
-            count: result.data.acostarep_cliente_aggregate.aggregate.count,
+            totalClientes: result.data.acostarep_cliente_aggregate.aggregate.count,
           };
         return { clientes: [], count: 0 };
       } catch (err) {

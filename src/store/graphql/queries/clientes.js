@@ -1,7 +1,11 @@
 import { gql } from "@apollo/client/core";
 /* eslint-disable import/prefer-default-export */
 export const GET_CLIENTES = gql`
-  query GET_CLIENTES($keyword: String = null) {
+  query GET_CLIENTES(
+    $keyword: String = null
+    $limit: Int = 10
+    $offset: Int = 0
+  ) {
     clientes: acostarep_cliente(
       order_by: { name: asc }
       where: {
@@ -15,6 +19,8 @@ export const GET_CLIENTES = gql`
           { empresa: { _ilike: $keyword } }
         ]
       }
+      limit: $limit
+      offset: $offset
     ) {
       direccion
       dui

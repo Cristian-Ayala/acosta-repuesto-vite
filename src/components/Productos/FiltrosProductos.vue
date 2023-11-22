@@ -33,8 +33,8 @@
         filterable
         remote
         value-key="id"
-        :remote-method="remoteMethodMarcas"
         :loading="loading.marcas"
+        @input="marcaFilterSearch"
       >
         <el-option
           v-for="mar in marcas"
@@ -54,8 +54,8 @@
         filterable
         remote
         value-key="id"
-        :remote-method="remoteMethodCategorias"
         :loading="loading.categorias"
+        @input="categoryFilterSearch"
       >
         <el-option
           v-for="categoria in categorias"
@@ -131,6 +131,7 @@ export default {
     },
     marcas: [],
     categorias: [],
+    debounceTimer: null,
   }),
   computed: {
     ...mapState("productos", [
@@ -232,6 +233,18 @@ export default {
         },
       );
       this.loading.categorias = false;
+    },
+    marcaFilterSearch(event) {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.remoteMethodMarcas(event.target.value);
+      }, 500);
+    },
+    categoryFilterSearch(event) {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.remoteMethodCategorias(event.target.value);
+      }, 500);
     },
   },
 };

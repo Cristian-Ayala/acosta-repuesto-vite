@@ -51,6 +51,17 @@
             v-if="clientes.length === 0"
             description="No hay registros"
           />
+          <div class="mt-3 mb-2" style="margin-left: -12px">
+            <el-pagination
+              v-model:currentPage="pagination.page"
+              small
+              background
+              layout="prev, pager, next"
+              :total="totalClientes"
+              :page-size="pagination.perPage"
+              hide-on-single-page
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -98,25 +109,37 @@ export default {
       title: "",
       clientSelected: {},
       debounceTimer: null,
+      pagination: {
+        page: 1,
+        perPage: 10,
+      },
     };
   },
   computed: {},
-  watch: {},
+  watch: {
+    "pagination.page": function handler(newPage) {
+      this.pagination.page = newPage;
+      const keyword =
+        this.searchKeyword != null && this.searchKeyword !== ""
+          ? `%${this.searchKeyword}%`
+          : null;
+      this.getClientes({ keyword });
+    },
+  },
   mounted() {
     this.getClientes({ keyword: null });
   },
   methods: {
-    getClientes(variables) {
+    async getClientes(keywordFilter) {
       this.show.clientTableLoading = true;
-      if (this.debounceTimer) {
-        clearTimeout(this.debounceTimer);
-      }
-      this.debounceTimer = setTimeout(async () => {
-        const res = await this.$store.dispatch("clientes/getAll", variables);
-        this.clientes = res.clientes;
-        this.totalClientes = res.totalClientes;
-        this.show.clientTableLoading = false;
-      }, 500);
+      const res = await this.$store.dispatch("clientes/getAllClients", {
+        ...keywordFilter,
+        limit: this.pagination.perPage,
+        offset: this.pagination.perPage * (this.pagination.page - 1),
+      });
+      this.clientes = res.clientes;
+      this.totalClientes = res.totalClientes;
+      this.show.clientTableLoading = false;
     },
     createClient() {
       this.clientSelected = { CLEAR: true };
@@ -134,22 +157,24 @@ export default {
     },
     closeModalAndRefresh() {
       this.show.modalAddEditClient = false;
-      this.getClientes();
+      this.getClientes({});
     },
     clienteDeleted() {
       this.show.modalDeleteClient = false;
-      this.getClientes();
+      this.getClientes({});
     },
     filterClientes(event) {
       if (this.debounceTimer) {
         this.searchKeyword = event?.target?.value || "";
         clearTimeout(this.debounceTimer);
       }
-      const keyword =
-        this.searchKeyword != null && this.searchKeyword !== ""
-          ? `%${this.searchKeyword}%`
-          : null;
-      this.getClientes({ keyword });
+      this.debounceTimer = setTimeout(() => {
+        const keyword =
+          this.searchKeyword != null && this.searchKeyword !== ""
+            ? `%${this.searchKeyword}%`
+            : null;
+        this.getClientes({ keyword });
+      }, 500);
     },
   },
 };
@@ -179,5 +204,8 @@ div.filtros > div.d-inline-flex.auto-scroll.pb-2 {
   height: 2rem;
   padding: 0;
   font-size: 12px;
+}
+div:deep(.el-pagination.is-background.el-pagination--small) {
+  justify-content: center;
 }
 </style>

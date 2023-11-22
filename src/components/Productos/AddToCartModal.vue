@@ -34,7 +34,6 @@
           v-model="price"
           :precision="2"
           :min="0"
-          :max="stock"
           size="small"
         />
       </el-radio>
