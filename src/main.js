@@ -20,7 +20,6 @@ app.config.globalProperties.$url = import.meta.env.VITE_BACKEND_URL;
 app.config.globalProperties.$FILE_MANAGER = import.meta.env.VITE_FILE_MANAGER;
 app.config.errorHandler = function errorHandler(err, instance, info) {
   window.console.error(err, instance, info);
-  console.log(`Error: ${err.toString()}\nInfo: ${info}`);
   throw err;
 };
 app.config.warnHandler = (msg, instance, trace) => {

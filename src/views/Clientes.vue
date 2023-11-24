@@ -17,35 +17,29 @@
             </el-button>
           </div>
           <div class="card-body">
-            <div class="filtros">
-              <div class="d-inline-flex pr-2 pb-2">
-                <el-button
-                  type="primary"
-                  round
-                  @click="show.orderFilterDrawer = true"
-                  >Filtros ({{ allFilters.length }})</el-button
-                >
-              </div>
-              <div
-                v-if="allFilters && allFilters.length > 0"
-                class="d-inline-flex auto-scroll pb-2"
-              >
-                <el-button
-                  v-for="filter in allFilters"
-                  :key="filter"
-                  type="primary"
-                  round
-                  disabled
-                  class="btn-sm pr-2 pl-2"
-                  @click="show.orderFilterDrawer = true"
-                >
-                  {{ filter }}
-                </el-button>
-              </div>
+            <div
+              class="form-group mb-0 flex-middle"
+              style="
+                padding-left: 1rem;
+                background: #fff;
+                border-radius: 0 0 1rem 1rem;
+              "
+            >
+              <i class="fas fa-search text-gray"></i>
+              <input
+                :value="searchKeyword"
+                type="search"
+                placeholder="Buscar cliente..."
+                class="form-control form-control-sm border-0 no-shadow pl-4"
+                @input="filterClientes"
+              />
             </div>
           </div>
         </div>
-        <div style="display: grid">
+        <div v-if="show.clientTableLoading">
+          <clientes-view-loading v-for="i in 10" :key="i" />
+        </div>
+        <div v-else style="display: grid">
           <client-view
             v-for="(cliente, index) in clientes"
             :key="index"
@@ -53,11 +47,22 @@
             @open-edit-modal="editClient(cliente)"
             @open-delete-modal="deleteClient(cliente)"
           ></client-view>
+          <el-empty
+            v-if="clientes.length === 0"
+            description="No hay registros"
+          />
+          <div class="mt-3 mb-2" style="margin-left: -12px">
+            <el-pagination
+              v-model:currentPage="pagination.page"
+              small
+              background
+              layout="prev, pager, next"
+              :total="totalClientes"
+              :page-size="pagination.perPage"
+              hide-on-single-page
+            />
+          </div>
         </div>
-        <div v-if="show.clientTableLoading">
-          <clientes-view-loading v-for="i in 10" :key="i" />
-        </div>
-        <el-empty v-if="clientes.length === 0" description="No hay registros" />
       </div>
     </div>
     <!-- Fin del Cuerpo a escribir -->
@@ -92,7 +97,7 @@ export default {
   props: {},
   data() {
     return {
-      allFilters: [],
+      searchKeyword: "",
       show: {
         orderFilterDrawer: false,
         clientTableLoading: false,
@@ -103,17 +108,35 @@ export default {
       totalClientes: 0,
       title: "",
       clientSelected: {},
+      debounceTimer: null,
+      pagination: {
+        page: 1,
+        perPage: 10,
+      },
     };
   },
   computed: {},
-  watch: {},
+  watch: {
+    "pagination.page": function handler(newPage) {
+      this.pagination.page = newPage;
+      const keyword =
+        this.searchKeyword != null && this.searchKeyword !== ""
+          ? `%${this.searchKeyword}%`
+          : null;
+      this.getClientes({ keyword });
+    },
+  },
   mounted() {
-    this.getClientes();
+    this.getClientes({ keyword: null });
   },
   methods: {
-    async getClientes() {
+    async getClientes(keywordFilter) {
       this.show.clientTableLoading = true;
-      const res = await this.$store.dispatch("clientes/getAll");
+      const res = await this.$store.dispatch("clientes/getAllClients", {
+        ...keywordFilter,
+        limit: this.pagination.perPage,
+        offset: this.pagination.perPage * (this.pagination.page - 1),
+      });
       this.clientes = res.clientes;
       this.totalClientes = res.totalClientes;
       this.show.clientTableLoading = false;
@@ -134,11 +157,24 @@ export default {
     },
     closeModalAndRefresh() {
       this.show.modalAddEditClient = false;
-      this.getClientes();
+      this.getClientes({});
     },
     clienteDeleted() {
       this.show.modalDeleteClient = false;
-      this.getClientes();
+      this.getClientes({});
+    },
+    filterClientes(event) {
+      if (this.debounceTimer) {
+        this.searchKeyword = event?.target?.value || "";
+        clearTimeout(this.debounceTimer);
+      }
+      this.debounceTimer = setTimeout(() => {
+        const keyword =
+          this.searchKeyword != null && this.searchKeyword !== ""
+            ? `%${this.searchKeyword}%`
+            : null;
+        this.getClientes({ keyword });
+      }, 500);
     },
   },
 };
@@ -168,5 +204,8 @@ div.filtros > div.d-inline-flex.auto-scroll.pb-2 {
   height: 2rem;
   padding: 0;
   font-size: 12px;
+}
+div:deep(.el-pagination.is-background.el-pagination--small) {
+  justify-content: center;
 }
 </style>

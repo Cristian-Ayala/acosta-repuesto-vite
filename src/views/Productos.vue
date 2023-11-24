@@ -5,7 +5,11 @@
         <div class="card">
           <div class="card-header">
             <div class="cardHeaderWrapper">
-              <h6 class="text-uppercase mb-0" style="display: inline-block">
+              <h6
+                id="productosTitle"
+                class="text-uppercase mb-0"
+                style="display: inline-block"
+              >
                 Productos
               </h6>
               <el-button
@@ -20,9 +24,10 @@
             <div class="filtros">
               <div class="d-inline-flex pr-2 pb-2">
                 <el-button
+                  ref="btnFiltros"
                   type="primary"
                   round
-                  @click="show.modalFiltros = true"
+                  @click="clickFiltros()"
                 >
                   Filtros ({{ allFilters.length }})
                 </el-button>
@@ -92,10 +97,7 @@
                   v-if="isAbleToModify"
                   type="danger"
                   circle
-                  @click="
-                    prodSelected = JSON.parse(JSON.stringify(prod));
-                    show.deleteProduc = true;
-                  "
+                  @click="deleteProd(prod)"
                 >
                   <i class="fas fa-times" aria-hidden="true"></i>
                 </el-button>
@@ -123,6 +125,10 @@
                 </el-button>
               </div>
             </el-card>
+            <el-empty
+              v-if="productos.length === 0"
+              description="Productos no encontrados"
+            />
           </div>
           <div class="mt-3" style="margin-left: -12px">
             <el-pagination
@@ -225,19 +231,11 @@ export default {
   },
   computed: {
     ...mapState("auth", ["isAbleToModify"]),
-    // TODO: depurar este computed
     ...mapState("productos", [
       "currentPage",
       "loadingTableProductos",
       "productos",
       "producto",
-      "cacheEditProd",
-      "editedProd",
-      "newProd",
-      "deleteTransaction",
-      "editTransaction",
-      "numeroDeEditados",
-      "newProductMobile",
       "perPage",
       "totalRows",
       "filtroCategorias",
@@ -272,6 +270,10 @@ export default {
     this.fetchProducts();
   },
   methods: {
+    clickFiltros() {
+      document.activeElement.blur();
+      this.show.modalFiltros = true;
+    },
     ...mapMutations("productos", [
       "clearData",
       "removeRegistro",
@@ -300,9 +302,15 @@ export default {
       return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
     },
     createProduct() {
+      document.activeElement.blur();
       this.prodSelected = { CLEAR: true };
       this.title = "Agregar producto";
       this.show.addEditProdMovile = true;
+    },
+    deleteProd(prod) {
+      document.activeElement.blur();
+      this.prodSelected = JSON.parse(JSON.stringify(prod));
+      this.show.deleteProduc = true;
     },
     getStock(prod) {
       switch (localStorage.getItem("locationSelected")) {
@@ -495,5 +503,8 @@ div:deep(.el-pagination.is-background.el-pagination--small) {
   box-shadow: -1px 0rem 2rem rgb(0 0 0 / 64%);
   width: 2.5rem !important;
   height: 2.5rem !important;
+}
+.bodyProducts:has(div.el-empty) {
+  display: block;
 }
 </style>

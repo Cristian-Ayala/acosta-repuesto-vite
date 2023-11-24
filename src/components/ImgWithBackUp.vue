@@ -46,10 +46,11 @@ export default {
 <style scoped>
 .image {
   width: 100%;
-  max-height: 7.5rem;
+  max-height: 8rem;
+  object-fit: cover;
 }
 .image-container {
-  height: 7.5rem;
+  height: 8rem;
   display: flex;
 }
 </style>

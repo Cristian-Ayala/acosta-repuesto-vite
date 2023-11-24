@@ -29,7 +29,7 @@
 </template>
 
 <script>
-// import { mapActions } from "vuex";
+import { mapMutations } from "vuex";
 import { useAuth0 } from "@auth0/auth0-vue";
 import HeaderComp from "@/components/Header.vue";
 import LeftSideBar from "@/components/Left-SideBar.vue";
@@ -80,26 +80,18 @@ export default {
         localStorage.setItem("userName", user.name);
         localStorage.setItem("email", user.email);
         localStorage.setItem("allowedRoles", JSON.stringify(user["https://hasura.io/jwt/claims"]["x-hasura-allowed-roles"]));
-        localStorage.setItem("role", user["https://hasura.io/jwt/claims"]["x-hasura-allowed-roles"][0]);
+        const role = user["https://hasura.io/jwt/claims"]["x-hasura-allowed-roles"][0];
+        localStorage.setItem("role", role);
+        this.REVALIDATE_ABILITY_TO_MODIFY(role);
         this.setLocation(user.metadata.sucursal);
         localStorage.setItem("profilePicture", user.picture);
         this.loading.user = false;
       },
     },
   },
-  created() {
-    // import { isLoggedIn } from './router/middleware/auth';
-    // this.initDB();
-    // this.initDbCategorias();
-    // this.initDbProductos();
-    // this.initDbOrdenes();
-  },
   mounted() {},
   methods: {
-    // ...mapActions("marcas", ["initDB"]),
-    // ...mapActions("categorias", ["initDbCategorias"]),
-    // ...mapActions("productos", ["initDbProductos"]),
-    // ...mapActions("ordenes", ["initDbOrdenes"]),
+    ...mapMutations("auth", ["REVALIDATE_ABILITY_TO_MODIFY"]),
     setLocation(locations) {
       const selectedLocation = localStorage.getItem("locationSelected");
       if (!selectedLocation) {

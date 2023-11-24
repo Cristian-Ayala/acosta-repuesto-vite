@@ -47,8 +47,8 @@
             :orden="orden"
             @update-orders="updateOrders()"
           ></order-view>
+          <el-empty v-if="ordenes.length === 0" description="No hay ordenes" />
         </div>
-        <el-empty v-if="ordenes.length === 0" description="No hay ordenes" />
       </div>
       <div class="mt-3" style="margin-left: -12px">
         <el-pagination
@@ -126,7 +126,12 @@ export default {
             this.filtersArray.date.start,
           ).toLocaleDateString()}`,
         );
-      else filters.push(`Día: ${new Date().toLocaleDateString()}`);
+      else
+        filters.push(
+          `Día: ${new Date(
+            this.filtersArray.date?.start || new Date(),
+          ).toLocaleDateString()}`,
+        );
       if (
         this.filtersArray.price?.priceLte != null &&
         this.filtersArray.price?.priceLte !== 0

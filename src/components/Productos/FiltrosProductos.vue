@@ -10,13 +10,7 @@
     <div class="input-group">
       <!-- v-b-modal.barCode -->
       <input v-model.trim="tmpFiltroUPC" type="text" class="form-control" />
-      <span
-        class="input-group-text"
-        @click="
-          show.modalUPCBarcode = true;
-          setCalledFrom('FiltrosProductos.vue');
-        "
-      >
+      <span class="input-group-text" @click="show.modalUPCBarcode = true">
         <i class="fas fa-barcode"></i>
       </span>
     </div>
@@ -39,8 +33,8 @@
         filterable
         remote
         value-key="id"
-        :remote-method="remoteMethodMarcas"
         :loading="loading.marcas"
+        @input="marcaFilterSearch"
       >
         <el-option
           v-for="mar in marcas"
@@ -60,8 +54,8 @@
         filterable
         remote
         value-key="id"
-        :remote-method="remoteMethodCategorias"
         :loading="loading.categorias"
+        @input="categoryFilterSearch"
       >
         <el-option
           v-for="categoria in categorias"
@@ -98,11 +92,14 @@
       </span>
     </template>
   </el-dialog>
-  <u-p-c-reader :show="show"></u-p-c-reader>
+  <u-p-c-reader
+    :show="show"
+    @set-upc-selected="(upc) => (tmpFiltroUPC = upc)"
+  ></u-p-c-reader>
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 import UPCReader from "@/components/Productos/UPCReader.vue";
 
 // Variables for upc barcode scanner
@@ -134,6 +131,7 @@ export default {
     },
     marcas: [],
     categorias: [],
+    debounceTimer: null,
   }),
   computed: {
     ...mapState("productos", [
@@ -160,14 +158,22 @@ export default {
     tempFiltroUPC(tempFiltroUPC) {
       this.tmpFiltroUPC = tempFiltroUPC;
     },
+    "mostrar.addEditProdMovile": {
+      handler(isVisible) {
+        if (!isVisible) {
+          this.addScannerListener();
+          return;
+        }
+        document.removeEventListener("keypress", this.listenerFunction);
+      },
+      immediate: true,
+    },
   },
   mounted() {
     this.getFilters();
-    this.addScannerListener();
   },
   methods: {
     ...mapActions("productos", ["aplicarFiltros", "borrarFiltros"]),
-    ...mapMutations("productos", ["setCalledFrom"]),
     getFilters() {
       this.tmpFiltroMarcasActivas = [...this.filtroMarcas];
       this.tmpFiltroCategoriasActivas = [...this.filtroCategorias];
@@ -227,6 +233,18 @@ export default {
         },
       );
       this.loading.categorias = false;
+    },
+    marcaFilterSearch(event) {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.remoteMethodMarcas(event.target.value);
+      }, 500);
+    },
+    categoryFilterSearch(event) {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.remoteMethodCategorias(event.target.value);
+      }, 500);
     },
   },
 };

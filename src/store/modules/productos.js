@@ -13,7 +13,6 @@ export default (app) => ({
   state: {
     productos: [],
     newProd: [],
-    newProductMobile: {},
     currentPage: 1,
     perPage: 10,
     totalRows: 0,
@@ -22,17 +21,10 @@ export default (app) => ({
     filtroNombre: "",
     filtroUPC: "",
     tempFiltroUPC: "",
-    calledFrom: "",
     variables: {},
     ordenDetalleProductos: {},
   },
   mutations: {
-    setFiltroUPC(state, upc) {
-      state.tempFiltroUPC = upc;
-    },
-    setCalledFrom(state, calledFrom) {
-      state.calledFrom = calledFrom;
-    },
     SET_DETALLE_PRODUCTOS(state, { prod, addOne = false, removeOne = false }) {
       const tmpProd = { ...prod };
       if (addOne) {
@@ -68,7 +60,7 @@ export default (app) => ({
           dispatch("upcMessages", uniqueUPC);
           return null;
         }
-        if (producto.foto && producto.foto instanceof File) {
+        if (producto.foto) {
           const fotoUploaded = await dispatch(
             "uploadAttachments",
             producto.foto,

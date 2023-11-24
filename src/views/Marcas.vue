@@ -20,10 +20,11 @@
             <div class="form-group position-relative mb-0 flex-middle">
               <i class="fas fa-search text-gray"></i>
               <input
-                v-model.trim="searchDisplay"
+                :value="searchDisplay"
                 type="search"
                 placeholder="Buscar marca..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
+                @input="filterBrand"
               />
             </div>
             <table class="table card-text table-hover">
@@ -140,6 +141,9 @@ export default {
     },
     async getAllMarcas() {
       this.marcas = await this.$store.dispatch("marcas/getAll");
+    },
+    filterBrand(event) {
+      this.searchDisplay = event?.target?.value?.trim() || "";
     },
   },
 };

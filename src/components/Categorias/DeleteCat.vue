@@ -51,6 +51,7 @@ export default {
   watch: {
     categoryProp: {
       deep: true,
+      immediate: true,
       handler(newValue) {
         if (Object.keys(newValue).length === 0) return;
         this.categoria = newValue;

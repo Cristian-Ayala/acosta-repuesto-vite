@@ -15,10 +15,11 @@
             <div class="form-group position-relative mb-0 flex-middle">
               <i class="fas fa-search text-gray"></i>
               <input
-                v-model="searchDisplay"
+                :value="searchDisplay"
                 type="search"
                 placeholder="Buscar categorias..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
+                @input="filterCategorias"
               />
             </div>
             <table class="table card-text table-hover">
@@ -73,6 +74,10 @@
               />
             </div>
             <el-skeleton v-if="loadingTableCategoria" :rows="4" animated />
+            <el-empty
+              v-else-if="categorias.length === 0"
+              description="Categorias no encontradas"
+            />
           </div>
         </div>
       </div>
@@ -125,14 +130,6 @@ export default {
     ]),
   },
   watch: {
-    searchDisplay() {
-      this.page = 1;
-      // reset the debounce timer if the user types a new letter
-      if (this.debounceTimer) {
-        clearTimeout(this.debounceTimer);
-      }
-      this.fetchCategorias(500);
-    },
     page() {
       this.fetchCategorias();
     },
@@ -165,6 +162,15 @@ export default {
     handleChangePage(currentPage) {
       this.page = currentPage;
     },
+    filterCategorias(event) {
+      this.page = 1;
+      // reset the debounce timer if the user types a new letter
+      if (this.debounceTimer) {
+        this.searchDisplay = event?.target?.value || "";
+        clearTimeout(this.debounceTimer);
+      }
+      this.fetchCategorias(500);
+    }
   },
 };
 </script>
