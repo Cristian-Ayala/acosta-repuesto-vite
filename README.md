@@ -21,6 +21,7 @@ Idioma español: (haz click ➡)
    - [Products](#products)
    - [Orders](#orders)
    - [Statistics](#statistics)
+   - [Clients](#clients)
 - [Contributing](#contributing)
 
 ## Description of the application
@@ -167,7 +168,7 @@ Always refer to the project's documentation and specific README files in the rep
 
 #### Filter brands
 <p align="center">
-  <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/9a778318-8fc5-421a-b98e-231e2e5da898" height="500"/>
+  <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/e6cfccb3-a6a1-4e56-948f-cb37bdf994a7" height="500"/>
 </p>
 
 #### Edit brands
@@ -246,11 +247,43 @@ Always refer to the project's documentation and specific README files in the rep
   <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/6fd4bd22-732b-4d00-88e4-d70f9e0d24b2" height="500"/>
 </p>
 
+#### Filter orders
+<p align="center">
+  <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/1fbc412a-07c3-41fe-944f-f3342f7800f7" height="500"/>
+</p>
+
 ### Statistics
 
 #### Get statistics
 <p align="center">
   <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/131ff0b4-9a32-4ac2-bf1a-d5971617049f" height="500"/>
+</p>
+
+### Clients
+
+#### List all clients
+<p align="center">
+  <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/57f70938-daa2-42b9-8bb8-c6b4c1155c9b" height="500"/>
+</p>
+
+#### Add client
+<p align="center">
+  <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/6e9d840f-7bd1-473d-a34a-ee29e48b5e77" height="500"/>
+</p>
+
+#### Filter clients
+<p align="center">
+  <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/39798989-802c-4df2-b60c-328d843152fb" height="500"/>
+</p>
+
+#### Edit clients
+<p align="center">
+  <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/2fd6c153-922d-4989-ac49-a6d331c3d22e" height="500"/>
+</p>
+
+#### Delete clients
+<p align="center">
+  <img src="https://github.com/Cristian-Ayala/acosta-repuesto-vite/assets/41448429/6b87b056-a08e-4e11-9259-6a765f7f9297" height="500"/>
 </p>
 
 ## Contributing
