@@ -98,10 +98,10 @@ export default {
     return {
       price: this.prodSelected?.precio_publico || 0,
       cantidad: 0,
-      userOrganization: localStorage.getItem("locationSelected"),
     };
   },
   computed: {
+    ...mapState("auth", ["userProfile"]),
     ...mapState("productos", ["ordenDetalleProductos"]),
     subtotal() {
       // Validate inputs
@@ -124,7 +124,7 @@ export default {
       return this.$twoDecimalsOnly(this.price * this.cantidad);
     },
     stock() {
-      switch (this.userOrganization) {
+      switch (this.userProfile?.locationSelected) {
         case "Santa Ana":
           return this.prodSelected.stock_prod_sta_ana;
         case "Metapan":

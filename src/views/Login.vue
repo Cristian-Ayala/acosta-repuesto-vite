@@ -15,7 +15,7 @@
           Iniciar Sesión
         </button>
       </form>
-      <h6 v-if="error">Usuario o contraseña incorrecta.</h6>
+      <h6 v-if="error">Credenciales incorrectas.</h6>
     </div>
 
     <ul class="bg-bubbles">
@@ -44,40 +44,8 @@ export default {
       error: false,
     };
   },
-  mounted() {
-    // Trigger para comenzar script para probar si las cookies de terceros estan habilitadas
-    const url = `${import.meta.env.VITE_BACKEND_URL}step1.js.php`;
-    const step1El = document.createElement("script");
-    step1El.setAttribute("src", url);
-    document.body.appendChild(step1El);
-    // Fin del trigger para comenzar script para probar si las cookies de terceros estan habilitadas
-  },
-  created() {
-    // Inicio de script para probar si las cookies de terceros estan habilitadas
-    const that = this;
-    // eslint-disable-next-line
-    window._3rd_party_test_step1_loaded = function () {
-      // At this point, a third-party domain has now attempted to set a cookie (if all went to plan!)
-      const step2El = document.createElement("script");
-      const url = `${import.meta.env.VITE_BACKEND_URL}/step2.js.php`;
-      step2El.setAttribute("src", url);
-      document.head.appendChild(step2El);
-    };
-    // eslint-disable-next-line
-    window._3rd_party_test_step2_loaded = function (cookieSuccess) {
-      // If true, the third-party domain cookies are enabled
-      // If false, the third-party domain cookies are disable
-      if(!cookieSuccess) that.$router.push({ path: "/cookies" });
-    };
-  },
   methods: {
     async login() {
-      /**
-       * * My man
-       * ! deprecated
-       * ? questions
-       * TODO: Some task
-       */
       const settings = {
         method: "POST",
         headers: {
@@ -85,28 +53,22 @@ export default {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: this.username,
+          email: this.username,
           password: this.password,
         }),
-        credentials: "include",
       };
       try {
-        await fetch(`${import.meta.env.VITE_BACKEND_URL}_session`, settings);
-        this.$router.push({ path: "/" });
+        const res = await fetch(`${import.meta.env.VITE_NESTJS_DOMAIN}/auth/login`, settings);
+        if (res.status === 200) {
+          const data = await res.json();
+          localStorage.setItem("token", data.accessToken);
+          this.$router.push({ name: "home" });
+        } else {
+          this.error = true;
+        }
       } catch (error) {
         console.error(JSON.stringify(error));
         this.error = true;
-      }
-    },
-    areCookiesEnabled() {
-      try {
-        document.cookie = "cookietest=1";
-        const cookiesEnabled = document.cookie.indexOf("cookietest=") !== -1;
-        document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
-        return cookiesEnabled;
-      } catch (e) {
-        console.error(e);
-        return false;
       }
     },
   },

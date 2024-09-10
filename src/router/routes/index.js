@@ -1,5 +1,3 @@
-import { authGuard } from "@auth0/auth0-vue";
-
 const routes = [
   {
     path: "/",
@@ -9,42 +7,35 @@ const routes = [
         path: "",
         name: "home",
         component: () => import("@/views/Home.vue"),
-        beforeEnter: authGuard,
       },
       {
         path: "/categorias",
         component: () => import("@/views/Categorias.vue"),
-        beforeEnter: authGuard,
       },
       {
         path: "/productos",
         name: "Productos",
         component: () => import("@/views/Productos.vue"),
-        beforeEnter: authGuard,
       },
       {
         path: "/marcas",
         name: "Marcas",
         component: () => import("@/views/Marcas.vue"),
-        beforeEnter: authGuard,
       },
       {
         path: "/ordenes",
         name: "Ordenes",
         component: () => import("@/views/Ordenes.vue"),
-        beforeEnter: authGuard,
       },
       {
         path: "/estadisticas",
         name: "Estadisticas",
         component: () => import("@/views/Estadisticas.vue"),
-        beforeEnter: authGuard,
       },
       {
         path: "/clientes",
         name: "Clientes",
         component: () => import("@/views/Clientes.vue"),
-        beforeEnter: authGuard,
       },
     ],
   },

@@ -160,15 +160,14 @@ export default () => ({
         return null;
       }
     },
-    async readAllOrdenes({ state, commit }, filters) {
+    async readAllOrdenes({ state, commit,rootState }, filters) {
       try {
         if (filters != null && Object.keys(filters).length > 0) {
-          let sucursales = localStorage.getItem("sucursales");
-          sucursales = JSON.parse(sucursales);
+          const sucursales = rootState.auth.userProfile?.sucursal;
           state.variables = {
             limit: filters.limit || null,
             offset: filters.offset || null,
-            createdBy: localStorage.getItem("email"),
+            createdBy: rootState.auth.userProfile?.email,
             cedes: sucursales,
             orderTypeID: filters.orderTypeID,
             distributionTypeID: filters.distributionTypeID,

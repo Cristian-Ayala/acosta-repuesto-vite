@@ -7,6 +7,7 @@ import {
 import { InMemoryCache } from "@apollo/client/cache";
 import { setContext } from "@apollo/client/link/context";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+import { jwtDecode } from "jwt-decode";
 
 if (process.env.NODE_ENV) {
   // Adds messages only in a dev environment
@@ -19,8 +20,11 @@ const httpLink = new HttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  const token = window.localStorage.getItem("id_token");
-  const defaultRole = window.localStorage.getItem("role");
+  const token = window.localStorage.getItem("token");
+  if (!token || token === "undefined") return false;
+  const decoded = jwtDecode(token);
+  const defaultRole = decoded["https://hasura.io/jwt/claims"]["x-hasura-default-role"];
+
   return {
     headers: {
       ...headers,

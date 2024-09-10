@@ -258,6 +258,7 @@ export default {
       "enums",
     ]),
     ...mapState("productos", ["productos", "ordenDetalleProductos"]),
+    ...mapState("auth", ["userProfile"]),
     total() {
       let total = 0.0;
       Object.values(this.ordenDetalleProductos).forEach((prod) => {
@@ -282,7 +283,7 @@ export default {
   },
   async mounted() {
     this.clientes = [this.defaultClient];
-    this.userOrganization = localStorage.getItem("locationSelected");
+    this.userOrganization = this.userProfile?.locationSelected;
     this.date = todayDate();
   },
   methods: {
@@ -318,7 +319,7 @@ export default {
         const order = {
           status_id: orderType.code,
           total_orden: this.total,
-          cede: localStorage.getItem("locationSelected"),
+          cede: this.userProfile?.locationSelected,
           ...this.orden,
         };
         const resCreation = await this.createRegistroOrdenes({

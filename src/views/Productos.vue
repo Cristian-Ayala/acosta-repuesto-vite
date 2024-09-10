@@ -230,7 +230,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("auth", ["isAbleToModify"]),
+    ...mapState("auth", ["isAbleToModify", "userProfile"]),
     ...mapState("productos", [
       "currentPage",
       "loadingTableProductos",
@@ -313,7 +313,7 @@ export default {
       this.show.deleteProduc = true;
     },
     getStock(prod) {
-      switch (localStorage.getItem("locationSelected")) {
+      switch (this.userProfile.locationSelected) {
         case "Santa Ana":
           return prod.stock_prod_sta_ana;
         case "Metapan":

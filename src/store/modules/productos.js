@@ -321,13 +321,13 @@ export default (app) => ({
       state.filtroNombre = "";
       dispatch("readAllProducts");
     },
-    async uploadAttachments({ commit }, file) {
+    async uploadAttachments({ commit, rootState }, file) {
       try {
         if (!(file instanceof File)) return null;
         const url = `${app.config.globalProperties.$FILE_MANAGER}upload-photo`;
         const bodyFormData = new FormData();
         bodyFormData.append("file", file);
-        bodyFormData.append("userEmail", localStorage.getItem("email"));
+        bodyFormData.append("userEmail", rootState.auth.userProfile?.email);
         return fetch(url, {
           method: "POST",
           body: bodyFormData,

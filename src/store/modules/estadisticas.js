@@ -15,13 +15,13 @@ export default (app) => ({
   state: {},
   mutations: {},
   actions: {
-    getStatistics({ dispatch }, searchParameters) {
+    getStatistics({ dispatch, rootState }, searchParameters) {
       if (!isLoggedIn()) return rejectPromise("No está logueado");
       const settings = {
         method: "GET",
         credentials: "include",
       };
-      const role = localStorage.getItem("role");
+      const role = rootState.auth.userProfile.defaultRole;
       if (searchParameters.userSelected === "Todos" && role === "manager")
         return dispatch("getStatisticsByOrgDiv", {
           searchParameters,
@@ -100,11 +100,11 @@ export default (app) => ({
         settings,
       ).then((response) => response.json());
     },
-    getStatisticsByOrgDiv(store, { searchParameters, settings }) {
+    getStatisticsByOrgDiv({ rootState }, { searchParameters, settings }) {
       let orgDivision = null;
       if (searchParameters.orgDivSelected != null)
         orgDivision = searchParameters.orgDivSelected;
-      else orgDivision = localStorage.getItem("org_division");
+      else orgDivision = rootState.auth.userProfile.locationSelected;
       return fetch(
         `${app.config.globalProperties.$url}ordenes/_design/estadisticasVenta/_view/ordersByOrgDiv?startkey=["${orgDivision}",${searchParameters.startkey}]&endkey=["${orgDivision}",${searchParameters.endkey}]`,
         settings,

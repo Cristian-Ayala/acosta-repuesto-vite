@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <loading-screen v-if="loading.user && loading.token"></loading-screen>
+    <loading-screen v-if="loading.token"></loading-screen>
     <!-- <InstallPrompt /> -->
     <reload-p-w-a />
     <!-- eslint-disable vue/v-on-event-hyphenation -->
@@ -29,8 +29,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
-import { useAuth0 } from "@auth0/auth0-vue";
+import { jwtDecode } from "jwt-decode";
 import HeaderComp from "@/components/Header.vue";
 import LeftSideBar from "@/components/Left-SideBar.vue";
 import ReloadPWA from "@/components/ReloadPWA.vue";
@@ -45,64 +44,33 @@ export default {
     // InstallPrompt,
     LoadingScreen: () => import("@/components/LoadingScreen.vue"),
   },
-  setup() {
-    const { idTokenClaims, user, isAuthenticated } = useAuth0();
-
-    return {
-      idTokenClaims,
-      user,
-      isAuthenticated,
-    };
-  },
+  setup() {},
   data() {
     return {
       isLeftSideBar: false,
       loading: {
         token: true,
         user: true,
-      }
+      },
     };
   },
-  watch: {
-    idTokenClaims: {
-      handler(token) {
-        if (!token) return;
-        /* eslint-disable no-underscore-dangle */
-        window.localStorage.setItem("id_token", token.__raw);
-        /* eslint-enable no-underscore-dangle */
-        this.loading.token = false;
-      },
-    },
-    user: {
-      handler(user) {
-        if (!user) return;
-        localStorage.setItem("sucursales", JSON.stringify(user.metadata.sucursal));
-        localStorage.setItem("userName", user.name);
-        localStorage.setItem("email", user.email);
-        localStorage.setItem("allowedRoles", JSON.stringify(user["https://hasura.io/jwt/claims"]["x-hasura-allowed-roles"]));
-        const role = user["https://hasura.io/jwt/claims"]["x-hasura-allowed-roles"][0];
-        localStorage.setItem("role", role);
-        this.REVALIDATE_ABILITY_TO_MODIFY(role);
-        this.setLocation(user.metadata.sucursal);
-        localStorage.setItem("profilePicture", user.picture);
-        this.loading.user = false;
-      },
-    },
+  mounted() {
+    const token = window.localStorage.getItem("token");
+    if (!token || token === "undefined") return;
+    const decoded = jwtDecode(token);
+    this.$store.commit("auth/SET_PROFILE", decoded);
+    this.setLocation(decoded.sucursal);
+    this.loading.token = false;
   },
-  mounted() {},
   methods: {
-    ...mapMutations("auth", ["REVALIDATE_ABILITY_TO_MODIFY"]),
     setLocation(locations) {
       const selectedLocation = localStorage.getItem("locationSelected");
-      if (!selectedLocation) {
-        localStorage.setItem("locationSelected", locations[0]);
-        return;
-      }
-      const isLocationSelectedInLocationsAllowed = locations.find((location) => location === selectedLocation);
-      if (!isLocationSelectedInLocationsAllowed) {
+      if (!selectedLocation || !locations.includes(selectedLocation)) {
+        this.$store.commit("auth/SET_LOCATION_SELECTED", locations[0]);
         localStorage.setItem("locationSelected", locations[0]);
       }
-    }
+      this.$store.commit("auth/SET_LOCATION_SELECTED", selectedLocation);
+    },
   },
 };
 </script>

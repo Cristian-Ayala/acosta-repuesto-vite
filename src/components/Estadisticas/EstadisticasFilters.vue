@@ -49,7 +49,10 @@
           </el-col>
         </el-row>
       </el-form-item>
-      <el-form-item v-if="users != null && users.length > 1" label="Seleccionar usuario">
+      <el-form-item
+        v-if="users != null && users.length > 1"
+        label="Seleccionar usuario"
+      >
         <el-select
           v-model="filters.userSelected"
           placeholder="Seleccione un usuario"
@@ -111,8 +114,9 @@
 </template>
 
 <script>
-const sucursales = JSON.parse(localStorage.getItem("sucursales"));
-function initialState() {
+import { mapState } from "vuex";
+
+function initialState(userProfile) {
   return {
     dateType: "Por día",
     filters: {
@@ -120,16 +124,16 @@ function initialState() {
         start: new Date(),
         end: null,
       },
-      userSelected: localStorage.getItem("email"),
-      orgDivSelected: sucursales[0],
+      userSelected: userProfile?.email,
+      orgDivSelected: userProfile?.sucursal[0],
     },
     users: [],
     user: {
-      name: localStorage.getItem("email"),
-      role: localStorage.getItem("role"),
-      orgDiv: localStorage.getItem("locationSelected"),
+      name: userProfile?.email,
+      role: userProfile?.defaultRole,
+      orgDiv: userProfile?.locationSelected,
     },
-    organizationUnits: sucursales,
+    organizationUnits: userProfile?.sucursal,
   };
 }
 
@@ -143,7 +147,10 @@ export default {
   },
   emits: ["filtersConfirmed"],
   data() {
-    return initialState();
+    return initialState(this.userProfile);
+  },
+  computed: {
+    ...mapState("auth", ["userProfile"]),
   },
   watch: {
     dateType() {
@@ -162,9 +169,15 @@ export default {
       },
       immediate: true,
     },
-  },
-  async created() {
-    this.confirmClick();
+    userProfile: {
+      handler(profile) {
+        if (!profile) return;
+        Object.assign(this.$data, initialState(profile));
+        this.confirmClick();
+      },
+      deep: true,
+      immediate: true,
+    },
   },
   methods: {
     disabledStartDate(time) {
@@ -187,7 +200,7 @@ export default {
       this.show.estadisticasFilterDrawer = false;
     },
     clearFilters() {
-      Object.assign(this.$data, initialState());
+      Object.assign(this.$data, initialState(this.userProfile));
       this.confirmClick();
     },
   },

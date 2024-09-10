@@ -4,7 +4,7 @@
     <div class="card-body">
       <el-select v-model="areaSelected" placeholder="Seleccionar Area">
         <el-option
-          v-for="item in areasDropdown"
+          v-for="item in userProfile?.sucursal"
           :key="item"
           :label="item"
           :value="item"
@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "ChangeAreaSelected",
   props: {
@@ -32,11 +34,11 @@ export default {
   emits: ["closeAreaSelection"],
   data() {
     return {
-      areaSelected: localStorage.getItem("locationSelected"),
-      areasDropdown: JSON.parse(localStorage.getItem("sucursales")),
+      areaSelected: this.userProfile?.locationSelected,
     };
   },
   computed: {
+    ...mapState("auth", ["userProfile"]),
     showModal: {
       get() {
         return this.show;
@@ -48,7 +50,7 @@ export default {
   },
   methods: {
     seleccionarArea() {
-      localStorage.setItem("locationSelected", this.areaSelected);
+      this.$store.commit("auth/SET_LOCATION_SELECTED", this.areaSelected);
       this.$emit("closeAreaSelection");
     }
   },

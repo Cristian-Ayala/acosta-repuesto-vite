@@ -108,8 +108,8 @@
           </a>
         </router-link>
       </ul>
-      <div @click="areaSelected()">
-        <el-avatar v-if="profilePicture" :size="30" :src="profilePicture" />
+      <div class="profileImg" @click="areaSelected()">
+        <avatar :name="userName" background="#048A81"></avatar>
         <span class="username">{{ userName }}</span>
       </div>
     </div>
@@ -124,13 +124,15 @@
     <change-area-selected
       v-if="showModalToChangeAreaSelected"
       :show="showModalToChangeAreaSelected"
-      @close-area-selection="() => showModalToChangeAreaSelected = false"
+      @close-area-selection="() => (showModalToChangeAreaSelected = false)"
     ></change-area-selected>
   </div>
 </template>
 
 <script>
 import { defineAsyncComponent } from "vue";
+import { mapState } from "vuex";
+import Avatar from "vue3-avatar";
 
 export default {
   name: "LeftSideBar",
@@ -138,27 +140,26 @@ export default {
     ChangeAreaSelected: defineAsyncComponent(() =>
       import("./ChangeAreaSelected.vue"),
     ),
+    Avatar,
   },
   data() {
     return {
-      profilePicture: localStorage.getItem("profilePicture") || null,
-      userName: localStorage.getItem("userName") || null,
       showModalToChangeAreaSelected: false,
     };
   },
-  computed: {},
+  computed: {
+    ...mapState("auth", ["userProfile"]),
+    userName() {
+      return this.userProfile?.email.split("@")[0] || null;
+    },
+  },
   methods: {
     logout() {
       localStorage.clear();
-      this.$auth0.logout({
-        logoutParams: { returnTo: window.location.origin },
-      });
     },
     areaSelected() {
-      const areas = JSON.parse(
-        JSON.stringify(localStorage.getItem("sucursales")),
-      );
-      if (areas.length > 1) this.showModalToChangeAreaSelected = true;
+      if (this.userProfile.sucursal > 1)
+        this.showModalToChangeAreaSelected = true;
     },
   },
 };
@@ -186,5 +187,10 @@ export default {
   display: inline-block;
   line-break: auto;
   padding: 0 1rem;
+}
+div.profileImg > div.container {
+  display: flex;
+  justify-content: center;
+  font-family: Poppins, sans-serif !important;
 }
 </style>

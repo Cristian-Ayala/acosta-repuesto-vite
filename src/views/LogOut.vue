@@ -26,9 +26,6 @@ export default {
   methods: {
     logout() {
       localStorage.clear();
-      this.$auth0.logout({
-        logoutParams: { returnTo: window.location.origin },
-      });
     },
   },
 };

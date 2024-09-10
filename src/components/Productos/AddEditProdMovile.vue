@@ -396,7 +396,7 @@ export default {
     },
   },
   async mounted() {
-    this.organizationDivision = localStorage.getItem("sucursales");
+    this.organizationDivision = this.userProfile?.sucursal;
     this.modalIsActive();
     this.v$.$validate();
   },

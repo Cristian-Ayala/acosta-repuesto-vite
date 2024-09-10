@@ -17,7 +17,7 @@ function installPlugins({ app }) {
 
 const app = createApp(App);
 app.config.globalProperties.$url = import.meta.env.VITE_BACKEND_URL;
-app.config.globalProperties.$FILE_MANAGER = import.meta.env.VITE_FILE_MANAGER;
+app.config.globalProperties.$FILE_MANAGER = `${import.meta.env.VITE_NESTJS_DOMAIN}/file-manager/`;
 app.config.errorHandler = function errorHandler(err, instance, info) {
   window.console.error(err, instance, info);
   throw err;
