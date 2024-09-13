@@ -328,7 +328,8 @@ export default (app) => ({
         const bodyFormData = new FormData();
         bodyFormData.append("file", file);
         bodyFormData.append("userEmail", rootState.auth.userProfile?.email);
-        return fetch(url, {
+
+        return app.config.globalProperties.$customFetch(url, {
           method: "POST",
           body: bodyFormData,
           redirect: "follow",

@@ -108,7 +108,7 @@
           </a>
         </router-link>
       </ul>
-      <div class="profileImg" @click="areaSelected()">
+      <div class="profileImg" @click="$router.push({ name: 'Preferencias' })">
         <avatar :name="userName" background="#048A81"></avatar>
         <span class="username">{{ userName }}</span>
       </div>
@@ -121,25 +121,16 @@
       <i class="fas fa-door-open mr-3 text-black my-2" aria-hidden="true"></i>
       <span>Salir</span>
     </a>
-    <change-area-selected
-      v-if="showModalToChangeAreaSelected"
-      :show="showModalToChangeAreaSelected"
-      @close-area-selection="() => (showModalToChangeAreaSelected = false)"
-    ></change-area-selected>
   </div>
 </template>
 
 <script>
-import { defineAsyncComponent } from "vue";
 import { mapState } from "vuex";
 import Avatar from "vue3-avatar";
 
 export default {
   name: "LeftSideBar",
   components: {
-    ChangeAreaSelected: defineAsyncComponent(() =>
-      import("./ChangeAreaSelected.vue"),
-    ),
     Avatar,
   },
   data() {
@@ -156,10 +147,6 @@ export default {
   methods: {
     logout() {
       localStorage.clear();
-    },
-    areaSelected() {
-      if (this.userProfile.sucursal > 1)
-        this.showModalToChangeAreaSelected = true;
     },
   },
 };
@@ -192,5 +179,9 @@ div.profileImg > div.container {
   display: flex;
   justify-content: center;
   font-family: Poppins, sans-serif !important;
+}
+:deep(div.profileImg > div.container > div.avatar) {
+  color: #ffffff !important;
+  font-family: "Poppins", sans-serif;
 }
 </style>

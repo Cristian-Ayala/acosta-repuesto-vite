@@ -23,7 +23,7 @@ export default () => ({
     SET_PROFILE(state, userProfile) {
       state.userProfile = userProfile;
       state.userProfile.defaultRole = userProfile["https://hasura.io/jwt/claims"]["x-hasura-default-role"];
-      state.isAbleToModify = state.userProfile.defaultRole === "gerente_area";
+      state.isAbleToModify = state.userProfile.defaultRole === "gerente_area" || state.userProfile.defaultRole === "admin";
     },
     SET_LOCATION_SELECTED(state, location) {
       state.userProfile.locationSelected = location;

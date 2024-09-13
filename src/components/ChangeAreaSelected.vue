@@ -14,7 +14,9 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="$emit('closeAreaSelection')"> Cancelar </el-button>
-        <el-button type="primary" @click="seleccionarArea()"> Guardar </el-button>
+        <el-button type="primary" @click="seleccionarArea()">
+          Guardar
+        </el-button>
       </span>
     </template>
   </el-dialog>
@@ -48,11 +50,20 @@ export default {
       },
     },
   },
+  watch: {
+    userProfile: {
+      handler(profile) {
+        if (!profile) return;
+        this.areaSelected = profile.locationSelected;
+      },
+      immediate: true,
+    },
+  },
   methods: {
     seleccionarArea() {
       this.$store.commit("auth/SET_LOCATION_SELECTED", this.areaSelected);
       this.$emit("closeAreaSelection");
-    }
+    },
   },
 };
 </script>
