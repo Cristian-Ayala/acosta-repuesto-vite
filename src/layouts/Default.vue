@@ -68,6 +68,7 @@ export default {
       if (!selectedLocation || !locations.includes(selectedLocation)) {
         this.$store.commit("auth/SET_LOCATION_SELECTED", locations[0]);
         localStorage.setItem("locationSelected", locations[0]);
+        return;
       }
       this.$store.commit("auth/SET_LOCATION_SELECTED", selectedLocation);
     },

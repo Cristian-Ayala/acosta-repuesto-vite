@@ -186,31 +186,31 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState } from "vuex";
 import { defineAsyncComponent } from "vue";
 
 export default {
   name: "ProductosIndex",
   components: {
-    AddEditProdMovile: defineAsyncComponent(() =>
-      import("@/components/Productos/AddEditProdMovile.vue"),
+    AddEditProdMovile: defineAsyncComponent(
+      () => import("@/components/Productos/AddEditProdMovile.vue"),
     ),
-    EliminarProdMovil: defineAsyncComponent(() =>
-      import("@/components/Productos/EliminarProdMovil.vue"),
+    EliminarProdMovil: defineAsyncComponent(
+      () => import("@/components/Productos/EliminarProdMovil.vue"),
     ),
-    AddToCartModal: defineAsyncComponent(() =>
-      import("@/components/Productos/AddToCartModal.vue"),
+    AddToCartModal: defineAsyncComponent(
+      () => import("@/components/Productos/AddToCartModal.vue"),
     ),
     FiltrosProductos: () =>
       import("@/components/Productos/FiltrosProductos.vue"),
     ImgWithBackUp: () => import("@/components/ImgWithBackUp.vue"),
     LoadingProductos: () =>
       import("@/components/Productos/LoadingProductos.vue"),
-    DraggableButton: defineAsyncComponent(() =>
-      import("@/components/Productos/DraggableButton.vue"),
+    DraggableButton: defineAsyncComponent(
+      () => import("@/components/Productos/DraggableButton.vue"),
     ),
-    NuevaOrden: defineAsyncComponent(() =>
-      import("@/components/Ordenes/NuevaOrden.vue"),
+    NuevaOrden: defineAsyncComponent(
+      () => import("@/components/Ordenes/NuevaOrden.vue"),
     ),
   },
   data() {
@@ -235,7 +235,6 @@ export default {
       "currentPage",
       "loadingTableProductos",
       "productos",
-      "producto",
       "perPage",
       "totalRows",
       "filtroCategorias",
@@ -274,18 +273,6 @@ export default {
       document.activeElement.blur();
       this.show.modalFiltros = true;
     },
-    ...mapMutations("productos", [
-      "clearData",
-      "removeRegistro",
-      "editProd",
-      "saveEditProd",
-      "undoEditProd",
-      "transactionRemove",
-      "addProd",
-      "removeNewRegistro",
-      "saveNewProduct",
-      "editNewRegistro",
-    ]),
     fetchProducts() {
       this.$store.dispatch("productos/readAllProducts");
     },
