@@ -6,4 +6,11 @@ import importcss from "./importcss";
 import commonFn from "./commonFn";
 import protectedFetch from "./protectedFetch";
 
-export default [apollo, element, sentry, importcss, commonFn, protectedFetch];
+const plugins = [apollo, element, importcss, commonFn, protectedFetch];
+
+// Conditionally add Sentry if the environment variable VITE_ENABLE_SENTRY_PLUGIN is set to true
+if (import.meta.env.VITE_ENABLE_SENTRY_PLUGIN === "true") {
+  plugins.push(sentry);
+}
+
+export default plugins;

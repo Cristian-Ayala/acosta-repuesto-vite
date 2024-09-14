@@ -74,9 +74,6 @@ Proporcione instrucciones paso a paso sobre cómo instalar o configurar su proye
 3. Añada las siguientes variables al archivo `.env`:
 
 ```plaintext
-# Auth0 Integration
-VITE_CLIENT_ID="<YOUR_AUTH0_CLIENT_ID>"
-VITE_DOMAIN="<YOUR_AUTH0_DOMAIN>"
 
 # Hasura Integration
 VITE_BACKEND_URL="<HASURA_URL>"
@@ -116,9 +113,7 @@ Sustituya los valores del marcador de posición por su configuración real.
 4. Iniciar el servidor: Ejecuta `npm run start` o `yarn start`.
 
 ### Recursos adicionales:
-- [Documentación de Hasura para integrar Auth0](https://hasura.io/learn/graphql/hasura/authentication/1-create-auth0-app/)
-
-Por favor, asegúrese de reemplazar los marcadores de posición como `<YOUR_AUTH0_CLIENT_ID>`, `<YOUR_AUTH0_DOMAIN>`, `<HASURA_URL>`, `<NESTJS_BACKEND_URL>` con los valores reales obtenidos de sus configuraciones.
+Por favor, asegúrese de reemplazar los marcadores de posición como `<HASURA_URL>`, `<NESTJS_BACKEND_URL>` con los valores reales obtenidos de sus configuraciones.
 
 Consulte siempre la documentación del proyecto y los archivos README específicos en los repositorios para cualquier paso de configuración adicional o instrucciones específicas no cubiertas aquí.
 

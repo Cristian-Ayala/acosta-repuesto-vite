@@ -10,7 +10,7 @@
           </div>
         </div>
         <div class="cuadros-home">
-            <div class="cuadro1-home" @click="showModalToChangePassword = true">
+          <div class="cuadro1-home" @click="showModalToChangePassword = true">
             <img
               src="../assets/img/password.webp"
               alt="..."
@@ -44,6 +44,34 @@
             </div>
             <div class="cuadros-text-home">
               Cambia la cede en la que te encuentras.
+            </div>
+          </div>
+        </div>
+        <div
+          v-if="
+            userProfile != null &&
+            (userProfile.roles.includes('admin') ||
+              userProfile.roles.includes('gerente_area'))
+          "
+          class="cuadros-home"
+        >
+          <div
+            class="cuadro4-home"
+            @click="$router.push({ name: 'UsersView' })"
+          >
+            <img
+              src="../assets/img/users.webp"
+              alt="..."
+              style="max-width: 100%"
+            />
+            <div
+              class="font-weight-bold d-block"
+              style="margin: 1rem; font-size: 2.5rem"
+            >
+              Usuarios
+            </div>
+            <div class="cuadros-text-home">
+              Crea nuevos usuarios, editarlos o darles de baja
             </div>
           </div>
         </div>

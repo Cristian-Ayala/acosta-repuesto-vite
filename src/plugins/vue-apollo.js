@@ -9,7 +9,7 @@ import { setContext } from "@apollo/client/link/context";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import { jwtDecode } from "jwt-decode";
 
-if (process.env.NODE_ENV) {
+if (process.env.VITE_NODE_ENV === "development") {
   // Adds messages only in a dev environment
   loadDevMessages();
   loadErrorMessages();
