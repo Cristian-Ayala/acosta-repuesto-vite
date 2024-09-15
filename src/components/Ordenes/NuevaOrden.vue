@@ -188,7 +188,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
+import { mapState, mapActions } from "vuex";
 import ResumenNuevaOrden from "./ResumenNuevaOrden.vue";
 import CreateEditClient from "@/components/Clientes/CreateEditClient.vue";
 
@@ -247,17 +247,12 @@ export default {
   },
   computed: {
     ...mapState("ordenes", [
-      "ordSelected",
-      "showDetOrd",
-      "metPago",
-      "prodSearch",
-      "currentPage",
       "tipoDistribucionArray",
       "dropDownTypeOfOrder",
       "dropDownMetodoPago",
       "enums",
     ]),
-    ...mapState("productos", ["productos", "ordenDetalleProductos"]),
+    ...mapState("productos", ["ordenDetalleProductos"]),
     ...mapState("auth", ["userProfile"]),
     total() {
       let total = 0.0;
@@ -298,13 +293,6 @@ export default {
         if (!err) window.console.error("err", err);
       }
     },
-    ...mapMutations("ordenes", [
-      "change",
-      "decProducto",
-      "incProducto",
-      "filtroProd",
-      "dosDecimalesProd",
-    ]),
     ...mapActions("ordenes", ["createRegistroOrdenes"]),
     async createOrder() {
       const loading = this.$loading({ fullscreen: true });

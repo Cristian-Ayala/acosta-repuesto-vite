@@ -49,10 +49,12 @@
 </template>
 
 <script setup>
-import imageCompression from "browser-image-compression";
 import { Delete, Download, Plus, ZoomIn } from "@element-plus/icons-vue";
-import { ref, watch } from "vue";
+import imageCompression from "browser-image-compression";
 import { genFileId } from "element-plus";
+import { getCurrentInstance, ref, watch } from "vue";
+
+const { appContext } = getCurrentInstance();
 
 const optionsImgCompress = {
   maxSizeMB: 0.2,
@@ -86,24 +88,31 @@ const handlePictureCardPreview = (file) => {
 
 const handleDownload = async (file) => {
   if (!file.url && !file.name) return;
-  const response = await fetch(file.url);
 
-  if (!response.ok) {
-    throw new Error("Network response was not ok.");
+  // Replace fetch with customFetch
+  try {
+    const response = await appContext.config.globalProperties.$customFetch(
+      file.url,
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok.");
+    }
+
+    // Get the response as a Blob
+    const blob = await response.blob();
+
+    // Create an object URL for the fetched resource
+    const objectURL = URL.createObjectURL(blob);
+    const downloadLink = document.createElement("a");
+    downloadLink.href = objectURL;
+    downloadLink.download = file.name;
+    downloadLink.target = "_blank";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  } catch (error) {
+    console.error("Download failed:", error);
   }
-
-  // Get the response as a Blob
-  const blob = await response.blob();
-
-  // Create an object URL for the fetched resource
-  const objectURL = URL.createObjectURL(blob);
-  const downloadLink = document.createElement("a");
-  downloadLink.href = objectURL;
-  downloadLink.download = file.name;
-  downloadLink.target = "_blank";
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-  document.body.removeChild(downloadLink);
 };
 
 const upload = ref();
@@ -121,7 +130,8 @@ const handleExceed = (files) => {
 
 function cleanFileName(fileName) {
   const indexOfExtension = fileName.lastIndexOf(".");
-  const fileNameWithoutExtension = indexOfExtension < 0 ? fileName : fileName.substring(0, indexOfExtension);
+  const fileNameWithoutExtension =
+    indexOfExtension < 0 ? fileName : fileName.substring(0, indexOfExtension);
   const withoutAccents = fileNameWithoutExtension
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
@@ -132,7 +142,9 @@ function cleanFileName(fileName) {
 }
 
 function cleanBlobName(blob) {
-  const fileWithNewName = new File([blob], cleanFileName(blob.name), { type: blob.type });
+  const fileWithNewName = new File([blob], cleanFileName(blob.name), {
+    type: blob.type,
+  });
   return fileWithNewName;
 }
 
@@ -149,20 +161,33 @@ const handleHttpRequest = (options) => {
 
 watch(
   () => props.modelValue,
-  (arrFiles) => {
+  async (arrFiles) => {
     if (!arrFiles || !arrFiles.length) return;
     const fileURL = arrFiles[0];
+
     if (
       typeof fileURL === "string" &&
       fileURL.includes("file-manager/photo/")
     ) {
-      const fileSplit = fileURL.split("/file-manager/photo/");
-      fileList.value = [
-        {
-          url: fileURL,
-          name: fileSplit && fileSplit.length > 1 ? fileSplit[1] : fileURL,
-        },
-      ];
+      try {
+        const response =
+          await appContext.config.globalProperties.$customFetch(fileURL);
+        if (!response.ok) {
+          throw new Error("Failed to fetch the file.");
+        }
+        const blob = await response.blob();
+        const fileName = fileURL.split("/file-manager/photo/")[1] || fileURL;
+        const objectURL = URL.createObjectURL(blob);
+
+        fileList.value = [
+          {
+            url: objectURL,
+            name: fileName,
+          },
+        ];
+      } catch (error) {
+        console.error("Error fetching file:", error);
+      }
       return;
     }
     if (fileURL instanceof Blob) {
