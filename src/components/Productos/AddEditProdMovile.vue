@@ -265,7 +265,7 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required, integer } from "@vuelidate/validators";
-import { mapMutations, mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import AgregarMar from "@/components/Marcas/AgregarMar.vue";
 import AgregarCat from "@/components/Categorias/AgregarCat.vue";
 import UPCReader from "@/components/Productos/UPCReader.vue";
@@ -351,7 +351,9 @@ export default {
       },
     };
   },
-  computed: {},
+  computed: {
+    ...mapState("auth", ["userProfile"]),
+  },
   watch: {
     "v$.$errors": {
       handler(value) {
@@ -401,7 +403,6 @@ export default {
     this.v$.$validate();
   },
   methods: {
-    ...mapMutations("productos", ["removeRegistro", "applyAllChanges"]),
     ...mapActions("productos", ["confirmation"]),
     /* eslint-disable vue/no-mutating-props */
     async confirm() {
