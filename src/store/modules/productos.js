@@ -1,12 +1,13 @@
 import { apolloClient } from "@/plugins/vue-apollo";
 import {
-  GET_PRODUCTOS,
-  GET_PRODUCT_BY_UPC,
-} from "@/store/graphql/queries/productos";
-import {
   CREATE_UPDATE_PRODUCTO,
   DELETE_PRODUCTO,
 } from "@/store/graphql/mutations/productos";
+import {
+  GET_PRODUCTOS,
+  GET_PRODUCT_BY_UPC,
+} from "@/store/graphql/queries/productos";
+import router from "@/router";
 
 export default (app) => ({
   namespaced: true,
@@ -44,6 +45,9 @@ export default (app) => ({
         );
       }
       state.ordenDetalleProductos[prod.id] = { ...tmpProd };
+    },
+    SET_ORDEN_DETALLE_PRODUCTOS_FROM_LOCALSTORAGE(state, ordDetProdString) {
+      state.ordenDetalleProductos = JSON.parse(ordDetProdString);
     },
     REMOVE_FROM_CART(state, id) {
       delete state.ordenDetalleProductos[id];
@@ -130,6 +134,15 @@ export default (app) => ({
         state.loadingTableProductos = false;
       } catch (err) {
         window.console.error(err);
+        if (err.message.includes("JWTExpired")) {
+          localStorage.setItem(
+            "ordenDetalleProductos",
+            JSON.stringify(JSON.stringify(state.ordenDetalleProductos)),
+          );
+          err.message =
+            "Su sesión ha expirado, por favor vuelva a iniciar sesión.";
+          router.push({ name: "Login" });
+        }
         commit(
           "common/errorNotification",
           `Error al listar productos. ${err}`,
@@ -329,11 +342,12 @@ export default (app) => ({
         bodyFormData.append("file", file);
         bodyFormData.append("userEmail", rootState.auth.userProfile?.email);
 
-        return app.config.globalProperties.$customFetch(url, {
-          method: "POST",
-          body: bodyFormData,
-          redirect: "follow",
-        })
+        return app.config.globalProperties
+          .$customFetch(url, {
+            method: "POST",
+            body: bodyFormData,
+            redirect: "follow",
+          })
           .then((response) => response.json())
           .then((data) => {
             if (data.errors) throw new Error(data.errors);

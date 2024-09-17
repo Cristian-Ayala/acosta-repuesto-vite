@@ -5,7 +5,7 @@ export const GET_ORDENES = gql`
     $cedes: [String!]!
     $dateFrom: timestamptz = ""
     $dateTo: timestamptz = ""
-    $createdBy: String = ""
+    $createdBy: uuid = ""
     $totalGte: float8 = ""
     $totalLte: float8 = ""
     $orderTypeID: Int = -1

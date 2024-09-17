@@ -346,8 +346,16 @@ export default {
         precio_mayoreo: { required, minLength: 0 },
         precio_publico: { required, minLength: 0 },
         precio_taller: { required, minLength: 0 },
-        stock_prod_sta_ana: { required, minLength: 0, integer },
-        stock_prod_metapan: { required, minLength: 0, integer },
+        stock_prod_sta_ana: {
+          conditionalReq: this.stockProdStaAna,
+          minLength: 0,
+          integer,
+        },
+        stock_prod_metapan: {
+          conditionalReq: this.stockProdMetapan,
+          minLength: 0,
+          integer,
+        },
       },
     };
   },
@@ -412,7 +420,7 @@ export default {
       }
       const res = await this.confirmation(this.newProductMobile);
       if (!res) {
-        loading.close()
+        loading.close();
         return;
       }
       this.mostrar.addEditProdMovile = false;
@@ -492,6 +500,17 @@ export default {
       this.debounceTimer = setTimeout(() => {
         this.remoteMethodCategorias(event.target.value);
       }, 500);
+    },
+    stockProdMetapan(param) {
+      if (!this.organizationDivision.includes("Metapan")) return true;
+      return param != null && param >= 0;
+    },
+    stockProdStaAna(param) {
+      if (!this.organizationDivision.includes("Santa Ana")) return true;
+      return (
+        param != null &&
+        param >= 0
+      );
     },
   },
 };

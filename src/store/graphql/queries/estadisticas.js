@@ -4,7 +4,7 @@ export const GET_STATISTICS = gql`
   query GET_STATISTICS(
     $fromDate: timestamptz!
     $toDate: timestamptz!
-    $createdBy: String!
+    $createdBy: uuid!
     $cedes: [String!]
   ) {
     numeroOrdenes: acostarep_ordenes_aggregate(

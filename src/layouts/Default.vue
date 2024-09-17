@@ -61,6 +61,7 @@ export default {
     this.$store.commit("auth/SET_PROFILE", decoded);
     this.setLocation(decoded.sucursal);
     this.loading.token = false;
+    this.verifyPendingData();
   },
   methods: {
     setLocation(locations) {
@@ -71,6 +72,32 @@ export default {
         return;
       }
       this.$store.commit("auth/SET_LOCATION_SELECTED", selectedLocation);
+    },
+    verifyPendingDataOrder() {
+      const order = JSON.parse(localStorage.getItem("order"));
+      const prodByOrder = JSON.parse(localStorage.getItem("prodByOrder"));
+      if (!order || !prodByOrder) return;
+      localStorage.removeItem("order");
+      localStorage.removeItem("prodByOrder");
+      this.$store.dispatch("ordenes/createRegistroOrdenes", {
+        order,
+        prodByOrder,
+      });
+    },
+    verifyPendingDataDetOrder() {
+      const ordenDetalleProductos = JSON.parse(
+        localStorage.getItem("ordenDetalleProductos"),
+      );
+      if (!ordenDetalleProductos) return;
+      localStorage.removeItem("ordenDetalleProductos");
+      this.$store.commit(
+        "ordenes/SET_ORDEN_DETALLE_PRODUCTOS_FROM_LOCALSTORAGE",
+        ordenDetalleProductos,
+      );
+    },
+    verifyPendingData() {
+      this.verifyPendingDataOrder();
+      this.verifyPendingDataDetOrder();
     },
   },
 };

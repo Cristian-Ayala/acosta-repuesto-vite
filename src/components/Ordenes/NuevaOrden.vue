@@ -314,7 +314,11 @@ export default {
           order,
           prodByOrder: Object.values(this.ordenDetalleProductos),
         });
-        if (!resCreation) return;
+        if (resCreation === "JWTExpired") {
+          this.$router.push({ name: "Login" });
+          loading.close();
+          return;
+        }
         // this.$emit("clearOrderFilters");
         // eslint-disable-next-line
         this.show.newOrder = false;

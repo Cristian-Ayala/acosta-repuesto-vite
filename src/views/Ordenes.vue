@@ -52,7 +52,7 @@
       </div>
       <div class="mt-3" style="margin-left: -12px">
         <el-pagination
-          v-model:currentPage="pagination.page"
+          :current-page="pagination.page"
           small
           background
           layout="prev, pager, next"
@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
+import { mapState, mapActions } from "vuex";
 import NuevaOrden from "@/components/Ordenes/NuevaOrden.vue";
 import OrderView from "@/components/Ordenes/OrderView.vue";
 import OrderFilters from "@/components/Ordenes/OrderFilters.vue";
@@ -171,7 +171,6 @@ export default {
   },
   mounted() {},
   methods: {
-    ...mapMutations("ordenes", ["clickRow"]),
     ...mapActions("ordenes", ["readAllOrdenes"]),
     async filtersConfirmed(filters) {
       this.show.loadingOrders = true;

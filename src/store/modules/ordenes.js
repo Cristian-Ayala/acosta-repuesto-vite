@@ -127,13 +127,20 @@ export default () => ({
         commit("productos/CLEAR_CART", null, { root: true });
         return res.data?.insertOrder?.id;
       } catch (error) {
+        let returnValue = null;
+        if (error.message.includes("JWTExpired")) {
+          localStorage.setItem("order", JSON.stringify(order));
+          localStorage.setItem("prodByOrder", JSON.stringify(prodByOrder));
+          error.message = "Su sesión ha expirado, por favor vuelva a iniciar sesión.";
+          returnValue = "JWTExpired";
+        }
         commit(
           "common/errorNotification",
           `Error al guardar la orden. ${error}`,
           { root: true },
         );
         window.console.error("Error in createRegistroOrdenes:", error);
-        return null;
+        return returnValue;
       }
     },
     async createProdByOrder(store, { prodByOrder, idOrden }) {
@@ -160,14 +167,14 @@ export default () => ({
         return null;
       }
     },
-    async readAllOrdenes({ state, commit,rootState }, filters) {
+    async readAllOrdenes({ state, commit, rootState }, filters) {
       try {
         if (filters != null && Object.keys(filters).length > 0) {
           const sucursales = rootState.auth.userProfile?.sucursal;
           state.variables = {
             limit: filters.limit || null,
             offset: filters.offset || null,
-            createdBy: rootState.auth.userProfile?.email,
+            createdBy: rootState.auth.userProfile?.id,
             cedes: sucursales,
             orderTypeID: filters.orderTypeID,
             distributionTypeID: filters.distributionTypeID,

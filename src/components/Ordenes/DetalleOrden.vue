@@ -6,8 +6,8 @@
       <p>{{ formatDate(ordSelected.created_at) }}</p>
 
       <h5 v-if="ordSelected.cliente">Nombre del cliente:</h5>
-      <p>
-        {{ `${ordSelected.cliente.name} ${ordSelected.cliente.last_name}` }}
+      <p v-if="ordSelected != null && ordSelected.cliente != null">
+        {{ `${ordSelected?.cliente?.name} ${ordSelected?.cliente?.last_name}` }}
       </p>
 
       <div class="line"></div>
@@ -128,7 +128,10 @@ export default {
       })}`;
     },
     async changeDeliveryStatusLocal(statusId) {
-      await this.changeDeliveryStatus({ id_orden: this.ordSelected.id, statusId });
+      await this.changeDeliveryStatus({
+        id_orden: this.ordSelected.id,
+        statusId,
+      });
       this.$emit("updateOrders");
       // eslint-disable-next-line
       this.show.detOrd = false;
