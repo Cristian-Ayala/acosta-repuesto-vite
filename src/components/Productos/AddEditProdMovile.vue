@@ -437,7 +437,6 @@ export default {
       // usually scanners throw an 'Enter' key at the end of read
       if (e.key === "Enter") {
         if (code.length > 10) {
-          window.console.log("code", code);
           this.newProductMobile.upc = code;
           // this.$refs.dewdew.cwrcv();
           /// code ready to use

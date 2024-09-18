@@ -88,21 +88,23 @@ const handlePictureCardPreview = (file) => {
 
 const handleDownload = async (file) => {
   if (!file.url && !file.name) return;
-
   // Replace fetch with customFetch
   try {
-    const response = await appContext.config.globalProperties.$customFetch(
-      file.url,
-    );
-    if (!response.ok) {
-      throw new Error("Network response was not ok.");
+    let objectURL = file.url;
+    if(file.url.includes("blob")){
+      const response = await appContext.config.globalProperties.$customFetch(
+        file.url,
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok.");
+      }
+
+      // Get the response as a Blob
+      const blob = await response.blob();
+
+      // Create an object URL for the fetched resource
+      objectURL = URL.createObjectURL(blob);
     }
-
-    // Get the response as a Blob
-    const blob = await response.blob();
-
-    // Create an object URL for the fetched resource
-    const objectURL = URL.createObjectURL(blob);
     const downloadLink = document.createElement("a");
     downloadLink.href = objectURL;
     downloadLink.download = file.name;
@@ -175,14 +177,16 @@ watch(
         if (!response.ok) {
           throw new Error("Failed to fetch the file.");
         }
-        const blob = await response.blob();
+        const url = await response.text();
         const fileName = fileURL.split("/file-manager/photo/")[1] || fileURL;
-        const objectURL = URL.createObjectURL(blob);
-
+        const cleanTmpFileName =
+          fileName !== fileURL
+            ? fileName.replace(/^[a-f0-9-]+_/, "")
+            : fileName;
         fileList.value = [
           {
-            url: objectURL,
-            name: fileName,
+            url,
+            name: cleanTmpFileName,
           },
         ];
       } catch (error) {
