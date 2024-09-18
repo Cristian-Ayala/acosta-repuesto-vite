@@ -4,13 +4,18 @@
       <h1>Bienvenido</h1>
 
       <form class="form" autocomplete="on">
-        <input v-model="username" type="text" placeholder="Usuario">
+        <input
+          v-model="username"
+          type="text"
+          placeholder="Usuario"
+          @input="onInputChangeEmail"
+        />
         <input
           v-model="password"
           type="password"
           placeholder="Contraseña"
           autocomplete="on"
-        >
+        />
         <button id="login-button" type="submit" @click.prevent="login()">
           Iniciar Sesión
         </button>
@@ -58,7 +63,10 @@ export default {
         }),
       };
       try {
-        const res = await fetch(`${import.meta.env.VITE_NESTJS_DOMAIN}/auth/login`, settings);
+        const res = await fetch(
+          `${import.meta.env.VITE_NESTJS_DOMAIN}/auth/login`,
+          settings,
+        );
         if (res.status === 200) {
           const data = await res.json();
           localStorage.setItem("token", data.accessToken);
@@ -70,6 +78,9 @@ export default {
         console.error(JSON.stringify(error));
         this.error = true;
       }
+    },
+    onInputChangeEmail() {
+      this.username = this.username.toLowerCase().replace(/\s+/g, "");
     },
   },
 };

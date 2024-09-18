@@ -9,8 +9,8 @@
       "
     >
       <img
-        src="../assets/img/acosta.webp"
-        alt="acosta img"
+        :src="getImgUrl($clientHomeImgName)"
+        alt="home image"
         style="max-width: 100%"
       />
     </div>
@@ -20,7 +20,15 @@
     <div class="cuadros-home">
       <div class="cuadro1-home">
         <router-link to="/productos">
-          <img src="../assets/img/1.webp" alt="..." style="max-width: 100%" />
+          <img
+            :src="
+              $clientSquare1ImgName != null
+                ? getImgUrl($clientSquare1ImgName)
+                : getImgUrl('1')
+            "
+            alt="..."
+            style="max-width: 100%"
+          />
           <div
             class="font-weight-bold d-block"
             style="margin: 1rem; font-size: 2.5rem"
@@ -151,6 +159,24 @@ export default {
         this.isAbleToDo = notAbleToModifyLabels;
       },
       immediate: true,
+    },
+  },
+  methods: {
+    getImgUrl(imgName) {
+      // Import all .webp images in the assets folder
+      const images = import.meta.glob("../assets/img/*.webp", { eager: true });
+
+      // Create the path from the environment variable
+      const imagePath = `../assets/img/${imgName}.webp`;
+
+      // Check if the image exists, if not return a fallback image
+      if (images[imagePath]) {
+        return images[imagePath].default; // Access the image's default export
+      }
+
+      window.console.warn(`Image not found: ${imagePath}`);
+      // Return a fallback image path
+      return images["../assets/img/acosta.webp"].default;
     },
   },
 };

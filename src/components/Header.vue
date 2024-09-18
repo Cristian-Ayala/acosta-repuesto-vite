@@ -10,8 +10,8 @@
         </div>
         <router-link to="/">
           <a class="navbar-brand font-weight-bold text-uppercase text-base">
-            Acosta Repuestos</a
-          >
+            {{ $clientName }}
+          </a>
         </router-link>
       </nav>
     </header>

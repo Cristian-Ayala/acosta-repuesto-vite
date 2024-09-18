@@ -53,8 +53,8 @@
           />
           <div class="mt-3 mb-2" style="margin-left: -12px">
             <el-pagination
-              v-model:currentPage="pagination.page"
-              small
+              :current-page="pagination.page"
+              size="small"
               background
               layout="prev, pager, next"
               :total="totalClientes"

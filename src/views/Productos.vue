@@ -133,7 +133,7 @@
           <div class="mt-3" style="margin-left: -12px">
             <el-pagination
               :current-page="currentPage"
-              small
+              size="small"
               background
               layout="prev, pager, next"
               :total="totalRows"

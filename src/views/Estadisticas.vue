@@ -121,7 +121,11 @@ export default {
         filters.push(`Hasta${this.getDayMonthYear(this.filtersQuery.toDate)}`);
       }
       filters.push(this.filtersQuery.orgDivSelected);
-      filters.push(this.filtersQuery.createdBy != null ? this.filtersQuery.createdBy : "Todos los empleados");
+      filters.push(
+        this.filtersQuery.createdBy != null
+          ? this.filtersQuery.createdBy
+          : "Todos los empleados",
+      );
       return filters;
     },
   },
@@ -173,12 +177,13 @@ export default {
       const dates = this.getStartAndEndDate(params?.date || { start: null });
       const filters = {
         ...dates,
-        createdBy: params?.userSelected,
+        createdBy: params?.userSelected?.creation_user?.id,
         orgDivSelected: params?.orgDivSelected,
       };
       if (Array.isArray(params?.orgDivSelected))
         filters.orgDivSelected = "Todas las cedes";
       this.filtersQuery = JSON.parse(JSON.stringify(filters));
+      this.filtersQuery.createdBy = params?.userSelected?.creation_user?.email;
       let cedesSelected = filters.orgDivSelected;
       if (cedesSelected === "Todas las cedes") {
         delete filters.orgDivSelected;

@@ -69,7 +69,7 @@
                 layout="prev, pager, next"
                 :total="categoriasCount"
                 :hide-on-single-page="true"
-                small
+                size="small"
                 @current-change="handleChangePage($event)"
               />
             </div>

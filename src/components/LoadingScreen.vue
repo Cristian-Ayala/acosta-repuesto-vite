@@ -27,7 +27,7 @@ h4 {
   text-transform: uppercase;
   font-weight: 700;
   font-family: Poppins, sans-serif;
-  color: #e10d2dbd;
+  color: var(--primary-app-color);
   position: absolute;
   bottom: 2rem;
   display: flex;

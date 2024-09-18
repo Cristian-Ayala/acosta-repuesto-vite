@@ -52,8 +52,8 @@
       </div>
       <div class="mt-3" style="margin-left: -12px">
         <el-pagination
-          :current-page="pagination.page"
-          small
+          v-model:current-page="pagination.page"
+          size="small"
           background
           layout="prev, pager, next"
           :total="ordenesCount"

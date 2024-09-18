@@ -9,8 +9,8 @@
     <el-form label-position="top">
       <el-form-item label="Fecha">
         <el-radio-group v-model="dateType" size="large">
-          <el-radio-button label="Por día" />
-          <el-radio-button label="Por rango" />
+          <el-radio-button value="Por día">Por día</el-radio-button>
+          <el-radio-button value="Por rango"> Por rango </el-radio-button>
         </el-radio-group>
         <el-col v-if="dateType === 'Por día'" :span="24">
           <el-date-picker
@@ -75,11 +75,11 @@
           <el-radio-button
             v-for="type in dropDownTypeOfOrder"
             :key="type.id"
-            :label="type.id"
+            :value="type.id"
           >
             {{ type.name }}
           </el-radio-button>
-          <el-radio-button :label="null"> Todas </el-radio-button>
+          <el-radio-button value="null"> Todas </el-radio-button>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="Tipo de distribución">
@@ -88,22 +88,26 @@
             v-for="type in tipoDistribucionArray"
             :key="type.id"
             :label="type.id"
+            :value="type.id"
           >
             {{ type.name }}
           </el-radio-button>
-          <el-radio-button :label="null"> Todas </el-radio-button>
+          <el-radio-button value="null"> Todas </el-radio-button>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="Estado de la orden" size="small">
+      <el-form-item
+        v-if="dropdownStatus.length > 0"
+        label="Estado de la orden"
+        size="small"
+      >
         <el-radio-group v-model="filters.statusID">
           <el-radio-button
             v-for="status in dropdownStatus"
             :key="status.id"
-            :label="status.id"
-          >
-            {{ status.name }}
-          </el-radio-button>
-          <el-radio-button :label="null"> Todas </el-radio-button>
+            :label="status.name"
+            :value="status.id"
+          />
+          <el-radio-button value="null" label="Todas" />
         </el-radio-group>
       </el-form-item>
     </el-form>
@@ -136,9 +140,9 @@ const filters = {
     priceLte: null,
     priceGte: null,
   },
-  orderTypeID: null,
-  distributionTypeID: null,
-  statusID: null,
+  orderTypeID: "null",
+  distributionTypeID: "null",
+  statusID: "null",
 };
 
 export default {
@@ -187,6 +191,9 @@ export default {
     },
     confirmClick() {
       const options = { ...this.filters };
+      Object.entries(options).forEach(([key, value]) => {
+        if (value === "null") options[key] = null;
+      });
       if (typeof options.price.priceGte !== "number")
         options.price.priceGte = null;
       if (typeof options.price.priceLte !== "number")

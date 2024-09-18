@@ -4,7 +4,7 @@ export const GET_STATISTICS = gql`
   query GET_STATISTICS(
     $fromDate: timestamptz!
     $toDate: timestamptz!
-    $createdBy: uuid!
+    $createdBy: uuid
     $cedes: [String!]
   ) {
     numeroOrdenes: acostarep_ordenes_aggregate(
@@ -62,13 +62,14 @@ export const GET_STATISTICS = gql`
 
 export const GET_USERS = gql`
   query GET_USERS($cedes: [String!]!) {
-    users: acostarep_ordenes(
-      distinct_on: created_by
-      where: { cede: { _in: $cedes } }
-    ) {
+  users: acostarep_ordenes(distinct_on: created_by, where: {cede: {_in: $cedes}}) {
+    id
+    cede
+    creation_user {
       id
-      created_by
-      cede
+      email
+      name
     }
   }
+}
 `;

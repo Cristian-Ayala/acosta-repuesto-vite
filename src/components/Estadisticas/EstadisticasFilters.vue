@@ -9,8 +9,8 @@
     <el-form label-position="top">
       <el-form-item label="Fecha">
         <el-radio-group v-model="dateType" size="large">
-          <el-radio-button label="Por día" />
-          <el-radio-button label="Por rango" />
+          <el-radio-button label="Por día" value="Por día" />
+          <el-radio-button label="Por rango" value="Por rango" />
         </el-radio-group>
         <el-col v-if="dateType === 'Por día'" :span="24">
           <el-date-picker
@@ -62,10 +62,9 @@
           <el-option
             v-for="item in users"
             :key="item.id"
-            :label="item.created_by"
-            :value="item.created_by"
+            :value="item.creation_user?.email"
           >
-            <span style="float: left">{{ item.created_by }}</span>
+            <span style="float: left">{{ item?.creation_user?.email }}</span>
             <span
               style="
                 float: right;
@@ -119,6 +118,14 @@ import { mapState } from "vuex";
 function initialState(userProfile) {
   return {
     dateType: "Por día",
+    defaultUserSelectedObj: {
+      id: userProfile?.id,
+      creation_user: {
+        id: userProfile?.id,
+        email: userProfile?.email,
+        name: userProfile?.name,
+      },
+    },
     filters: {
       date: {
         start: new Date(),
@@ -161,7 +168,11 @@ export default {
     },
     organizationUnits: {
       async handler(cedes) {
-        if (!cedes || this.user.role !== "gerente_area") return;
+        if (
+          !cedes ||
+          (this.user.role !== "gerente_area" && this.user.role !== "admin")
+        )
+          return;
         [this.filters.orgDivSelected] = cedes;
         this.users = await this.$store.dispatch("estadisticas/GET_USERS", {
           cedes,
@@ -193,6 +204,14 @@ export default {
     confirmClick() {
       const options = { ...this.filters };
       if (options.userSelected === "Todos") options.userSelected = null;
+      else if (this.users != null && this.users.length > 0) {
+        const getUsrSelected = this.users.find(
+          (user) => user.creation_user?.email === options.userSelected,
+        );
+        options.userSelected = getUsrSelected;
+      } else {
+        options.userSelected = this.defaultUserSelectedObj;
+      }
       if (options.orgDivSelected === "Todos")
         options.orgDivSelected = this.organizationUnits;
       this.$emit("filtersConfirmed", options);

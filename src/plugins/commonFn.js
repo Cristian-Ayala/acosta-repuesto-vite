@@ -10,4 +10,7 @@ function twoDecimalsOnly(value) {
 
 export default ({ app }) => {
   app.config.globalProperties.$twoDecimalsOnly = twoDecimalsOnly;
+  app.config.globalProperties.$clientName = import.meta.env.VITE_CLIENT_NAME;
+  app.config.globalProperties.$clientHomeImgName = import.meta.env.VITE_CLIENT_HOME_IMG_NAME;
+  app.config.globalProperties.$clientSquare1ImgName = import.meta.env.VITE_CLIENT_SQUARE_1_IMG_NAME;
 };

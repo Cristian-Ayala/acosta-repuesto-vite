@@ -14,28 +14,23 @@
     <el-radio-group v-model="price">
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-radio :label="prodSelected.precio_publico" size="small" border>
+          <el-radio :value="prodSelected.precio_publico" size="small" border>
             ${{ prodSelected.precio_publico }}
           </el-radio>
         </el-col>
         <el-col :span="8">
-          <el-radio :label="prodSelected.precio_mayoreo" size="small" border>
+          <el-radio :value="prodSelected.precio_mayoreo" size="small" border>
             ${{ prodSelected.precio_mayoreo }}
           </el-radio>
         </el-col>
         <el-col :span="8">
-          <el-radio :label="prodSelected.precio_taller" size="small" border>
+          <el-radio :value="prodSelected.precio_taller" size="small" border>
             ${{ prodSelected.precio_taller }}
           </el-radio>
         </el-col>
       </el-row>
-      <el-radio :label="price" border>
-        <el-input-number
-          v-model="price"
-          :precision="2"
-          :min="0"
-          size="small"
-        />
+      <el-radio :value="price" border>
+        <el-input-number v-model="price" :precision="2" :min="0" size="small" />
       </el-radio>
     </el-radio-group>
     <div class="text-center"><h4>Cantidad:</h4></div>

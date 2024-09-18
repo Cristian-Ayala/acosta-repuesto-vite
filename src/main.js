@@ -4,13 +4,18 @@ import App from "./App.vue";
 import "element-plus/dist/index.css";
 import plugins from "./plugins/index";
 import router from "./router";
+import "./configureClient";
 
 function installPlugins({ app }) {
   plugins.forEach((plugin) => {
     try {
       plugin({ app, router });
     } catch (error) {
-      window.console.error("Error occurred while loading plugin:", error, plugin);
+      window.console.error(
+        "Error occurred while loading plugin:",
+        error,
+        plugin,
+      );
     }
   });
 }
