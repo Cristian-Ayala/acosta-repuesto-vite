@@ -62,11 +62,11 @@ export default defineConfig(({ mode }) => {
           short_name: `${env.VITE_CLIENT_NAME}`,
           app_name: `${env.VITE_CLIENT_NAME}`,
           description: "Manage inventory and catalogs",
-          theme_color: "#fff",
+          theme_color: "#b12525",
           start_url: "/",
           display_override: ["fullscreen", "minimal-ui"],
           display: "fullscreen",
-          background_color: "#000",
+          background_color: "#fff",
           icons: [
             {
               src: `img/${env.VITE_CLIENT_PWA_ICON_NAME || ""}192x192.png`,
