@@ -64,8 +64,8 @@ export default defineConfig(({ mode }) => {
           description: "Manage inventory and catalogs",
           theme_color: "#b12525",
           start_url: "/",
-          display_override: ["fullscreen", "minimal-ui"],
-          display: "fullscreen",
+          display_override: ["standalone", "minimal-ui"],
+          display: "standalone",
           background_color: "#fff",
           icons: [
             {
