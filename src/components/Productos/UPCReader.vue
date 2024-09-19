@@ -54,7 +54,6 @@ export default {
   },
   methods: {
     onDecode(a) {
-      window.console.log("decoded upc:", a);
       this.$emit("setUpcSelected", a);
       this.barcode = a;
     },

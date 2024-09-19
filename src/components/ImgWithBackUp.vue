@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import backupImg from "@/assets/img/moto.png";
+import backupImg from "@/assets/img/cow512x512.png";
 
 export default {
   name: "ImgWithBackUp",
@@ -42,9 +42,9 @@ export default {
     },
     async getProtectedImg() {
       try {
-        const response = await this.$customFetch(this.source);
-        const blob = await response.blob();
-        this.currentSource = URL.createObjectURL(blob);
+        const res = await this.$customFetch(this.source);
+        const imgUrl = await res.text();
+        this.currentSource = imgUrl;
       } catch (error) {
         this.handleImageError();
       }
